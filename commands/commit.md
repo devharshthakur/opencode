@@ -7,7 +7,7 @@ subtask: false
 
 # Commit
 
-Organize current Git changes into one or more meaningful commits with user approval.
+Organize current Git changes into one or more meaningful commits. Commit only after user approval.
 
 ## Skills
 
@@ -29,53 +29,64 @@ Staged changes:
 Unstaged changes:
 !`git diff --stat`
 
-## Instructions (follow strictly)
+## Workflow
+
+Follow in order.
 
 ### 1. Assess
 
-Run `git diff` on individual files to understand exactly what changed. Classify each change by purpose (feature, fix, refactor, chore, style, docs, test, etc.).
+Inspect changes before proposing commits:
+
+- Use `git diff` / `git diff --cached` on relevant files.
+- Check untracked files before adding them.
+- Classify each change by purpose: `feat`, `fix`, `refactor`, `chore`, `docs`, `test`, `style`, `perf`, `ci`.
 
 ### 2. Group
 
-Decide on the commit structure:
+Choose commit structure:
 
-**If changes are small and logically coherent** (all changes relate to the same purpose) → propose a **single commit**. Do not split unnecessarily.
+- Small coherent changes → propose one commit. Do not split unnecessarily.
+- Unrelated purposes → propose focused groups.
 
-**If changes span multiple unrelated purposes** → organize into focused commit groups. Each group must:
+Each group must have one clear purpose, related files only, and reviewable size.
 
-- Have a single, clear purpose
-- Be small enough for easy review
-- Only contain related files
+### 3. Present commit plan
 
-### 3. Present the plan
+Show:
 
-Show the user a structured commit plan:
+- Commit count.
+- For each commit: message, purpose, files included.
+- Files intentionally left out, if any.
 
-### 4. Ask for approval
+### 4. Ask approval
 
-Ask the user if they want to proceed, regroup, or adjust commit messages and descriptions.
+Ask user to proceed, regroup, or adjust messages/descriptions. Do not commit before approval.
 
 ### 5. Execute
 
-After approval, process commits **one at a time**:
+After approval, process one commit at a time:
 
-1. `git add <files>` for the commit group
-2. Build a conventional commit message of the form `type(scope): subject`. Add a description body **only if the change is substantial enough to warrant it** — small changes get a subject line only.
-3. `git commit` with the message
-4. Show the commit output
-5. Proceed to the next commit
+1. `git add <files>` for that group only.
+2. Build conventional message: `type(scope): subject`.
+3. Add body only when substantial context is needed; small commits use subject only.
+4. Run `git commit`.
+5. Show commit output.
+6. Continue to next approved group.
 
 ### 6. Summary
 
-After all commits, show:
+After all commits, report:
 
-- Total commits created
-- Branch name
-- Any remaining uncommitted changes (if user chose to leave some out)
+- Total commits created.
+- Branch name.
+- Remaining uncommitted changes, if any.
 
 ## Rules
 
-- **Always** use conventional commit format: `type(scope): subject`. This is non-negotiable. Types: `feat`, `fix`, `refactor`, `chore`, `docs`, `test`, `style`, `perf`, `ci`.
-- Never commit without explicit approval
-- If user rejects the plan, ask how to regroup
-- Description body is optional — only include for substantial changes that need explanation
+- Always use conventional commit format: `type(scope): subject`.
+- Allowed types: `feat`, `fix`, `refactor`, `chore`, `docs`, `test`, `style`, `perf`, `ci`.
+- Never commit without explicit approval.
+- If user rejects plan, ask how to regroup.
+- Do not include unrelated files.
+- Do not push unless user explicitly asks.
+- Keep output concise; no large diffs in final summary.

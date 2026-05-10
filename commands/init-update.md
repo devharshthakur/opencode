@@ -7,189 +7,131 @@ subtask: false
 
 # Init Update
 
-Update the token-conserving agent docs created by `/init` so they match the latest project state without unnecessary rewrites.
+Update token-conserving agent docs created by `/init` without unnecessary reads or rewrites.
 
 Arguments: `$ARGUMENTS`
 
-## Modes
-
-- Default / no args: delta update. Update only docs whose owning project area changed.
-- `full`: broad re-scan. Refresh all stale agent docs after major refactors or large project changes.
-- `check`: read-only stale-doc report. Do not create, edit, delete, move, or back up files.
-- `repair`: fix doc system structure: missing indexes, broken links, missing per-folder READMEs, taxonomy drift. Avoid broad content rewrite.
-
-If mode is unclear, ask the user before proceeding.
-
 ## Goal
 
-Keep `.agents/` docs accurate, compact, and cheap for future agents to read.
+Keep `.agents/` docs accurate, compact, and cheap for future agents. Update durable project knowledge only: architecture, boundaries, layout, ownership, runtime/config/tooling, APIs/data/frontend/backend/testing/ops, conventions, invariants, gotchas, open questions. Do not create a full code inventory.
 
-Update durable project knowledge only:
+## Modes
 
-- architecture and boundaries
-- source layout and ownership
-- runtime/config/tooling
-- APIs/data/frontend/backend/testing/ops docs where present
-- conventions, invariants, gotchas, open questions
+| Mode | Behavior |
+|---|---|
+| default / no args | Delta update. Change only docs whose owning area drifted. |
+| `full` | Re-scan major areas and refresh stale docs after large changes. |
+| `check` | Read-only stale-doc report. No writes, backups, deletes, moves, formatting. |
+| `repair` | Fix doc structure/navigation: missing indexes, broken links, missing folder READMEs, taxonomy drift. Avoid broad content rewrite. |
 
-Do not turn update into full code inventory.
+If mode is unclear, ask before proceeding.
 
-## Required existing docs
+## Required docs
 
-Expected files:
-
-- `AGENTS.md`
-- `.agents/architecture.md`
-- `.agents/docs/README.md`
+Expected: `AGENTS.md`, `.agents/architecture.md`, `.agents/docs/README.md`.
 
 If `.agents/docs/README.md` is missing:
 
-- In default, `full`, or `check` mode: tell user to run `/init` first, unless enough `.agents/docs/**` structure exists to continue safely.
-- In `repair` mode: reconstruct indexes from existing `.agents/docs/**` if possible; otherwise tell user to run `/init`.
+- default/`full`/`check`: tell user to run `/init`, unless existing `.agents/docs/**` is enough to continue safely.
+- `repair`: reconstruct indexes from existing `.agents/docs/**` if possible; otherwise tell user to run `/init`.
 
 ## Workflow
 
-### 1. Size project with `ls -a`
+Follow in order.
 
-Run `ls -a` first. Use top-level shape to decide exploration depth.
+### 1. Size repo
 
-- Small repo: inspect directly with targeted reads/globs.
-- Huge repo or monorepo: use focused `explore` subagents by changed area/module/package.
-- Never dispatch vague blanket subagents.
+- Run `ls -a` first.
+- Small repo: targeted reads/globs.
+- Huge repo/monorepo: focused `explore` subagents by changed area/module/package. No blanket agents.
 
-### 2. Load current agent-doc map
+### 2. Load docs map first
 
-Read navigation docs first:
+Read navigation docs before source grep:
 
 - `AGENTS.md`
 - `.agents/architecture.md`
 - `.agents/docs/README.md`
 - `.agents/docs/**/README.md`
 
-Build a concise docs map:
+Build a concise map: file/folder purpose, owning doc per topic, reading order, open questions, taxonomy shape.
 
-- each docs file/folder purpose
-- owning doc per domain/topic
-- reading order
-- open questions / uncertainty sections
-- current taxonomy shape
+Input-token rule: read only docs needed to map ownership. Broad grep or broad doc reads only when map is missing/stale.
 
-Prefer docs map before grep. Broad grep only when docs are insufficient.
+### 3. Detect drift cheaply
 
-### 3. Detect project drift cheaply
-
-Use cheap signals before reading many files:
+Use cheap signals before content reads:
 
 - `git status --porcelain`
 - `git diff --name-only`
 - `git diff --cached --name-only`
 - `git log --name-only --oneline -20`
-- manifests/package/workspace files
-- config files
-- root docs
-- source tree shape
-- test tree shape
+- manifests/workspace/package files, configs, root docs, source/test tree shape
 
-Detect drift types:
+Detect drift in: apps/packages/modules, package manager/scripts/deps/workspaces, entrypoints/config/env, tests/fixtures, APIs/routes/contracts/auth, data models/migrations/storage/schemas, frontend routing/state/components, backend services/jobs/integrations, architecture flows/boundaries/invariants/gotchas, stale paths, broken README links.
 
-- new/removed/renamed apps, packages, modules, directories
-- changed package manager, scripts, dependencies, workspace config
-- changed entrypoints, runtime config, env variables
-- changed test commands, fixtures, test strategy
-- new/removed APIs, routes, contracts, auth behavior
-- changed data models, migrations, storage, schemas
-- changed frontend routing, state, component conventions
-- changed backend services, jobs, integrations
-- stale architecture flows, boundaries, invariants, gotchas
-- stale path references in docs
-- broken links in `.agents/docs/README.md` or per-folder READMEs
+### 4. Choose scope
 
-### 4. Choose update scope
+- default: update only owning docs for changed areas; leave unrelated docs untouched.
+- `full`: re-scan major areas; refresh stale `.agents/architecture.md` and `.agents/docs/**`; keep taxonomy unless evidence supports split/merge.
+- `check`: read only; report stale docs; no edits/backups/creates/deletes/renames/formatting.
+- `repair`: fix navigation/structure; create folder `README.md` only when folder has multiple docs; repair links/map entries; split/merge only when taxonomy blocks selective reading; avoid content refresh unless needed for repair.
+- If many top-level areas changed or docs map is unreliable in default mode, recommend `/init-update full` before broad rewrite.
 
-Default delta mode:
+### 5. Back up changed files
 
-- Update only docs whose owning area changed.
-- Leave unrelated docs untouched.
-- If many top-level areas changed or docs map is unreliable, recommend `/init-update full` before broad rewrite.
+Skip in `check` mode.
 
-`full` mode:
-
-- Re-scan all major areas.
-- Refresh stale docs across `.agents/architecture.md` and `.agents/docs/**`.
-- Keep existing taxonomy unless clear evidence supports split/merge.
-
-`check` mode:
-
-- Read only.
-- Produce stale-doc report.
-- No edits, backups, file creation, deletes, renames, or formatting.
-
-`repair` mode:
-
-- Fix docs navigation and structure.
-- Create missing `README.md` files for folders with multiple docs.
-- Repair broken links and stale map entries.
-- Split/merge docs only when taxonomy clearly blocks selective reading.
-- Avoid broad content refresh unless required to repair navigation.
-
-### 5. Backup before overwrite
-
-Skip this section in `check` mode because no writes are allowed.
-
-Before replacing any existing target file, back it up under:
+Before overwriting target files, back them up under:
 
 `.agents/backups/init-update-YYYYMMDD-HHMMSS/<relative-path>`
 
-Targets include any changed file under:
+Targets: changed files under `AGENTS.md`, `.agents/architecture.md`, `.agents/docs/**`.
 
-- `AGENTS.md`
-- `.agents/architecture.md`
-- `.agents/docs/**`
-
-Rules:
+Backup rules:
 
 - Back up only files you will overwrite.
+- Use filesystem copy/move commands (`mkdir -p`, `cp`, `cp -R`, `mv`, or `rsync` if available).
+- Do not recreate backups by reading file content and writing it again; this wastes tokens and may alter bytes.
+- Preserve relative paths under backup root.
 - Do not back up generated/vendor/cache output.
-- Never silently discard user-authored instructions.
-- Preserve and migrate unique manual notes.
-- If existing docs conflict with current code, update only when evidence is clear.
-- If uncertain, preserve old note and record uncertainty in `decisions.md` or `decisions/open-questions.md`.
+- Preserve/migrate unique manual notes.
+- If docs conflict with code, update only with clear evidence. If uncertain, preserve old note and record uncertainty in `decisions.md` or `decisions/open-questions.md`.
 
-### 6. Update docs compactly
+### 6. Update compactly
 
-Keep token conservation first:
+Token conservation first:
 
-- Use bullets, tables, exact paths, and short commands.
-- Prefer stable patterns, boundaries, invariants, and gotchas.
+- Use bullets/tables, exact paths, short commands.
+- Prefer stable patterns, boundaries, invariants, gotchas.
 - Do not summarize every source file.
 - Do not duplicate facts; update owning doc and link from indexes.
-- Keep root `AGENTS.md` tiny.
-- Keep README files navigation-only.
+- Keep root `AGENTS.md` tiny; keep README files navigation-only.
 - Update indexes when files move/split/merge.
-- Remove stale path refs only with clear evidence.
-- Optional: update a `Last reviewed:` line only in docs you touched; do not add churn if project docs do not use this convention.
+- Remove stale paths only with clear evidence.
+- Update `Last reviewed:` only in touched docs if project already uses that convention.
 
 Maintain taxonomy:
 
-- One stable fact has one owning file.
-- If a fact fits two docs, place it where future editing agent would first look.
-- Create folders only when a topic has multiple independent docs or one doc becomes too dense.
-- Avoid empty placeholder sections.
+- One stable fact, one owning file.
+- Put facts where future editing agent will look first.
+- Create folders only for multiple independent docs or over-dense docs.
+- No empty placeholder sections.
 
 ### 7. Security
 
 - Never copy secret values into docs.
-- If secret-bearing config exists, mention only safe path/type, never value.
-- Redact tokens, private URLs, credentials, certificates, cookies, and auth headers.
-- Do not include proprietary long dumps when concise pointers suffice.
+- Mention secret-bearing config by safe path/type only.
+- Redact tokens, private URLs, credentials, certs, cookies, auth headers.
+- Use concise pointers instead of proprietary long dumps.
 
-### 8. Final report
+### 8. Report
 
-Return concise summary:
+Return only:
 
 - Mode used.
 - Changed docs.
-- Unchanged docs that were checked.
+- Unchanged docs checked.
 - Backup directory, if any.
 - Drift found.
 - Taxonomy changes.
@@ -197,8 +139,9 @@ Return concise summary:
 - Subagents used, if any.
 - Open questions / unresolved uncertainty.
 
-## Output rules
+## Rules
 
 - Be terse and factual.
-- No markdown code fences in final summary unless showing file content explicitly.
+- Do not print full docs or large diffs in final summary; paths + short notes only.
+- No markdown code fences in final summary unless explicitly showing file content.
 - Do not commit changes.
