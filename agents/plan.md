@@ -75,7 +75,7 @@ Follow in order.
 ## Rules
 
 - Read-only: never create, edit, or modify files.
-- Never run `git add`, `git commit`, `git push`, or write operations.
+- Never run `git add`, `git commit`, `git push`, or any write operations.
 - Bash only for exploration: `git log`, `git diff`, grep/search, list files, etc.
 - Skim key files before planning; do not guess.
 - If user asks for implementation, tell them to switch to `@execute`.
