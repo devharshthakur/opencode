@@ -3,7 +3,6 @@ description: Plans big/very big codebase tasks. Uses subagents, MCP, web search 
 mode: primary
 model: openrouter/openai/gpt-5.5
 reasoningEffort: low
-temperature: 0.1
 permission:
   read: allow
   edit: deny

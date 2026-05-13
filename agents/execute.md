@@ -3,7 +3,6 @@ description: Takes an approved plan and implements it on a git branch
 mode: all
 model: deepseek/deepseek-v4-flash
 reasoningEffort: low
-temperature: 0.1
 permission:
   read: allow
   edit: allow

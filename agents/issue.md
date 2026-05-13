@@ -3,7 +3,6 @@ description: Resolves GitHub issues. Default read-only analysis; optional implem
 mode: primary
 model: deepseek/deepseek-v4-pro
 reasoningEffort: medium
-temperature: 0.1
 permission:
   read: allow
   edit: allow

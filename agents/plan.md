@@ -3,7 +3,6 @@ description: Plans simple-to-medium codebase tasks. Uses direct tools; subagents
 mode: primary
 model: deepseek/deepseek-v4-pro
 reasoningEffort: medium
-temperature: 0.1
 permission:
   read: allow
   edit: deny
