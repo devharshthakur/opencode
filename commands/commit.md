@@ -1,7 +1,7 @@
 ---
 description: Commit changes as one or more meaningful commits
 agent: plan
-model: deepseek/deepseek-v4-flash
+model: opencode/deepseek-v4-flash-free
 subtask: false
 ---
 

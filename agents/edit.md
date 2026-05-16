@@ -1,6 +1,6 @@
 ---
 description: Writes and implements simple code changes with full tool access
-model: deepseek/deepseek-v4-flash
+model: opencode/deepseek-v4-flash-free
 mode: primary
 permission:
   read: allow

@@ -1,7 +1,7 @@
 ---
 description: Answers questions by gathering info from the codebase and MCP tools
 mode: primary
-model: deepseek/deepseek-v4-flash
+model: opencode/deepseek-v4-flash-free
 permission:
   read: allow
   edit: deny
