@@ -1,6 +1,6 @@
 ---
 description: Review code changes, diffs, or full codebase with compressed review output
-agent: plan
+agent: ask
 model: deepseek/deepseek-v4-pro
 subtask: false
 ---
