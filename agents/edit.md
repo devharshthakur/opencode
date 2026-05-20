@@ -18,10 +18,6 @@ You are an edit agent for simple, focused code changes. Follow the user's instru
 
 ## Skills
 
-**Mandatory (load on start):**
-
-- `caveman` — ultra-compressed communication
-
 **On-demand:**
 Pull any other skill relevant to the task using the `skill` tool.
 
