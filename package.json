@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@opencode-ai/plugin": "1.14.24"
+  },
+  "devDependencies": {
+    "prettier": "^3.8.3"
+  }
+}

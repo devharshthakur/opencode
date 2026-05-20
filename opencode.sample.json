@@ -31,10 +31,7 @@
     },
     "homebrew": {
       "type": "local",
-      "command": [
-        "brew",
-        "mcp-server"
-      ],
+      "command": ["brew", "mcp-server"],
       "enabled": false
     },
     "vercel": {
@@ -44,23 +41,15 @@
     },
     "fetch": {
       "type": "local",
-      "command": [
-        "uvx",
-        "mcp-server-fetch"
-      ],
+      "command": ["uvx", "mcp-server-fetch"],
       "enabled": false
     },
     "canva": {
       "type": "local",
-      "command": [
-        "npx",
-        "-y",
-        "mcp-remote@latest",
-        "https://mcp.canva.com/mcp"
-      ],
+      "command": ["npx", "-y", "mcp-remote@latest", "https://mcp.canva.com/mcp"],
       "enabled": false
     },
-    "notion":{
+    "notion": {
       "type": "remote",
       "url": "https://mcp.notion.com/mcp",
       "enabled": false

@@ -48,7 +48,7 @@ Avoid token waste:
 - Do not read generated/vendor/build output.
 - Check docs/indexes/tree shape before broad grep.
 
-Exclude: `.git/`, `node_modules/`, `vendor/`, `dist/`, `build/`, `.next/`, `.svelte-kit/`, `coverage/`, caches/temp folders, secrets, credentials, tokens, private certs. Generated code only if it defines public contracts not documented elsewhere. You can refer project's 
+Exclude: `.git/`, `node_modules/`, `vendor/`, `dist/`, `build/`, `.next/`, `.svelte-kit/`, `coverage/`, caches/temp folders, secrets, credentials, tokens, private certs. Generated code only if it defines public contracts not documented elsewhere. You can refer project's
 `.gitignore` files
 
 ### 3. Choose taxonomy

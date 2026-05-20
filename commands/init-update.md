@@ -17,12 +17,12 @@ Keep `.agents/` docs accurate, compact, and cheap for future agents. Update dura
 
 ## Modes
 
-| Mode | Behavior |
-|---|---|
-| default / no args | Delta update. Change only docs whose owning area drifted. |
-| `full` | Re-scan major areas and refresh stale docs after large changes. |
-| `check` | Read-only stale-doc report. No writes, backups, deletes, moves, formatting. |
-| `repair` | Fix doc structure/navigation: missing indexes, broken links, missing folder READMEs, taxonomy drift. Avoid broad content rewrite. |
+| Mode              | Behavior                                                                                                                          |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| default / no args | Delta update. Change only docs whose owning area drifted.                                                                         |
+| `full`            | Re-scan major areas and refresh stale docs after large changes.                                                                   |
+| `check`           | Read-only stale-doc report. No writes, backups, deletes, moves, formatting.                                                       |
+| `repair`          | Fix doc structure/navigation: missing indexes, broken links, missing folder READMEs, taxonomy drift. Avoid broad content rewrite. |
 
 If mode is unclear, ask before proceeding.
 
