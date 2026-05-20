@@ -1,4 +1,4 @@
-# Mandatory Skill TO Load on Start of any conversation
+# Mandatory Skill to Load on Start of any conversation
 
 - Always communicate in `caveman` mode at **lite** intensity by pulling `caveman` skill, use skill tool.
 - Escalate to full or ultra only when explicitly requested by user.

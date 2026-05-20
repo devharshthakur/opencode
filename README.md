@@ -1,48 +1,47 @@
 # OpenCode Config
 
-Personal [OpenCode](https://opencode.ai) configuration — custom agents, commands, skills, and project-wide rules for AI-assisted development.
-
-## Structure
-
-| Path                   | Purpose                                                                        |
-| ---------------------- | ------------------------------------------------------------------------------ |
-| `agents/`              | Custom AI agents with model, permissions, and instructions                     |
-| `commands/`            | Slash commands (`/commit`, `/review`, `/init`) that invoke agents + skills     |
-| `skills/`              | Installed skill packs for specialized workflows (caveman, tdd, graphify, etc.) |
-| `AGENTS.md`            | Global rules enforced across all agents                                        |
-| `opencode.json`        | Active config: model, default agent, MCP server connections                    |
-| `opencode.sample.json` | Shareable template with `$VAR` placeholders                                    |
-| `package.json`         | Single dependency: `@opencode-ai/plugin`                                       |
+Personal [OpenCode](https://opencode.ai) configuration — custom agents, commands, plugins, and project-wide rules for AI-assisted development.
 
 ## Setup
 
 1. Copy `opencode.sample.json` → `opencode.json`
 2. Fill in your API keys (the sample uses `$VAR` placeholders)
-3. Run `npm install`
+3. Run `pnpm install`
 
 ## Agents
 
-| Agent     | Model                  | Role                            | Read-only |
-| --------- | ---------------------- | ------------------------------- | --------- |
-| `plan`    | deepseek-v4-pro        | Planner (default agent)         | ✓         |
-| `plan+`   | openai-gpt-5.5(medium) | Planner for large/complex tasks | ✓         |
-| `execute` | deepseek-v4-flash      | Implementation                  |           |
-| `edit`    | deepseek-v4-flash      | Lightweight edits               |           |
-| `ask`     | deepseek-v4-flash      | Q&A / exploration               | ✓         |
-| `fix`     | deepseek-v4-flash      | Bug fixing                      |           |
+Default agent: **build**. The `plan` agent is disabled.
+
+| Agent    | Model                         | Role                                         | Read-only |
+| -------- | ----------------------------- | -------------------------------------------- | --------- |
+| `ask`    | deepseek-v4-flash-free        | Q&A / codebase exploration                   | ✓         |
+| `build`  | deepseek-v4-pro               | Plan-first, approval-gated                   |           |
+| `build+` | openai-gpt-5.5                | Large/complex task planner                   |           |
+| `edit`   | deepseek-v4-flash-free        | Lightweight targeted edits                   |           |
+| `fix`    | deepseek-v4-pro (high-effort) | Root-cause bug diagnosis                     |           |
+| `issue`  | deepseek-v4-pro               | GitHub issue → plan → implement → PR → merge |           |
 
 ## Commands
 
-- `/commit` — stage and commit changes with conventional commit messages
-- `/review` — code review with compressed feedback
-- `/init` — initialize project context for OpenCode
-- `/init-update` — update existing project context
+| Command           | Description                                         |
+| ----------------- | --------------------------------------------------- |
+| `/caveman`        | Toggle caveman communication mode (lite/full/ultra) |
+| `/caveman-commit` | Stage and commit with conventional commit messages  |
+| `/caveman-review` | Code review with compressed feedback                |
+| `/init`           | Initialize project context for OpenCode             |
+| `/init-update`    | Update existing project context                     |
+| `/review`         | Standard code review                                |
 
-## Global Rules (AGENTS.md)
+## Plugins
 
-- Use Context7 MCP for documentation lookups
-- Use `pnpm` for Node package management
-- Use `uv` for Python package management (never pip)
+### Caveman Plugin
+
+Lifecycle plugin (`plugins/caveman/`) that handles caveman mode state across sessions:
+
+- **`session.created`** — writes active mode flag on session start
+- **`tui.prompt.append`** — parses slash commands and natural-language toggles, appends reinforcement line each prompt so model doesn't drift
+
+Skills directory (`~/.agents/skills/`) provides the actual caveman skill definitions. The plugin handles only dynamic state — the always-on ruleset comes from `AGENTS.md`.
 
 ## License
 
