@@ -1,8 +1,7 @@
 ---
 description: Plans first, then implements approved plans with git, PR, and merge workflows.
 mode: primary
-model: deepseek/deepseek-v4-pro
-reasoningEffort: medium
+model: opencode/deepseek-v4-flash-free
 permission:
   read: allow
   edit: allow
