@@ -14,6 +14,14 @@
 - For Python projects, use `uv` by default.
 - Do not use `pip` directly unless explicitly requested or required by project docs.
 
+## Local CLI Tools
+
+- `tree` is installed and may be used for read-only directory structure overviews.
+- Prefer `glob`, `grep`, and `read` for precise file discovery and file contents.
+- Use `tree` only for small/scoped folders, not whole large repos.
+- Recommended safe pattern: `tree -a -L 2 -I "node_modules|.git|dist|build|coverage|.next|.svelte-kit|.turbo" <path>`.
+- Do not rely on `tree` output for code/content claims; confirm with `read`, `glob`, or `grep`.
+
 ## Documentation and Context Gathering
 
 - Prefer MCP tools over general web search when available.
