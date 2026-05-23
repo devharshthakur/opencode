@@ -188,13 +188,13 @@ Before edits, run:
 
 If `git status --porcelain` is dirty, ask with `question` tool:
 
-| Choice                       | Action                                                                                                                                            |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Continue on current branch` | Warn this can mix work; recommended only when user explicitly accepts that risk, especially on `main`/`master`.                                  |
-| `Take changes to the branch` | Keep uncommitted changes and continue branch flow.                                                                                                |
+| Choice                       | Action                                                                                                                                          |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Continue on current branch` | Warn this can mix work; recommended only when user explicitly accepts that risk, especially on `main`/`master`.                                 |
+| `Take changes to the branch` | Keep uncommitted changes and continue branch flow.                                                                                              |
 | `Stash the changes`          | Ask stash description. If untracked files exist, ask whether to include them; use `git stash push -m "<description>"` or `--include-untracked`. |
-| `Commit current changes`     | Use commit workflow; commit only after approval; re-check status.                                                                                 |
-| `Custom instruction`         | Follow explicit direction; ask if unclear.                                                                                                        |
+| `Commit current changes`     | Use commit workflow; commit only after approval; re-check status.                                                                               |
+| `Custom instruction`         | Follow explicit direction; ask if unclear.                                                                                                      |
 
 Never include unrelated dirty changes in implementation commits, staging, or PRs.
 Stage only files changed for the approved issue implementation. Never stage pre-existing dirty files unless user explicitly included them.
