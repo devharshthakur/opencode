@@ -42,8 +42,9 @@ Follow in order.
 ### 1. Size repo
 
 - Run `ls -a` first.
-- Small repo: targeted reads/globs.
-- Huge repo/monorepo: focused `explore` subagents by changed area/module/package. No blanket agents.
+- Prefer `.agents/` docs over source scan for routing decisions.
+- Small repo: targeted reads/globs only after docs map says where to look.
+- Huge repo/monorepo: focused `explore` subagents by changed area/module/package from docs map or git signals. No blanket agents.
 
 ### 2. Load docs map first
 
@@ -56,7 +57,13 @@ Read navigation docs before source grep:
 
 Build a concise map: file/folder purpose, owning doc per topic, reading order, open questions, taxonomy shape.
 
-Input-token rule: read only docs needed to map ownership. Broad grep or broad doc reads only when map is missing/stale.
+Input-token rule: read only docs needed to map ownership. Broad grep, broad tree, broad doc reads, or subagents only when map is missing/stale/insufficient.
+
+Search budget:
+
+- Each grep/glob/source read must have a target path and reason from docs map, git drift, or manifest/config evidence.
+- Prefer changed paths from git signals, then owning docs, then targeted source files.
+- Do not run repo-wide grep just to rediscover facts already owned by `.agents/` docs.
 
 ### 3. Detect drift cheaply
 
@@ -70,10 +77,12 @@ Use cheap signals before content reads:
 
 Detect drift in: apps/packages/modules, package manager/scripts/deps/workspaces, entrypoints/config/env, tests/fixtures, APIs/routes/contracts/auth, data models/migrations/storage/schemas, frontend routing/state/components, backend services/jobs/integrations, architecture flows/boundaries/invariants/gotchas, stale paths, broken README links.
 
+Only read source content for drift candidates. If signals are inconclusive, report uncertainty or ask before broadening.
+
 ### 4. Choose scope
 
 - default: update only owning docs for changed areas; leave unrelated docs untouched.
-- `full`: re-scan major areas; refresh stale `.agents/architecture.md` and `.agents/docs/**`; keep taxonomy unless evidence supports split/merge.
+- `full`: re-scan major areas using docs map first; refresh stale `.agents/architecture.md` and `.agents/docs/**`; keep taxonomy unless evidence supports split/merge.
 - `check`: read only; report stale docs; no edits/backups/creates/deletes/renames/formatting.
 - `repair`: fix navigation/structure; create folder `README.md` only when folder has multiple docs; repair links/map entries; split/merge only when taxonomy blocks selective reading; avoid content refresh unless needed for repair.
 - If many top-level areas changed or docs map is unreliable in default mode, recommend `/init-update full` before broad rewrite.
@@ -105,6 +114,8 @@ Token conservation first:
 - Use bullets/tables, exact paths, short commands.
 - Prefer stable patterns, boundaries, invariants, gotchas.
 - Do not summarize every source file.
+- Preserve root `AGENTS.md` as docs-first router: `.agents/docs/README.md` -> `.agents/architecture.md` -> relevant owning docs -> targeted source reads.
+- Keep grep/subagent guidance explicit: scoped path/domain only, broad search only after `.agents/` docs fail.
 - Do not duplicate facts; update owning doc and link from indexes.
 - Keep root `AGENTS.md` tiny; keep README files navigation-only.
 - Update indexes when files move/split/merge.
