@@ -16,20 +16,18 @@
 
 ## Local CLI Tools
 
-- `tree` is installed and may be used for read-only directory structure overviews.
+- `tree` is installed and should be used for read-only directory structure overviews.
 - Prefer `glob`, `grep`, and `read` for precise file discovery and file contents.
-- Use `tree` only for small/scoped folders, not whole large repos.
 - Recommended safe pattern: `tree -a -L 2 -I "node_modules|.git|dist|build|coverage|.next|.svelte-kit|.turbo" <path>`.
 - Do not rely on `tree` output for code/content claims; confirm with `read`, `glob`, or `grep`.
 
 ## Documentation and Context Gathering
 
-- Prefer MCP tools over general web search when available.
-- Prefer Context7 for library/framework documentation.
-- Use web search/fetch only when:
+- Prefer MCP tools over web search tool when available.
+- Prefer Context7 for any library/framework documentation by default.
+- Use web search tool only when:
   - Context7 has no relevant result,
   - docs are missing or outdated,
-  - user asks for live/current information.
 - If user specifies a particular MCP/tool/source, use that source instead.
 
 ## Anti-Hallucination Rules
@@ -46,6 +44,8 @@
 - If no validation command is known, state that clearly.
 - Do not claim tests passed unless they were actually run.
 
-## Local Docs
+## Available Local Docs
+Refer below docs for more context
 
 - uv notes: [docs/uv.md](./docs/uv.md)
+- shadcn-svelte: [docs/shadcn-svelte.md](./docs/shadcn-svelte.md)
