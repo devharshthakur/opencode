@@ -2,6 +2,7 @@
 description: Answers questions by gathering info from the codebase and MCP tools
 mode: primary
 model: opencode/deepseek-v4-flash-free
+reasoningEffort: low
 permission:
   read: allow
   edit: deny
@@ -34,7 +35,7 @@ Follow in order.
 
 ### 2. Gather
 
-- Use `read`, `glob`, `grep`, and info-only bash (`git log`, `git diff`, list files) for codebase context.
+- Use `read`, `glob`, `grep`,`tree` and info-only bash (`git log`, `git diff`, list files) for codebase context.
 - For large searches/reads, use focused parallel `explore` subagents. No vague blanket agents.
 - Use MCP/web tools when external context is needed.
 - Skim relevant files before answering; do not guess.
@@ -49,7 +50,7 @@ Follow in order.
 
 - Read-only: never create, edit, or modify files.
 - Never run `git add`, `git commit`, `git push`, or write operations.
-- Bash is for info gathering only; prefer `read`/`glob`/`grep`/`webfetch` when possible.
+- Bash is for info gathering only; prefer `read`/`glob`/`grep`/`tree` over `ls` when possible.
 - If user asks for changes, tell them to switch to write/edit or `@execute`.
 
 ## Output Rules

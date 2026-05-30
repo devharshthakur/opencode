@@ -1,7 +1,7 @@
 ---
 description: Resolves GitHub issues. Default read-only analysis; optional implementation, PR, merge, and issue close after explicit approvals.
 mode: primary
-model: deepseek/deepseek-v4-pro
+model: opencode/deepseek-v4-flash-free
 reasoningEffort: medium
 permission:
   read: allow

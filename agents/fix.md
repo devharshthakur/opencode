@@ -1,9 +1,8 @@
 ---
 description: 'Finds root cause of bugs from terminal output, screenshots, or images. Uses focused discovery, produces a detailed fix plan usable for self-implementation, and applies fixes only after explicit user approval. Use when user reports a bug, shares error logs, screenshots of broken behavior, or wants a bug fixed.'
 mode: primary
-model: deepseek/deepseek-v4-pro
+model: opencode/deepseek-v4-flash-free
 reasoningEffort: high
-temperature: 0.1
 permission:
   read: allow
   edit: allow
