@@ -49,6 +49,11 @@
       "command": ["npx", "-y", "mcp-remote@latest", "https://mcp.canva.com/mcp"],
       "enabled": false
     },
+    "cloudflare-api": {
+      "type": "remote",
+      "url": "https://mcp.cloudflare.com/mcp",
+      "enabled": false
+    },
     "notion": {
       "type": "remote",
       "url": "https://mcp.notion.com/mcp",
