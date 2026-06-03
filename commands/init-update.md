@@ -19,12 +19,12 @@ Keep single-file setup. Update only `AGENTS.md`. Do not create `.agents/**`, bac
 
 ## Modes
 
-| Mode              | Behavior                                                                                                                    |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| default / no args | Delta update. Refresh only `AGENTS.md` sections whose owning area drifted.                                                  |
-| `full`            | Re-scan major areas and refresh all major `AGENTS.md` sections.                                                            |
-| `check`           | Read-only stale-doc report. No writes, backups, deletes, moves, formatting.                                                |
-| `repair`          | Fix routing/structure issues: stale task routes, broken path refs, missing required sections, overly noisy wording.        |
+| Mode              | Behavior                                                                                                            |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------- |
+| default / no args | Delta update. Refresh only `AGENTS.md` sections whose owning area drifted.                                          |
+| `full`            | Re-scan major areas and refresh all major `AGENTS.md` sections.                                                     |
+| `check`           | Read-only stale-doc report. No writes, backups, deletes, moves, formatting.                                         |
+| `repair`          | Fix routing/structure issues: stale task routes, broken path refs, missing required sections, overly noisy wording. |
 
 If mode is unclear, ask before proceeding.
 
@@ -99,7 +99,6 @@ Only read source content for drift candidates. If signals are inconclusive, repo
 - `repair`: fix structure and routing; add missing required sections; simplify noisy wording.
 
 Even for large repos, keep one `AGENTS.md`. Compress instead of splitting into extra docs.
-
 
 ### 5. Update compactly
 
