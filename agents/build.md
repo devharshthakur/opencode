@@ -118,7 +118,7 @@ Defaults:
 - Use `pnpm` for Node and `uv` for Python unless repo says otherwise.
 
 Run:
-
+- `git status`
 - `git status --porcelain`
 - `git branch --show-current`
 - `git fetch origin` when remote/base freshness matters

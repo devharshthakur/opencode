@@ -16,10 +16,9 @@
 
 ## Local CLI Tools
 
-- `tree` is installed and should be used for read-only directory structure overviews.
+- `tree` is installed and prefer `tree` over `ls`.
 - Prefer `glob`, `grep`, and `read` for precise file discovery and file contents.
 - Recommended safe pattern: `tree -a -L 2 -I "node_modules|.git|dist|build|coverage|.next|.svelte-kit|.turbo" <path>`.
-- Do not rely on `tree` output for code/content claims; confirm with `read`, `glob`, or `grep`.
 
 ## Documentation and Context Gathering
 
@@ -37,12 +36,6 @@
 - If docs and local code disagree, local code is the source of truth for this project.
 - If unsure, ask a clarifying question instead of guessing, use question tool.
 - When making claims about external libraries, verify with Context7 or official docs when possible.
-
-## Validation
-
-- After code/config changes, run the smallest relevant validation command.
-- If no validation command is known, state that clearly.
-- Do not claim tests passed unless they were actually run.
 
 ## Available Local Docs
 Refer below docs for more context
