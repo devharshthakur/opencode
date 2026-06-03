@@ -1,5 +1,5 @@
 ---
-description: Initialize token-conserving agent docs
+description: Initialize single-file agent briefing
 agent: edit
 model: deepseek/deepseek-v4-pro
 subtask: false
@@ -7,19 +7,17 @@ subtask: false
 
 # Init
 
-Create token-conserving agent docs for this repo. This command overrides OpenCode built-in `/init`.
+Create simple, high-signal `AGENTS.md` for this repo. This command overrides OpenCode built-in `/init`.
 
 ## Goal
 
-Make future agent sessions cheap and accurate with small, navigable, agent-facing docs instead of large root context.
+Make future agent sessions cheap and accurate with one durable project briefing that tells agents what this repo does, which files are source of truth, which files to read first for common tasks, how to validate changes, and which paths to ignore.
+
+Always output one `AGENTS.md`. Do not create `.agents/**`, backup folders, or supporting docs.
 
 ## Required outputs
 
-- `AGENTS.md` — tiny router; points to `.agents/docs/README.md` first.
-- `.agents/architecture.md` — boundaries, core flows, invariants, risks, gotchas.
-- `.agents/docs/README.md` — reading order, file/folder map, ownership table.
-- `.agents/docs/**` — mutually exclusive project context docs.
-- Per-folder `README.md` — only when folder has multiple docs; explains each file and when to read it.
+- `AGENTS.md` — required; only output file; primary project briefing and routing doc.
 
 ## Workflow
 
@@ -28,134 +26,101 @@ Follow in order.
 ### 1. Map repo cheaply
 
 - Run `ls -a` first.
-- If `.agents/` already exists, read its navigation first: `.agents/docs/README.md`, `.agents/architecture.md`, then relevant `.agents/docs/**/README.md` files.
-- Use existing `.agents/` docs to choose target paths/domains before source reads.
-- Small repo: use targeted reads/globs.
-- Huge repo/monorepo: use focused `explore` subagents only after docs/tree shape identify app/package/domain. No vague blanket agents.
+- If `AGENTS.md` already exists, read it before anything else.
+- If legacy `.agents/**` docs exist, read only what is needed to migrate durable notes into `AGENTS.md`.
+- Start from manifests, workspace files, root docs, config, runtime entrypoints, and major source roots.
+- Small/medium repo: use targeted reads/globs only.
+- Huge repo/monorepo: use focused `explore` subagents only after manifests/tree shape identify app/package/domain. No blanket repo-wide agents.
 
-### 2. Explore durable context
+### 2. Gather durable project context
 
-Gather stable project knowledge only:
+Capture only stable facts future agents need often:
 
-- Manifests, package/workspace files, configs, runtime entrypoints.
-- Existing docs/root markdown.
-- Source tree shape, major modules, boundaries.
-- Tests/tooling commands.
-- APIs, data models, frontend/backend areas, jobs, integrations where present.
+- Project purpose, users, domain terms, user-visible flows.
+- Detected ecosystem and stack from repo files.
+- Repo layout and important folders.
+- Source-of-truth files: manifests, workspace config, runtime/bootstrap files, routing files, schemas/contracts, migrations, test config, deployment/build config.
+- Architecture boundaries, invariants, risky areas, gotchas.
+- Common task routes: which files to read first for API/backend/frontend/data/auth/tests/build/tooling work.
+- Validation commands for install, lint, typecheck, tests, run/dev.
 
 Avoid token waste:
 
 - Do not summarize every source file.
 - Do not dump lockfiles.
 - Do not read generated/vendor/build output.
-- Check `.agents/`, docs/indexes, and tree shape before any broad grep.
-- Grep budget: every grep needs a target path and reason; prefer narrow paths from `.agents/docs/README.md` ownership map.
-- Subagent budget: use subagents only for focused domains/folders; never ask one to read the whole repo.
-- If `.agents/` docs are stale or missing, broaden gradually: manifests/configs/root docs first, then targeted source paths, then focused grep.
+- Do not broad-grep repo before manifests/config/docs identify target areas.
+- Every grep/read must have a target path and reason.
 
-Exclude: `.git/`, `node_modules/`, `vendor/`, `dist/`, `build/`, `.next/`, `.svelte-kit/`, `coverage/`, caches/temp folders, secrets, credentials, tokens, private certs. Use project `.gitignore` files to identify generated/vendor/cache paths. Include generated code only if it defines public contracts not documented elsewhere.
+Exclude: `.git/`, `node_modules/`, `vendor/`, `dist/`, `build/`, `.next/`, `.svelte-kit/`, `coverage/`, caches/temp folders, secrets, credentials, tokens, private certs. Include generated code only if it defines public contracts not documented elsewhere.
 
-### 3. Choose taxonomy
+### 3. Detect stack and include only relevant guidance
 
-Use smallest useful split. Prefer flat files until a topic becomes dense.
+Use repo evidence, not generic guesses.
 
-Default small-repo docs:
+Check only relevant files for detected ecosystem:
 
-- `.agents/docs/product.md` — purpose, users, domain terms, user-visible flows.
-- `.agents/docs/codebase.md` — layout, conventions, dependencies, ownership map.
-- `.agents/docs/runtime.md` — entrypoints, config/env, local/dev/prod behavior.
-- `.agents/docs/testing.md` — test strategy, commands, fixtures, conventions.
-- `.agents/docs/decisions.md` — accepted tradeoffs, constraints, open questions.
+- Node.js / webdev: `package.json`, `pnpm-workspace.yaml`, `turbo.json`, `tsconfig.json`, framework config (`next.config.*`, `vite.config.*`, `svelte.config.*`, etc.), app/router entrypoints, API/schema files, test config.
+- Python: `pyproject.toml`, `uv.lock`, lint/test config, package/app entrypoints, migrations/schema files.
+- Go: `go.mod`, `go.work`, `cmd/*`, `internal/*`, `pkg/*`, router/bootstrap/config files.
+- Rust: `Cargo.toml`, workspace `Cargo.toml`, `src/main.rs`, `src/lib.rs`, `crates/*`, integration tests, build/config files.
 
-Use folders only when useful, e.g.:
+Include only stacks and commands actually verified from files.
 
-- `.agents/docs/api/{README.md,routes.md,contracts.md,auth.md}`
-- `.agents/docs/data/{README.md,models.md,storage.md,migrations.md}`
-- `.agents/docs/frontend/{README.md,components.md,routing.md,state.md}`
-- `.agents/docs/backend/{README.md,services.md,jobs.md,integrations.md}`
-- `.agents/docs/operations/{README.md,build.md,deploy.md,observability.md}`
-- `.agents/docs/decisions/{README.md,accepted.md,open-questions.md}`
+### 4. Write compact `AGENTS.md`
 
-Taxonomy rules:
+Optimize for future input-token savings.
 
-- One stable fact, one owning file.
-- Link instead of duplicate.
-- Put facts where future editing agent will look first.
-- No empty placeholder sections.
-- Mark uncertainty in decisions/open questions; do not guess.
-- On reruns, preserve useful existing taxonomy and update in place unless structure is clearly noisy or wrong.
-- Migrate unique old notes into the owning file before overwrite; do not duplicate stale facts.
+Hard rules:
 
-### 4. Back up before overwrite
+- Target `AGENTS.md` at 120-220 lines when practical.
+- Every section must help routing, validation, or constraints.
+- Use bullets/tables, exact paths, short commands.
+- Do not duplicate facts.
+- Cite exact source paths for non-obvious claims.
+- If a fact is not verified, mark it `Unknown` or `Needs verification`.
+- Keep wording simple and direct.
 
-Before replacing existing target files/folders, back them up under:
+Required `AGENTS.md` sections:
 
-`.agents/backups/init-YYYYMMDD-HHMMSS/<relative-path>`
+- Project summary — what repo does, product/domain terms, runtime shape.
+- Stack fingerprint — languages, frameworks, package/build tools, test tools.
+- Important paths — only key folders/files and why they matter.
+- Source-of-truth files — manifests, config, entrypoints, routes, schemas/contracts, migrations, test/build/deploy files.
+- Read first by task — exact files/folders to read first for common tasks such as feature work, bug fix, API/backend change, DB/data change, auth, frontend/UI, tests, build/deploy/tooling.
+- Architecture and boundaries — major components, ownership, invariants, high-risk areas.
+- Commands — install, dev/run, lint, typecheck, test, build, package-specific commands when relevant.
+- Search rules — read `AGENTS.md` first, then targeted files; avoid broad grep/tree/subagents unless `AGENTS.md` is stale or insufficient.
+- Risks/gotchas — fragile areas, hidden coupling, migration concerns.
+- Unknowns/open questions — only if verified facts are missing.
 
-Targets: `AGENTS.md`, `.agents/architecture.md`, `.agents/docs/**`.
+Most important section: `Read first by task`. It should tell future agents exactly which files to open before grep.
 
-Backup rules:
+Even for large repos, keep one file. Compress aggressively instead of splitting into extra docs.
 
-- Use filesystem copy/move commands (`mkdir -p`, `cp`, `cp -R`, `mv`, or `rsync` if available).
-- Do not recreate backups by reading file content and writing it again; this wastes tokens and may alter bytes.
-- Preserve relative paths under backup root.
-- Back up only user-authored target content, not generated/vendor/cache output.
-- Never back up `.agents/backups/**`.
-- Never overwrite an existing backup directory; create a fresh timestamped directory.
-- Never silently discard user instructions. Migrate unique notes into owning docs.
-- If old instructions conflict with inferred behavior, preserve them and record conflict in `decisions.md` or `decisions/open-questions.md`.
-
-### 5. Write compact docs
-
-Optimize for future input-token savings:
-
-- Bullets/tables, exact paths, short commands.
-- Stable patterns, boundaries, invariants, gotchas.
-- Root `AGENTS.md` stays tiny.
-- Hard cap root `AGENTS.md` at 40 lines.
-- Target `.agents/architecture.md` at 200 lines or fewer unless repo size requires more.
-- Target each `.agents/docs/*.md` at 150 lines or fewer unless topic density requires more.
-- README files are navigation only.
-- Docs should guide selective reading without broad grep.
-- Cite exact source paths for non-obvious claims, e.g. `package.json`, `src/server.ts`.
-- If a fact is not verified from files, mark it as `Unknown` or an open question.
-
-Root `AGENTS.md` content should be this small shape:
-
-- Start here: `.agents/docs/README.md`; use it to choose relevant docs/source paths before grep or subagents.
-- Use `.agents/architecture.md` for architecture, boundaries, flows, invariants, and high-risk areas.
-- Before editing: read only relevant `.agents/` docs, then targeted source files. Avoid repo-wide grep/tree/subagents unless docs are missing/stale/insufficient.
-- Grep/subagents: keep scoped to owning folder/domain from `.agents/docs/README.md`; state reason when broadening search.
-- When project knowledge changes, update the owning `.agents/` doc.
-- External docs: use Context7 unless `AGENTS.md` or user names a specific MCP/tool.
-
-`.agents/docs/README.md` must include reading order, file/folder map, ownership table, “read this when…” guidance, and maintenance/search rules that route future agents away from broad grep.
-
-`.agents/architecture.md` must include system purpose, major components, runtime/data/control flows, boundaries/ownership, invariants/constraints, high-risk areas/gotchas, and open questions.
-
-### 6. Security
+### 5. Security
 
 - Never copy secret values into docs.
 - Mention secret-bearing config by safe path/type only.
 - Redact tokens, private URLs, credentials, certs, cookies, auth headers.
 - Use concise pointers instead of proprietary long dumps.
 
-### 7. Validate docs
+### 6. Validate docs
 
-- Confirm required files exist.
-- Confirm root `AGENTS.md` is tiny and only routes.
-- Confirm docs have unique ownership and avoid duplicated facts.
-- Confirm links/paths point to existing files where practical.
-- Confirm no secret values were copied.
+- Confirm `AGENTS.md` exists and is only output file.
+- Confirm it routes common tasks to exact source paths.
+- Confirm it includes only verified, high-value facts.
+- Confirm no new `.agents/**` docs or backup folders were created.
+- Confirm no duplicated facts or copied secrets.
+- Confirm referenced paths exist where practical.
 
-### 8. Report
+### 7. Report
 
 Return only:
 
 - Created files.
 - Overwritten files.
-- Backup directory.
-- Taxonomy chosen.
+- Whether output stayed single-file.
 - Validation run.
 - Subagents used, if any.
 - Uncertainties/open questions.
