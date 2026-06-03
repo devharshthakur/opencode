@@ -1,5 +1,5 @@
 ---
-description: Update token-conserving agent docs
+description: Update single-file agent briefing
 agent: edit
 model: deepseek/deepseek-v4-pro
 subtask: false
@@ -7,33 +7,35 @@ subtask: false
 
 # Init Update
 
-Update token-conserving agent docs created by `/init` without unnecessary reads or rewrites.
+Update `AGENTS.md` created by `/init` without unnecessary reads or rewrites.
 
 Arguments: `$ARGUMENTS`
 
 ## Goal
 
-Keep `.agents/` docs accurate, compact, and cheap for future agents. Update durable project knowledge only: architecture, boundaries, layout, ownership, runtime/config/tooling, APIs/data/frontend/backend/testing/ops, conventions, invariants, gotchas, open questions. Do not create a full code inventory.
+Keep `AGENTS.md` accurate, compact, and cheap for future agents. Refresh only durable project knowledge: project purpose, stack, important paths, source-of-truth files, task routing, architecture/boundaries, validation commands, invariants, gotchas, and open questions. Do not create a full code inventory.
+
+Keep single-file setup. Update only `AGENTS.md`. Do not create `.agents/**`, backup folders, or supporting docs.
 
 ## Modes
 
-| Mode              | Behavior                                                                                                                          |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| default / no args | Delta update. Change only docs whose owning area drifted.                                                                         |
-| `full`            | Re-scan major areas and refresh stale docs after large changes.                                                                   |
-| `check`           | Read-only stale-doc report. No writes, backups, deletes, moves, formatting.                                                       |
-| `repair`          | Fix doc structure/navigation: missing indexes, broken links, missing folder READMEs, taxonomy drift. Avoid broad content rewrite. |
+| Mode              | Behavior                                                                                                                    |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| default / no args | Delta update. Refresh only `AGENTS.md` sections whose owning area drifted.                                                  |
+| `full`            | Re-scan major areas and refresh all major `AGENTS.md` sections.                                                            |
+| `check`           | Read-only stale-doc report. No writes, backups, deletes, moves, formatting.                                                |
+| `repair`          | Fix routing/structure issues: stale task routes, broken path refs, missing required sections, overly noisy wording.        |
 
 If mode is unclear, ask before proceeding.
 
 ## Required docs
 
-Expected: `AGENTS.md`, `.agents/architecture.md`, `.agents/docs/README.md`.
+Expected: `AGENTS.md` only.
 
-If `.agents/docs/README.md` is missing:
+If `AGENTS.md` is missing:
 
-- default/`full`/`check`: tell user to run `/init`, unless existing `.agents/docs/**` is enough to continue safely.
-- `repair`: reconstruct indexes from existing `.agents/docs/**` if possible; otherwise tell user to run `/init`.
+- default/`full`/`check`: tell user to run `/init`, unless existing docs are enough to reconstruct safely.
+- `repair`: reconstruct `AGENTS.md` from existing durable docs if possible; otherwise tell user to run `/init`.
 
 ## Workflow
 
@@ -42,28 +44,27 @@ Follow in order.
 ### 1. Size repo
 
 - Run `ls -a` first.
-- Prefer `.agents/` docs over source scan for routing decisions.
-- Small repo: targeted reads/globs only after docs map says where to look.
-- Huge repo/monorepo: focused `explore` subagents by changed area/module/package from docs map or git signals. No blanket agents.
+- Read `AGENTS.md` before source grep.
+- Read legacy `.agents/**` docs only if needed to recover durable notes into `AGENTS.md`.
+- Small/medium repo: targeted reads/globs only after `AGENTS.md` points to likely drift.
+- Huge repo/monorepo: use focused `explore` subagents by changed app/package/domain only. No blanket repo agents.
 
-### 2. Load docs map first
+### 2. Load project briefing first
 
-Read navigation docs before source grep:
+Read, at minimum:
 
 - `AGENTS.md`
-- `.agents/architecture.md`
-- `.agents/docs/README.md`
-- `.agents/docs/**/README.md`
 
-Build a concise map: file/folder purpose, owning doc per topic, reading order, open questions, taxonomy shape.
+Build concise map:
 
-Input-token rule: read only docs needed to map ownership. Broad grep, broad tree, broad doc reads, or subagents only when map is missing/stale/insufficient.
+- current project summary
+- stack and tools
+- important paths and source-of-truth files
+- task-routing sections
+- boundaries/invariants/gotchas
+- any unknowns or stale notes
 
-Search budget:
-
-- Each grep/glob/source read must have a target path and reason from docs map, git drift, or manifest/config evidence.
-- Prefer changed paths from git signals, then owning docs, then targeted source files.
-- Do not run repo-wide grep just to rediscover facts already owned by `.agents/` docs.
+Input-token rule: use `AGENTS.md` to decide where to look next. Do not broad-grep repo to rediscover facts it already owns.
 
 ### 3. Detect drift cheaply
 
@@ -73,79 +74,77 @@ Use cheap signals before content reads:
 - `git diff --name-only`
 - `git diff --cached --name-only`
 - `git log --name-only --oneline -20`
-- manifests/workspace/package files, configs, root docs, source/test tree shape
+- manifests/workspace files, configs, root docs, entrypoints, and source/test tree shape
 
-Detect drift in: apps/packages/modules, package manager/scripts/deps/workspaces, entrypoints/config/env, tests/fixtures, APIs/routes/contracts/auth, data models/migrations/storage/schemas, frontend routing/state/components, backend services/jobs/integrations, architecture flows/boundaries/invariants/gotchas, stale paths, broken README links.
+Look for drift in:
+
+- package/workspace/crate/module structure
+- dependencies, scripts, toolchain, package manager
+- entrypoints/config/env
+- routing/APIs/contracts/auth
+- data models/storage/migrations/schemas
+- frontend routing/state/components
+- backend services/jobs/integrations
+- test/build/deploy commands
+- architecture boundaries/invariants/gotchas
+- stale or broken path references in `AGENTS.md`
 
 Only read source content for drift candidates. If signals are inconclusive, report uncertainty or ask before broadening.
 
 ### 4. Choose scope
 
-- default: update only owning docs for changed areas; leave unrelated docs untouched.
-- `full`: re-scan major areas using docs map first; refresh stale `.agents/architecture.md` and `.agents/docs/**`; keep taxonomy unless evidence supports split/merge.
-- `check`: read only; report stale docs; no edits/backups/creates/deletes/renames/formatting.
-- `repair`: fix navigation/structure; create folder `README.md` only when folder has multiple docs; repair links/map entries; split/merge only when taxonomy blocks selective reading; avoid content refresh unless needed for repair.
-- If many top-level areas changed or docs map is unreliable in default mode, recommend `/init-update full` before broad rewrite.
+- default: update only drifted `AGENTS.md` sections; leave stable sections untouched.
+- `full`: refresh all major `AGENTS.md` sections from current repo evidence.
+- `check`: report stale sections only; no edits/backups/creates/deletes/renames/formatting.
+- `repair`: fix structure and routing; add missing required sections; simplify noisy wording.
 
-### 5. Back up changed files
+Even for large repos, keep one `AGENTS.md`. Compress instead of splitting into extra docs.
 
-Skip in `check` mode.
 
-Before overwriting target files, back them up under:
-
-`.agents/backups/init-update-YYYYMMDD-HHMMSS/<relative-path>`
-
-Targets: changed files under `AGENTS.md`, `.agents/architecture.md`, `.agents/docs/**`.
-
-Backup rules:
-
-- Back up only files you will overwrite.
-- Use filesystem copy/move commands (`mkdir -p`, `cp`, `cp -R`, `mv`, or `rsync` if available).
-- Do not recreate backups by reading file content and writing it again; this wastes tokens and may alter bytes.
-- Preserve relative paths under backup root.
-- Do not back up generated/vendor/cache output.
-- Preserve/migrate unique manual notes.
-- If docs conflict with code, update only with clear evidence. If uncertain, preserve old note and record uncertainty in `decisions.md` or `decisions/open-questions.md`.
-
-### 6. Update compactly
+### 5. Update compactly
 
 Token conservation first:
 
+- Keep `AGENTS.md` primary.
+- Update only sections whose facts drifted.
+- Preserve stable sections as-is when still correct.
 - Use bullets/tables, exact paths, short commands.
-- Prefer stable patterns, boundaries, invariants, gotchas.
-- Do not summarize every source file.
-- Preserve root `AGENTS.md` as docs-first router: `.agents/docs/README.md` -> `.agents/architecture.md` -> relevant owning docs -> targeted source reads.
-- Keep grep/subagent guidance explicit: scoped path/domain only, broad search only after `.agents/` docs fail.
-- Do not duplicate facts; update owning doc and link from indexes.
-- Keep root `AGENTS.md` tiny; keep README files navigation-only.
-- Update indexes when files move/split/merge.
+- Do not create or depend on supporting docs.
 - Remove stale paths only with clear evidence.
-- Update `Last reviewed:` only in touched docs if project already uses that convention.
+- If a fact is uncertain, mark `Unknown` or `Needs verification` instead of guessing.
+- Keep wording simple and direct.
 
-Maintain taxonomy:
+Always keep these sections accurate when relevant:
 
-- One stable fact, one owning file.
-- Put facts where future editing agent will look first.
-- Create folders only for multiple independent docs or over-dense docs.
-- No empty placeholder sections.
+- Project summary
+- Stack fingerprint
+- Important paths
+- Source-of-truth files
+- Read first by task
+- Architecture and boundaries
+- Commands
+- Search rules
+- Risks/gotchas
+- Unknowns/open questions
 
-### 7. Security
+Most important maintenance target: `Read first by task`. Future agents should know what files to read before grep.
+
+### 6. Security
 
 - Never copy secret values into docs.
 - Mention secret-bearing config by safe path/type only.
 - Redact tokens, private URLs, credentials, certs, cookies, auth headers.
 - Use concise pointers instead of proprietary long dumps.
 
-### 8. Report
+### 7. Report
 
 Return only:
 
 - Mode used.
 - Changed docs.
 - Unchanged docs checked.
-- Backup directory, if any.
 - Drift found.
-- Taxonomy changes.
+- Whether docs stayed single-file.
 - Broken links/path refs fixed.
 - Subagents used, if any.
 - Open questions / unresolved uncertainty.
