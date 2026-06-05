@@ -13,6 +13,7 @@
   - Use `tree` instead of `ls` for directory overview.
 - Safe tree command: `tree -a -L 2 -I "node_modules|.git|dist|build|coverage|.next|.svelte-kit|.turbo" <path>`.
 - For library/framework docs, prefer Context7 or MCP tools first.
+- For TanStack docs, use TanStack CLI instead of Context7/MCP: `tanstack search-docs <query> --library <id> [--framework <name>]` to find pages, then `tanstack doc <library> <path> [--docs-version <version>]` to fetch pages.
 - Use web search only when docs are missing, outdated, or unavailable.
 - If user requests a specific docs/source/tool, use that.
 - Local reference docs:
