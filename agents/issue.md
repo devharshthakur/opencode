@@ -40,21 +40,21 @@ Resolve GitHub issues from start to end. Default mode: read-only issue/code anal
 - Prefer `question` over plain text whenever the user can choose from a limited set.
 - Use plain text only for open-ended details: issue number, secrets, exact commands, custom title/body, business rules, or long requirements.
 - Keep choices short, concrete, and mutually exclusive.
-- Include `Custom instruction` unless the listed choices cover all safe paths.
+- Use question options only for confirmed choices. Use the built-in typed-answer field for issue numbers, custom titles/bodies, exact commands, or revision details.
 - If user replies ambiguously outside `question`, ask again with `question`.
 
 ## Standard choices
 
-- Missing issue: `Enter issue number`, `Use issue from URL`, `Cancel`, `Custom instruction`.
-- Base branch: `Use main`, `Use develop`, `Use current branch`, `Custom instruction`.
-- Closed issue: `Analyze only`, `Continue implementation`, `Stop`, `Custom instruction`.
+- Missing issue: `Use issue from URL`, `Cancel`.
+- Base branch: `Use main`, `Use develop`, `Use current branch`.
+- Closed issue: `Analyze only`, `Continue implementation`, `Stop`.
 - After guide: `Show exact code changes`, `User implements; review later`, `Agent implements`, `Stop`.
-- Dirty tree: `Continue on current branch`, `Create branch with current changes`, `Stash changes`, `Commit current changes`, `Custom instruction`.
-- Branch conflict: `Use existing branch`, `Choose new branch name`, `Delete/recreate branch`, `Custom instruction`.
-- Validation: `Add regression test`, `Manual validation only`, `Stop and ask maintainer`, `Custom instruction`.
-- Validation failure: `Fix within approved issue guidance`, `Stop and summarize`, `Revise plan`, `Custom instruction`.
-- After implementation: `Commit changes`, `Leave staged only`, `Revise implementation`, `Custom instruction`.
-- PR: `Create PR`, `Edit PR title/body first`, `Do not create PR`, `Custom instruction`.
+- Dirty tree: `Continue on current branch`, `Create branch with current changes`, `Stash changes`, `Commit current changes`.
+- Branch conflict: `Use existing branch`, `Choose new branch name`, `Delete/recreate branch`.
+- Validation: `Add regression test`, `Manual validation only`, `Stop and ask maintainer`.
+- Validation failure: `Fix within approved issue guidance`, `Stop and summarize`, `Revise plan`.
+- After implementation: `Commit changes`, `Leave staged only`, `Revise implementation`.
+- PR: `Create PR`, `Edit PR title/body first`, `Do not create PR`.
 - Merge: `Merge only`, `Merge and close issue`, `Wait for checks`, `Do not merge`.
 
 ## Skills
@@ -75,7 +75,7 @@ Resolve GitHub issues from start to end. Default mode: read-only issue/code anal
 
 ## 1. Fetch issue
 
-1. Accept `123`, `#123`, or GitHub issue URL. Ask with `question` if missing or ambiguous.
+1. Accept `123`, `#123`, or GitHub issue URL. If missing or ambiguous, ask with `question` and use typed answer for the issue number or URL.
 2. If base branch is unclear, ask with standard base-branch choices. Default to `main` when safe.
 3. Run:
    - `gh issue view <issue> --json number,title,body,state,labels,assignees,comments,url`
@@ -122,7 +122,7 @@ Use this structure:
 
 - <targeted test/check>
 
-Then ask with `question` using after-guide choices.
+Then ask with `question` using after-guide choices. Use typed answer for extra implementation detail when needed.
 
 Rules:
 

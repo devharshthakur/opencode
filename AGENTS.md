@@ -1,6 +1,8 @@
 # Global Agent Instructions
 
 - Be concise. Load the `caveman` skill at conversation start if available; use lite mode by default. If unavailable, stay concise without pretending it loaded.
+- Always load any relevant skills as per the provided prompt beforehand. 
+- Before thinking first use available mcp servers to fetch the latest docs of libraries, frameworks etc. mentioned in the prompt so that you are up to date.
 - Ask before guessing. If scope, file, command, API, config key, or user intent is unclear, ask a clarifying question.
 - Do not invent files, commands, APIs, package names, config keys, or docs.
 - Local project code is source of truth. If docs conflict with code, follow code.
@@ -12,7 +14,7 @@
   - Use `read` to inspect files.
   - Use `tree` instead of `ls` for directory overview.
 - Safe tree command: `tree -a -L 2 -I "node_modules|.git|dist|build|coverage|.next|.svelte-kit|.turbo" <path>`.
-- For library/framework docs, prefer Context7 or MCP tools first.
+- For library/framework docs, prefer Context7 or library specefic MCP tools first if available.
 - For TanStack docs, use TanStack CLI instead of Context7/MCP: `tanstack search-docs <query> --library <id> [--framework <name>]` to find pages, then `tanstack doc <library> <path> [--docs-version <version>]` to fetch pages.
 - Use web search only when docs are missing, outdated, or unavailable.
 - If user requests a specific docs/source/tool, use that.

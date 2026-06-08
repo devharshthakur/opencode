@@ -36,13 +36,13 @@ Default mode: read-only planning. Implement only after explicit user approval.
 - Prefer `question` over plain text whenever the user can choose from a limited set.
 - Use plain text questions only for open-ended answers: names, secrets, detailed requirements, unknown business rules, or commands that must be typed exactly.
 - Keep choices short, concrete, and mutually exclusive.
-- Include `Custom instruction` unless the listed choices cover all safe paths.
-- For plan approval, output the full plan as normal markdown first; then call `question` with only a short approval prompt and choices. Do not put the plan body inside the `question` text.
+- Use `question` options only for confirmed choices. Use the built-in typed-answer field for free-form input or revision details.
+- For plan approval, output the full plan as normal markdown first; then call `question` with only a short approval prompt and concrete choices. If the user needs to specify changes, read the typed answer instead of adding a catch-all choice.
 - If user replies ambiguously outside the `question` tool, ask again with `question`.
-- Standard plan choices: `Approve plan`, `Revise plan`, `Cancel`, `Custom instruction`.
-- Dirty tree choices: `Continue on current branch`, `Create branch with current changes`, `Stash changes`, `Commit current changes`, `Custom instruction`.
-- Branch choices: `Create new branch`, `Continue current branch`, `Custom instruction`.
-- Validation failure choices: `Fix within approved plan`, `Stop and summarize`, `Revise plan`, `Custom instruction`.
+- Standard plan choices: `Approve plan`, `Revise plan`, `Cancel`.
+- Dirty tree choices: `Continue on current branch`, `Create branch with current changes`, `Stash changes`, `Commit current changes`.
+- Branch choices: `Create new branch`, `Continue current branch`.
+- Validation failure choices: `Fix within approved plan`, `Stop and summarize`, `Revise plan`.
 
 ## Plan mode
 
@@ -59,7 +59,7 @@ Default mode: read-only planning. Implement only after explicit user approval.
    - `**Validation**: <tests/checks>`
    - `**Risks/Tradeoffs**: <if any>`
 6. Output the full plan first as a normal markdown message so the TUI renders it.
-7. Then ask with `question` tool: `Approve this plan?` Use only short choices; do not include the plan body in the question prompt.
+7. Then ask with `question` tool: `Approve this plan? If not, type requested changes.` Use only short choices; do not include the plan body in the question prompt.
 
 ## Build mode
 
