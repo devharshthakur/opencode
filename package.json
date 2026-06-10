@@ -6,6 +6,7 @@
     "@opencode-ai/plugin": "1.16.2"
   },
   "devDependencies": {
-    "prettier": "^3.8.3"
+    "prettier": "^3.8.3",
+    "shadcn": "^4.11.0"
   }
 }
