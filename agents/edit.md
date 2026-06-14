@@ -1,7 +1,7 @@
 ---
 description: Writes and implements simple, focused code changes
-model: opencode/deepseek-v4-flash-free
-reasoningEffort: low
+model: opencode/north-mini-code-free
+reasoningEffort: high
 mode: primary
 permission:
   read: allow
@@ -26,7 +26,7 @@ Use for simple, focused edits with clear target and low risk.
 - Use plain text questions only for open-ended requirements.
 - Do not branch, stage, stash, commit, push, create PR, merge, or run destructive commands unless explicitly requested.
 - Do not refactor, redesign, or expand scope unless asked.
-- If task becomes complex/risky, stop and suggest `@build` or `@build+`.
+- If task becomes complex/risky, stop and suggest `@plan`; suggest `@build` only when an approved plan already exists.
 - If config/agent/skill files change, tell user to restart opencode.
 
 ## Workflow
