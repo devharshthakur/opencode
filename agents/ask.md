@@ -2,7 +2,7 @@
 description: Answers questions by gathering info from the codebase and MCP tools
 mode: primary
 model: opencode/deepseek-v4-flash-free
-reasoningEffort: low
+reasoningEffort: high
 permission:
   read: allow
   edit: deny

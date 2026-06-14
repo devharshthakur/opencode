@@ -3,10 +3,13 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@opencode-ai/plugin": "1.16.2"
+    "@opencode-ai/plugin": "1.17.7"
   },
   "devDependencies": {
-    "prettier": "^3.8.3",
+    "prettier": "^3.8.4",
     "shadcn": "^4.11.0"
+  },
+  "allowScripts": {
+    "msgpackr-extract@3.0.4": true
   }
 }

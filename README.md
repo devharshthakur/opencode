@@ -10,13 +10,13 @@ Personal [OpenCode](https://opencode.ai) configuration — custom agents, comman
 
 ## Agents
 
-Default agent: **build**. The `plan` agent is disabled.
+Default agent: **ask**. Use `plan` for planning-only work and `build` to implement an approved plan.
 
 | Agent    | Model                         | Role                                         | Read-only |
 | -------- | ----------------------------- | -------------------------------------------- | --------- |
 | `ask`    | deepseek-v4-flash-free        | Q&A / codebase exploration                   | ✓         |
-| `build`  | deepseek-v4-pro               | Plan-first, approval-gated                   |           |
-| `build+` | openai-gpt-5.5                | Large/complex task planner                   |           |
+| `plan`   | deepseek-v4-pro               | Planning-only for complex/risky work         | ✓         |
+| `build`  | deepseek-v4-flash-free        | Implements approved `@plan` plans            |           |
 | `edit`   | deepseek-v4-flash-free        | Lightweight targeted edits                   |           |
 | `fix`    | deepseek-v4-pro (high-effort) | Root-cause bug diagnosis                     |           |
 | `issue`  | deepseek-v4-pro               | GitHub issue → plan → implement → PR → merge |           |
