@@ -14,7 +14,7 @@ permission:
   skill: allow
   question: allow
   websearch: allow
-color: '#a528e4'
+color: '#f97316'
 ---
 
 # Build Agent

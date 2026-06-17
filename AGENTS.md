@@ -1,24 +1,12 @@
 # Global Agent Instructions
 
-- **Be concise. Load the `caveman` skill at conversation start if available; use lite mode by default. If unavailable, stay concise without pretending it loaded.**
-- **Always use Github Mcp server over `gh` cli for any github related tasks, fallover to `gh` cli if github mcp server is unavailable**
-- **For TanStack docs, use TanStack CLI instead of Context7/MCP: `tanstack search-docs <query> --library <id> [--framework <name>]` to find pages, then `tanstack doc <library> <path> [--docs-version <version>]` to fetch pages.**
-- **Use web search only when Context 7 Mcp results are insufficient.**
-- **Always load any relevant skills before hand.**
-- **Use `pnpm` for JavaScript/TypeScript unless the project requires `npm` or `yarn`.**
-- **Use `uv` for Python unless the project requires another tool. Do not use `pip` directly unless required.**
-- Before thinking first use available mcp servers to fetch the latest docs of libraries, frameworks etc. mentioned in the prompt so that you are up to date.
-- Ask before guessing. If scope, file, command, API, config key, or user intent is unclear, ask a clarifying question.
-- Do not invent files, commands, APIs, package names, config keys, or docs.
-- Local project code is source of truth. If docs conflict with code, follow code.
-- Prefer precise tools:
-  - Use `glob` to find files.
-  - Use `grep` to search content.
-  - Use `read` to inspect files.
-  - Use `tree` instead of `ls` for directory overview.
-- Safe tree command: `tree -a -L 2 -I "node_modules|.git|dist|build|coverage|.next|.svelte-kit|.turbo" <path>`.
-- For library/framework docs, prefer Context7 or library specefic MCP tools first if available.
-- If user requests a specific docs/source/tool, use that.
-- Local reference docs:
-  - uv: [docs/uv.md](./docs/uv.md)
-  - shadcn-svelte: [docs/shadcn-svelte.md](./docs/shadcn-svelte.md)
+- **Be concise. Load `caveman` skill at start; use lite mode.**
+- **Doc priority**: Context7 → library-specific MCP → TanStack CLI (for TanStack) → web search as fallback.
+- **Always load relevant skills before working.**
+- **Before answering, fetch latest docs via available MCP tools when libraries/frameworks are mentioned.**
+- Use `pnpm` for JS/TS unless project says otherwise. Use `uv` for Python; never raw `pip`.
+- Ask before guessing. Never invent files, APIs, packages, config keys, or docs.
+- Local code is source of truth — if docs conflict, follow code.
+- Prefer `glob`/`grep`/`read` over `ls`/`cat`/`find`. Use `tree -a -L 2 -I "node_modules|.git|dist|build|coverage|.next|.svelte-kit|.turbo" <path>` for directories.
+- If user requests a specific docs source, use that.
+- Local reference docs: [uv](./docs/uv.md), [shadcn-svelte](./docs/shadcn-svelte.md).

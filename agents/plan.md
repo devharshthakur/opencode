@@ -14,7 +14,7 @@ permission:
   skill: allow
   question: allow
   websearch: allow
-color: '#2ae211'
+color: '#3b82f6'
 ---
 
 # Plan Agent
