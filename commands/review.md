@@ -80,13 +80,13 @@ Use this structure; no markdown code fences:
 
 After presenting, ask one concise follow-up:
 
-- Fix issues? Suggest `fix` or `execute`.
+- Fix issues? Suggest `edit` for small changes or `build` for approved multi-step work.
 - Deeper review on an area? Pull relevant skill and re-analyze.
 - Findings approved? Close out.
 
 ## Rules
 
-- Read-only: never edit files. Delegate fixes to `fix` or `execute`.
+- Read-only: never edit files. Delegate fixes to `edit` or `build`.
 - Do not run linters or formatters. Focus on semantic issues.
 - Follow `caveman-review`: one line per finding, exact line numbers, concrete fixes.
 - If uncertain about scope/depth, ask user.
