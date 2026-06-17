@@ -10,16 +10,25 @@ Personal [OpenCode](https://opencode.ai) configuration — custom agents, comman
 
 ## Agents
 
-Default agent: **ask**. Use `plan` for planning-only work and `build` to implement an approved plan.
+Default agent: **ask**. Use `chat` for non-project conversation, `plan` for risky work, `edit` for small safe changes, and `build` to implement an approved plan.
 
-| Agent    | Model                         | Role                                         | Read-only |
-| -------- | ----------------------------- | -------------------------------------------- | --------- |
-| `ask`    | deepseek-v4-flash-free        | Q&A / codebase exploration                   | ✓         |
-| `plan`   | deepseek-v4-pro               | Planning-only for complex/risky work         | ✓         |
-| `build`  | deepseek-v4-flash-free        | Implements approved `@plan` plans            |           |
-| `edit`   | deepseek-v4-flash-free        | Lightweight targeted edits                   |           |
-| `fix`    | deepseek-v4-pro (high-effort) | Root-cause bug diagnosis                     |           |
-| `issue`  | deepseek-v4-pro               | GitHub issue → plan → implement → PR → merge |           |
+| Agent   | Model                  | Role                                          | Read-only |
+| ------- | ---------------------- | --------------------------------------------- | --------- |
+| `chat`  | deepseek-v4-flash-free | General chat with MCP/web, no project access  | ✓         |
+| `ask`   | deepseek-v4-flash-free | Project Q&A, diagnosis, issue analysis        | ✓         |
+| `plan`  | deepseek-v4-pro        | Formal phased planning for complex/risky work | ✓         |
+| `build` | deepseek-v4-flash-free | Implements approved plans and delivery steps  |           |
+| `edit`  | deepseek-v4-flash-free | Lightweight targeted edits                    |           |
+
+`chat` stays off-project. `ask` handles read-only repo analysis, bug diagnosis, and issue analysis. `plan` stays reserved for formal phased plans.
+
+## Skills
+
+| Skill                   | Purpose                                  |
+| ----------------------- | ---------------------------------------- |
+| `fix-diagnosis`         | Root-cause workflow and fix-plan format  |
+| `github-issue-analysis` | Read-only GitHub issue analysis workflow |
+| `github-delivery`       | Commit / PR / merge / issue-close flow   |
 
 ## Commands
 
