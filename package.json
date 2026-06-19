@@ -6,6 +6,8 @@
     "@opencode-ai/plugin": "1.17.7"
   },
   "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.2",
     "prettier": "^3.8.4",
     "shadcn": "^4.11.0"
   },
