@@ -59,5 +59,10 @@
       "url": "https://mcp.notion.com/mcp",
       "enabled": false
     }
+  },
+  "permission": {
+    "external_directory": {
+      "*": "allow"
+    }
   }
 }
