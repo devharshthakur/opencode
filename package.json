@@ -12,11 +12,11 @@
     ]
   },
   "dependencies": {
-    "@opencode-ai/plugin": "1.17.7"
+    "@opencode-ai/plugin": "1.17.9"
   },
   "devDependencies": {
     "husky": "^9.1.7",
-    "lint-staged": "^15.5.2",
+    "lint-staged": "^17.0.8",
     "prettier": "^3.8.4",
     "shadcn": "^4.11.0"
   },
