@@ -1,6 +1,6 @@
 ---
 description: Writes and implements simple, focused code changes
-model: opencode/north-mini-code-free
+model: opencode-go/deepseek-v4-flash
 reasoningEffort: high
 mode: primary
 color: '#10b981'

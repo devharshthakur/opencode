@@ -1,7 +1,7 @@
 ---
 description: Default read-only project agent for codebase Q&A, bug diagnosis, and GitHub issue analysis
 mode: primary
-model: opencode/deepseek-v4-flash-free
+model: opencode-go/deepseek-v4-flash
 reasoningEffort: high
 permission:
   read: allow

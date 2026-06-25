@@ -1,7 +1,7 @@
 ---
 description: General conversation agent with MCP and web tools, but no local project access
 mode: primary
-model: opencode/deepseek-v4-flash-free
+model: opencode-go/deepseek-v4-flash
 reasoningEffort: high
 permission:
   read: deny
