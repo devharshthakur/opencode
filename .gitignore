@@ -3,3 +3,4 @@ package-lock.json
 bun.lock
 skills/*
 opencode.json
+service.json

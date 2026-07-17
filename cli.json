@@ -1,0 +1,20 @@
+{
+  "theme": {
+    "name": "opencode",
+    "mode": "light"
+  },
+  "diffs": {
+    "wrap": "none",
+    "tree": false,
+    "view": "unified"
+  },
+  "session": {
+    "sidebar": "hide",
+    "scrollbar": false,
+    "thinking": "hide"
+  },
+  "hints": {
+    "tips": false
+  },
+  "animations": true
+}
