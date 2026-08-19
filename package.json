@@ -12,15 +12,16 @@
     ]
   },
   "dependencies": {
-    "@opencode-ai/plugin": "latest"
+    "@opencode-ai/plugin": "1.18.18"
   },
   "devDependencies": {
-    "husky": "^9.1.7",
-    "lint-staged": "^17.0.8",
-    "prettier": "^3.9.5",
-    "shadcn": "^4.13.0"
+    "husky": "9.1.7",
+    "lint-staged": "17.3.0",
+    "prettier": "3.9.6",
+    "shadcn": "4.18.0"
   },
   "allowScripts": {
-    "msgpackr-extract@3.0.4": true
+    "msgpackr-extract@3.0.4": true,
+    "msw@2.15.0": true
   }
 }
