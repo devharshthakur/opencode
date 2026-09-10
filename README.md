@@ -32,25 +32,11 @@ Default agent: **ask**. Use `chat` for non-project conversation, `plan` for risk
 
 ## Commands
 
-| Command           | Description                                         |
-| ----------------- | --------------------------------------------------- |
-| `/caveman`        | Toggle caveman communication mode (lite/full/ultra) |
-| `/caveman-commit` | Stage and commit with conventional commit messages  |
-| `/caveman-review` | Code review with compressed feedback                |
-| `/init`           | Initialize project context for OpenCode             |
-| `/init-update`    | Update existing project context                     |
-| `/review`         | Standard code review                                |
-
-## Plugins
-
-### Caveman Plugin
-
-Lifecycle plugin (`plugins/caveman/`) that handles caveman mode state across sessions:
-
-- **`session.created`** — writes active mode flag on session start
-- **`tui.prompt.append`** — parses slash commands and natural-language toggles, appends reinforcement line each prompt so model doesn't drift
-
-Skills directory (`~/.agents/skills/`) provides the actual caveman skill definitions. The plugin handles only dynamic state — the always-on ruleset comes from `AGENTS.md`.
+| Command        | Description                             |
+| -------------- | --------------------------------------- |
+| `/init`        | Initialize project context for OpenCode |
+| `/init-update` | Update existing project context         |
+| `/review`      | Standard code review                    |
 
 ## License
 
