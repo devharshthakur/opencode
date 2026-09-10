@@ -1,3 +1,4 @@
 {
-  "biome.enabled": false
+  "biome.enabled": false,
+  "js/ts.experimental.useTsgo": false
 }
