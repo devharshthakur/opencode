@@ -1,7 +1,7 @@
 ---
 description: Implements approved plans and handles optional delivery phases only after explicit approval
 mode: primary
-model: opencode-go/deepseek-v4-flash
+model: opencode-go/deepseek-flash
 reasoningEffort: high
 permission:
   read: allow
