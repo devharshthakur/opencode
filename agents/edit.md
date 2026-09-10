@@ -1,6 +1,6 @@
 ---
 description: Writes and implements simple, focused code changes
-model: opencode-go/deepseek-flash
+model: opencode-go/deepseek-v4.1-flash
 reasoningEffort: high
 mode: primary
 color: '#10b981'

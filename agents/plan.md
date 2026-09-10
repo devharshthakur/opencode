@@ -1,7 +1,7 @@
 ---
 description: Plans large, complex, risky, cross-module, migration, architecture, or unclear tasks only. Produces approved plans for @build; never writes files or runs write-capable operations.
 mode: primary
-model: opencode-go/deepseek-flash
+model: opencode-go/deepseek-v4.1-flash
 reasoningEffort: high
 permission:
   read: allow
