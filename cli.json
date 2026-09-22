@@ -14,7 +14,7 @@
     "thinking": "hide"
   },
   "hints": {
-    "tips": false
+    "tips": true
   },
-  "animations": true
+  "animations": false
 }
