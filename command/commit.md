@@ -1,6 +1,6 @@
 ---
 description: Stage logically grouped changes and create approved Conventional Commits
-agent: build
+agent: edit
 ---
 
 # Commit
