@@ -9,7 +9,7 @@ permission:
   glob: allow
   grep: allow
   bash:
-    "*": ask
+    "*": allow
     "git status": allow
     "git status *": allow
     "git diff": allow
@@ -19,8 +19,8 @@ permission:
     "git show": allow
     "git show *": allow
     "git rev-parse *": allow
-    "rm *": deny
-    "rmdir *": deny
+    "rm *": ask
+    "rmdir *": ask
     "git clean *": deny
     "git reset --hard*": deny
     "git restore *": deny

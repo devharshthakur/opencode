@@ -9,16 +9,7 @@ permission:
   glob: allow
   grep: allow
   bash:
-    "*": deny
-    "git status": allow
-    "git status *": allow
-    "git diff": allow
-    "git diff *": allow
-    "git log": allow
-    "git log *": allow
-    "git show": allow
-    "git show *": allow
-    "git rev-parse *": allow
+    "*": allow
   task:
     "*": deny
     explore: allow
