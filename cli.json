@@ -13,7 +13,8 @@
     "scrollbar": false,
     "thinking": "hide",
     "grouping": "auto",
-    "verbosity": "low"
+    "verbosity": "low",
+    "image_preview": true
   },
   "tabs": {
     "mode": "off"
