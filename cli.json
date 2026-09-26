@@ -11,10 +11,19 @@
   "session": {
     "sidebar": "hide",
     "scrollbar": false,
-    "thinking": "hide"
+    "thinking": "hide",
+    "grouping": "auto",
+    "verbosity": "low"
+  },
+  "tabs": {
+    "mode": "off"
+  },
+  "attention": {
+    "sound": true
   },
   "hints": {
     "tips": true
   },
-  "animations": false
+  "animations": true,
+  "scroll": { "speed": 3, "acceleration": true }
 }
