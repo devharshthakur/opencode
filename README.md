@@ -9,7 +9,13 @@ Most days, I use **`ask` to understand the code** and **`edit` to change it**. W
 ## Getting started
 
 1. Place the files in `~/.config/opencode`, or `$XDG_CONFIG_HOME/opencode` if you use a custom config directory.
-2. Open [`opencode.jsonc`](opencode.jsonc), pick models you have access to, and set up provider authentication.
+2. Copy the sample config and adjust it:
+
+   ```sh
+   cp opencode.sample.jsonc opencode.jsonc
+   ```
+
+   Pick models you have access to and set up provider authentication.
 3. Set `CONTEXT7_API_KEY` in your environment. Context7 is the only MCP integration enabled by default.
 4. Install the dependency from this directory:
 
@@ -20,7 +26,7 @@ Most days, I use **`ask` to understand the code** and **`edit` to change it**. W
 5. Restart OpenCode and open a fresh session.
 
 > [!NOTE]
-> Use `opencode.jsonc`, not `opencode.sample.json`. The sample is an older template and doesn't match the current setup. The active config uses `{env:VAR}` for environment variables.
+> `opencode.jsonc` is ignored by Git so your personal models and tokens stay local. Use [`opencode.sample.jsonc`](opencode.sample.jsonc) as the starting template. It uses `{env:VAR}` for environment variables.
 
 > [!WARNING]
 > This is a personal configuration, not a hardened preset. External-directory access is allowed, and the terminal is set to autoaccept permissions. Review those settings before using it with your projects.
@@ -127,7 +133,8 @@ The main files are split by responsibility:
 
 | File or folder | What's inside |
 | --- | --- |
-| [`opencode.jsonc`](opencode.jsonc) | Models, agents, permissions, MCP integrations, and the `zsh` shell |
+| `opencode.jsonc` (local, ignored) | Your models, agents, permissions, MCP integrations, and the `zsh` shell |
+| [`opencode.sample.jsonc`](opencode.sample.jsonc) | Template to copy to `opencode.jsonc` |
 | [`cli.json`](cli.json) | Terminal appearance and interaction settings |
 | [`AGENTS.md`](AGENTS.md) | Shared rules for development, documentation, and verification |
 | [`agents/`](agents/) | The `chat`, `ask`, and `edit` definitions |
@@ -159,7 +166,7 @@ The global rules request approval before reading environment files, private keys
 
 `package.json` pins `@opencode-ai/plugin` to `1.18.35`, with `package-lock.json` tracking the install. There are no package scripts, local plugin implementations, or configured plugin entries.
 
-`opencode.json` and `service.json` are ignored by Git. Keep credentials and local service state out of commits.
+`opencode.json`, `opencode.jsonc`, and `service.json` are ignored by Git. Keep credentials and local service state out of commits.
 
 </details>
 
