@@ -76,19 +76,19 @@ Breaking changes (MUST be marked when compatibility breaks):
 
 Types (the spec only assigns meaning to `feat` and `fix`; others are allowed):
 
-| type       | use                                   | SemVer effect        |
-| ---------- | ------------------------------------- | -------------------- |
-| `feat`     | a new feature                         | MINOR                |
-| `fix`      | a bug fix                             | PATCH                |
-| `docs`     | documentation only                    | none                 |
-| `style`    | formatting/whitespace, no logic       | none                 |
-| `refactor` | code change that is neither feat/fix  | none                 |
-| `perf`     | performance improvement               | none                 |
-| `test`     | tests                                 | none                 |
-| `build`    | build system or dependencies          | none                 |
-| `ci`       | CI configuration                      | none                 |
-| `chore`    | other maintenance                     | none                 |
-| `revert`   | revert a previous commit              | none                 |
+| type       | use                                  | SemVer effect |
+| ---------- | ------------------------------------ | ------------- |
+| `feat`     | a new feature                        | MINOR         |
+| `fix`      | a bug fix                            | PATCH         |
+| `docs`     | documentation only                   | none          |
+| `style`    | formatting/whitespace, no logic      | none          |
+| `refactor` | code change that is neither feat/fix | none          |
+| `perf`     | performance improvement              | none          |
+| `test`     | tests                                | none          |
+| `build`    | build system or dependencies         | none          |
+| `ci`       | CI configuration                     | none          |
+| `chore`    | other maintenance                    | none          |
+| `revert`   | revert a previous commit             | none          |
 
 - Casing is not significant to tools, EXCEPT `BREAKING CHANGE`, which MUST be uppercase.
 - For a revert, prefer the `revert` type and reference the reverted commits in a footer, e.g.:
@@ -143,14 +143,3 @@ For each approved commit, in order:
 5. Verify the full message is correct: `git log -1 --format=%B`.
 
 Never use `git add -A`, `git add .`, or `git commit -a` unless the user explicitly approved committing every listed file.
-
-## Step 7 — Report and offer push
-
-- Show `git status --short` and `git log --oneline -<n>` for the new commits.
-- Ask with `question` whether to push. Do NOT push without approval.
-- If approved: `git push` (never `--force`). If there is no upstream: `git push -u origin <branch>`.
-
-## Failure handling
-
-- If a commit fails (hook or error): fix the cause, re-stage, and make a NEW commit. Never amend a failed commit.
-- If a hook rejects the commit: report the hook output and stop; ask how to proceed.

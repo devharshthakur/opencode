@@ -1,6 +1,6 @@
 ---
 name: fix-diagnosis
-description: bug, stack trace, screenshot, repro, error log. Use for read-only root-cause diagnosis and detailed fix plans before @edit or @build.
+description: bug, stack trace, screenshot, repro, error log. Use for read-only root-cause diagnosis and detailed fix plans before edit or the approved-plan /build workflow.
 ---
 
 # Fix Diagnosis
@@ -35,4 +35,5 @@ Use for bug reports, stack traces, screenshots, failing commands, or broken beha
 **Risks/Edge Cases**: <notable concerns>
 ```
 
-Keep plan detailed enough for manual implementation or a narrow `@edit`/`@build` handoff.
+Keep the plan detailed enough for manual implementation or a narrow handoff to `edit`; use
+`/build` with `edit` for explicitly approved fix-plan execution.
