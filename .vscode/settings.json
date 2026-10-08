@@ -1,4 +1,8 @@
 {
   "biome.enabled": false,
-  "js/ts.experimental.useTsgo": false
+  "js/ts.experimental.useTsgo": false,
+  "search.exclude": {
+    "**/.git": true
+  },
+  "search.useIgnoreFiles": true
 }
