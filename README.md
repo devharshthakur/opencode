@@ -1,12 +1,37 @@
 # OpenCode Config
 
-Personal [OpenCode](https://opencode.ai) V2 configuration — custom agents, commands, plugins, skills, and project-wide rules for AI-assisted development.
+Personal [OpenCode](https://opencode.ai/v2/docs/) V2 configuration — custom agents, commands, skills, terminal preferences, and project-wide rules for AI-assisted development.
 
 ## Setup
 
-1. Copy `opencode.sample.json` → `opencode.json`
-2. Fill in your API keys (the sample uses `$VAR` placeholders)
-3. Run `pnpm install`
+1. Place this configuration in `~/.config/opencode` (or `$XDG_CONFIG_HOME/opencode`). Review the personal settings before using them.
+2. Use the tracked `opencode.jsonc` as the current configuration. Choose models available to your account and configure provider authentication.
+3. Set `CONTEXT7_API_KEY` in the environment for the enabled Context7 MCP server. Optional GitHub MCP uses `GITHUB_MCP_TOKEN` and is disabled by default.
+4. Run `npm install` to install the dependency in `package.json`; the repository currently tracks `package-lock.json`.
+5. Restart OpenCode and start a fresh session after changing agents or skills.
+
+`opencode.sample.json` is an older template, not a mirror of the active configuration: it still selects `plan`, uses legacy configuration shapes, and contains literal `$VAR` placeholders. Do not copy it unchanged to reproduce the current setup. The active configuration uses `{env:VAR}` environment substitutions.
+
+## Configuration files
+
+| Path | Purpose |
+| --- | --- |
+| `opencode.jsonc` | Current model, default agent, subagent overrides, permissions, MCP servers, and `zsh` shell |
+| `cli.json` | Terminal preferences: light theme, unified diffs, low verbosity, hidden thinking/sidebar, and tabs off |
+| `AGENTS.md` | Global development, documentation, tooling, and verification instructions |
+| `agents/` | Custom primary agents: `chat`, `ask`, and `edit` |
+| `commands/` | Explicit planning, approved-build, and autonomous implementation commands |
+| `skills/` | Repository-maintained workflow skills and supporting references |
+| `opencode.sample.json` | Older example configuration requiring review before use |
+| `package.json`, `package-lock.json` | `@opencode-ai/plugin` dependency pinned to `1.18.35`; no package scripts |
+
+There are no local plugin implementations or configured plugin entries. `opencode.json` and `service.json` are ignored by Git; do not publish local service state or credentials.
+
+### MCP and permissions
+
+Context7 is the only MCP server enabled by default. Optional disabled integrations are AWS, GitHub, Google Cloud (general, Backup and DR, observability, storage), Homebrew, Vercel, Canva, Notion, Chrome DevTools, Cloudflare, LinkedIn, and Kite. Enable only the integrations you need and supply their authentication and local prerequisites.
+
+Global permissions allow external-directory access and request approval for reads of environment files, private keys, and common credential files; `.env.example` is allowed. `cli.json` currently selects permission autoaccept, so review that preference alongside the configured permission rules before using this setup.
 
 ## Agents
 
@@ -17,6 +42,8 @@ Default agent: **edit**. Use `chat` for non-project conversation, `ask` for read
 | `chat`  | `opencode-go/deepseek-v4.1-flash`    | General chat with MCP/web, no project access   | ✓         |
 | `ask`   | `opencode-go/deepseek-v4.1-flash`    | Project Q&A, diagnosis, issue analysis, and planning | ✓     |
 | `edit`  | `opencode-go/deepseek-v4.1-flash`    | Full-access development and Git/GitHub work    |           |
+
+The primary agent files do not pin models; they inherit the configured default unless overridden. Built-in subagents are configured separately: `explore` uses `opencode/big-pickle`, and `general` uses `opencode-go/deepseek-v4.1-flash#high`.
 
 `chat` cannot access the workspace or launch subagents. `ask` denies file edits but retains its existing broad shell access and read-only `explore` subagent access; avoiding write-producing shell commands is an instruction, not a shell permission restriction. Its short prompt answers ordinary questions directly and loads relevant workflows. `edit` is the general-purpose execution agent: ordinary edits and small tasks run directly, and explicitly requested workflows use relevant skills. It has no agent-specific tool restrictions; global secret-read approvals, project permissions, and applicable policies remain enforced.
 
@@ -45,7 +72,9 @@ Skills are advertised by description and loaded on demand. Agent prompts select 
 | `fix-diagnosis` | Read-only root-cause diagnosis and fix-plan format |
 | `investigate-first` | Evidence-ranked diagnosis for ambiguous failures |
 | `lean-build`, `migration`, `safe-refactor`, `surgical-patch`, `verify-and-stop` | Scoped implementation and validation workflows |
-| `caveman-explore` | Compact routing guidance for the read-only `explore` subagent |
+| `tanstack-cli` | TanStack CLI scaffolding, add-ons, templates, and agent introspection |
+
+This table lists skills maintained in this repository. Built-in or externally installed skills may also be available in a running OpenCode session; they are not stored here.
 
 `plan`, `build`, and `implement` are registered but hidden from automatic model invocation with `opencode/autoinvoke: false`. Their commands explicitly load the exact skill IDs. Loading a skill to inspect or discuss it does not authorize executing its workflow.
 
@@ -57,8 +86,8 @@ Skills are advertised by description and loaded on demand. Agent prompts select 
 | `/build [plan/phase context]` | Select `edit`, explicitly load the build skill, and verify existing plan approval before execution |
 | `/implement <task>` | Run `edit` with the autonomous implementation skill; separate worktree by default |
 | `/implement-branch <task>` | Run `edit` with the same skill on a separate branch in the current checkout; no worktrees |
-| `/commit` | Stage approved changes and create approved Conventional Commits |
-| `/github-issue-analysis` | Read-only GitHub issue analysis and implementation guide |
+
+These are the four repository-defined commands. For standalone commits, explicitly request the `commit` skill; there is no local `/commit` command file. GitHub issue analysis can be requested from `ask`; there is no local `/github-issue-analysis` command file.
 
 Both implementation commands explicitly load the skill, run in the current session, preserve user overrides, and use no embedded shell commands. With no task or identifiable task context, they request a task before repository mutation. For implementation without delivery, use `/implement <task>; no commits, no push, no PR` or the branch-only equivalent.
 
