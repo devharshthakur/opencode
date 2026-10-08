@@ -73,6 +73,8 @@ Choose how much control you want over the task:
 | --- | --- |
 | `/plan <task>` | `ask` writes a plan for you to review |
 | `/build [plan or phase]` | `edit` carries out a plan you've explicitly approved |
+| `/commit [constraints]` | Plans local commits and asks for approval before staging or committing |
+| `/commit-auto [constraints]` | Creates scoped local commits without routine confirmation; never pushes |
 | `/implement <task>` | Implements, validates, commits, pushes, and opens or updates a PR in a separate worktree |
 | `/implement-branch <task>` | The same delivery workflow, on a separate branch in the current checkout |
 
@@ -89,6 +91,19 @@ Use this when you want to review the approach before anything changes.
 ```
 
 Planning doesn't edit files, run shell commands, or launch subagents. Building only starts when the plan, approval, and scope are clear. It includes validation, but **commits, pushes, and PRs need separate approval**.
+
+### Commit locally
+
+Both `/commit` and `/commit-auto` use the shared `commit` skill. The commands own the approval
+policy: `/commit` requires approval of the exact files and messages; `/commit-auto` authorizes
+scoped local commits without routine confirmation. Both stop for unclear scope, secrets, or
+unrelated staged changes and honor tool permissions. Neither pushes or creates PRs; pushing is
+left to you.
+
+```text
+/commit api only
+/commit-auto Commit the reviewed documentation changes only
+```
 
 ### Take a task through to a PR
 
@@ -121,7 +136,7 @@ You can narrow that permission in the request:
 
 The approved-plan `/build` workflow also checks dirty-checkout state, scope, and validation. It doesn't automatically create branches or worktrees, stage changes, or publish anything.
 
-All four commands run in the current session. If the task or required approval is missing, they ask before changing the repository. Use a fresh session when returning from autonomous delivery to ordinary editing.
+All six commands run in the current session. If the task or required approval is missing, they ask before changing the repository. `/commit-auto` skips routine commit approval, not safety checks. Use a fresh session when returning from autonomous delivery to ordinary editing.
 
 Skills describe how to work; they don't grant tool permissions or bypass approvals.
 
@@ -138,7 +153,7 @@ The main files are split by responsibility:
 | [`cli.json`](cli.json) | Terminal appearance and interaction settings |
 | [`AGENTS.md`](AGENTS.md) | Shared rules for development, documentation, and verification |
 | [`agents/`](agents/) | The `chat`, `ask`, and `edit` definitions |
-| [`commands/`](commands/) | The four workflow commands |
+| [`commands/`](commands/) | The six workflow commands |
 | [`skills/`](skills/) | Reusable workflow instructions |
 
 The terminal uses a light theme, unified diffs, and low verbosity. Thinking output and the sidebar are hidden, and tabs are off.
@@ -182,7 +197,7 @@ Agents load relevant skills when they need them, rather than loading every workf
 | `plan` | Write a reviewable plan and hand off to `/build` |
 | `build` | Execute an explicitly approved plan |
 | `implement` | Deliver a task through validation and a PR |
-| `commit` | Review changes and get approval before committing |
+| `commit` | Inspect, group, and create safe commits under the caller's approval policy |
 | `fix-diagnosis` | Find the root cause and write a fix plan without edits |
 | `investigate-first` | Gather evidence when the cause isn't clear |
 | `lean-build` | Build a focused feature without overbuilding |
@@ -194,7 +209,9 @@ Agents load relevant skills when they need them, rather than loading every workf
 
 `plan`, `build`, and `implement` require explicit invocation. Their metadata sets `opencode/autoinvoke: false`, and the workflow commands load them directly. Reading or discussing a skill doesn't authorize running it.
 
-For a standalone commit, request the `commit` skill. There's no repository-defined `/commit` command. For GitHub issue analysis, ask `ask`; there's no local `/github-issue-analysis` command either.
+For standalone commits, use `/commit` for explicit confirmation or `/commit-auto` for local-only
+commits without routine confirmation. Loading the `commit` skill alone does not authorize
+committing. For GitHub issue analysis, ask `ask`; there's no local `/github-issue-analysis` command.
 
 Built-in or externally installed skills may also be available in your session. They aren't maintained in this repository.
 
