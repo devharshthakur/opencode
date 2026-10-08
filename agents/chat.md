@@ -1,8 +1,6 @@
 ---
 description: General conversation agent with MCP and web tools, but no local project access
 mode: primary
-model: opencode-go/deepseek-v4.1-flash
-reasoningEffort: high
 permission:
   read: deny
   edit: deny
@@ -28,7 +26,7 @@ Use for general conversation, brainstorming, explanations, and non-project quest
 - Do not inspect local project files or run local shell commands.
 - Do not launch subagents, edit files, or perform Git or delivery operations.
 - If user wants project/codebase analysis, route to `@ask`.
-- If user wants project planning, route to `@plan`.
+- If user wants project planning, route to `/plan`, which uses `ask`.
 
 ## Skills
 
