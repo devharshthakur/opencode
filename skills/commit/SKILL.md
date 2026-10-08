@@ -1,21 +1,21 @@
 ---
 name: commit
-description: Use when asked to commit changes or create a git commit; inspect changes, plan logically grouped Conventional Commits, get approval, then commit safely.
+description: Use when asked to commit changes or create a git commit; inspect changes, group Conventional Commits, and commit safely under the caller's approval policy.
 ---
 
 # Commit
 
-This skill is for the user's explicit request to create git commits. Still confirm the plan before committing. Follow any commit-specific instructions the user provides (for example, `api only`, `single commit`, `no split`, `scope: api`, or `message: ...`).
+This skill defines safe commit mechanics; the invoking command or explicit user request defines authorization and whether commit-plan confirmation is required. Loading or discussing this skill alone does not authorize staging or committing. Follow the caller's approval policy and any commit-specific instructions the user provides (for example, `api only`, `single commit`, `no split`, `scope: api`, or `message: ...`).
 
 ## Step 0 — Hard rules (never break)
 
 - NEVER run destructive git: `reset --hard`, `clean -fd`, `rebase`, `checkout .`, `restore` of unstaged work, or force push.
 - NEVER commit secrets: `.env*`, credentials, tokens, keys, `*.pem`, `*.key`, `id_rsa*`, `.npmrc`, `.netrc`, service-account files.
 - NEVER stage files unrelated to the described change.
-- NEVER amend, push, or create a PR unless the user explicitly approves that step (push is offered in Step 7).
+- Amend, push, and PR creation are outside ordinary commit authorization. Never perform them without separate explicit authorization; a caller's local-only restriction still applies.
 - NEVER invent a scope or a footer value. Use only scopes and facts you can verify.
 - NEVER write `BREAKING CHANGE` or `!` unless the change really is incompatible.
-- If anything is unclear or risky, use the `question` tool and stop.
+- If scope is unclear, secrets are present, or unrelated changes are staged, stop before mutation and use the `question` tool. Skipping routine confirmation never bypasses safety checks or tool permissions.
 
 ## Step 1 — Inspect (read-only)
 
@@ -114,15 +114,15 @@ Types (the spec only assigns meaning to `feat` and `fix`; others are allowed):
   - optional `body` (what and why; wrap ~72 chars)
   - optional `footer(s)` (only verifiable values, e.g. `Refs: #123`, `Reviewed-by: Z`)
 
-## Step 5 — Present plan and get approval
+## Step 5 — Present plan
 
 - Show the full plan: files per commit, plus the exact header, body, and footers.
-- Ask for approval with the `question` tool.
-- Do NOT commit anything before approval.
+- Apply the caller's approval policy before staging or committing. This skill adds no routine confirmation gate of its own.
+- If authorization or the approval policy is missing or unclear, stop and request it.
 
 ## Step 6 — Commit
 
-For each approved commit, in order:
+For each authorized commit, in order:
 
 1. Stage only that commit's files explicitly:
    `git add -- <path> <path> ...`
@@ -142,4 +142,4 @@ For each approved commit, in order:
 
 5. Verify the full message is correct: `git log -1 --format=%B`.
 
-Never use `git add -A`, `git add .`, or `git commit -a` unless the user explicitly approved committing every listed file.
+Never use `git add -A`, `git add .`, or `git commit -a`; stage each commit's files explicitly.
