@@ -74,9 +74,9 @@ Choose how much control you want over the task:
 | `/plan <task>` | `ask` writes a plan for you to review |
 | `/build [plan or phase]` | `edit` carries out a plan you've explicitly approved |
 | `/commit [constraints]` | Plans local commits and asks for approval before staging or committing |
-| `/commit-auto [constraints]` | Creates scoped local commits without routine confirmation; never pushes |
+| `/commit:auto [constraints]` | Creates scoped local commits without routine confirmation; never pushes |
 | `/implement <task>` | Implements, validates, commits, pushes, and opens or updates a PR in a separate worktree |
-| `/implement-branch <task>` | The same delivery workflow, on a separate branch in the current checkout |
+| `/implement:branch <task>` | The same delivery workflow, on a separate branch in the current checkout |
 
 ### Plan first, then build
 
@@ -94,15 +94,15 @@ Planning doesn't edit files, run shell commands, or launch subagents. Building o
 
 ### Commit locally
 
-Both `/commit` and `/commit-auto` use the shared `commit` skill. The commands own the approval
-policy: `/commit` requires approval of the exact files and messages; `/commit-auto` authorizes
+Both `/commit` and `/commit:auto` use the shared `commit` skill. The commands own the approval
+policy: `/commit` requires approval of the exact files and messages; `/commit:auto` authorizes
 scoped local commits without routine confirmation. Both stop for unclear scope, secrets, or
 unrelated staged changes and honor tool permissions. Neither pushes or creates PRs; pushing is
 left to you.
 
 ```text
 /commit api only
-/commit-auto Commit the reviewed documentation changes only
+/commit:auto Commit the reviewed documentation changes only
 ```
 
 ### Take a task through to a PR
@@ -111,7 +111,7 @@ Use `/implement` when you want the whole delivery workflow. You can supply a tas
 
 ```text
 /implement Fix the timeout described in issue #42
-/implement-branch Add tests for the settings page
+/implement:branch Add tests for the settings page
 ```
 
 > [!IMPORTANT]
@@ -126,7 +126,7 @@ You can narrow that permission in the request:
 <details>
 <summary>Delivery rules and safety checks</summary>
 
-- **Isolation:** `/implement` uses a worktree by default and preserves the original checkout, even if it's dirty. `/implement-branch` creates no worktrees and stops if branch switching would be unsafe.
+- **Isolation:** `/implement` uses a worktree by default and preserves the original checkout, even if it's dirty. `/implement:branch` creates no worktrees and stops if branch switching would be unsafe.
 - **Base:** uses published `main`, or the verified remote default branch if `main` doesn't exist. You can request a different base.
 - **Overrides:** `no commits` also means no staging, push, or PR. `no push` also means no PR. `no PR` still allows commits and a push.
 - **History:** published commits are append-only. The workflow doesn't routinely amend, rebase, or force-push.
@@ -136,7 +136,7 @@ You can narrow that permission in the request:
 
 The approved-plan `/build` workflow also checks dirty-checkout state, scope, and validation. It doesn't automatically create branches or worktrees, stage changes, or publish anything.
 
-All six commands run in the current session. If the task or required approval is missing, they ask before changing the repository. `/commit-auto` skips routine commit approval, not safety checks. Use a fresh session when returning from autonomous delivery to ordinary editing.
+All six commands run in the current session. If the task or required approval is missing, they ask before changing the repository. `/commit:auto` skips routine commit approval, not safety checks. Use a fresh session when returning from autonomous delivery to ordinary editing.
 
 Skills describe how to work; they don't grant tool permissions or bypass approvals.
 
@@ -209,7 +209,7 @@ Agents load relevant skills when they need them, rather than loading every workf
 
 `plan`, `build`, and `implement` require explicit invocation. Their metadata sets `opencode/autoinvoke: false`, and the workflow commands load them directly. Reading or discussing a skill doesn't authorize running it.
 
-For standalone commits, use `/commit` for explicit confirmation or `/commit-auto` for local-only
+For standalone commits, use `/commit` for explicit confirmation or `/commit:auto` for local-only
 commits without routine confirmation. Loading the `commit` skill alone does not authorize
 committing. For GitHub issue analysis, ask `ask`; there's no local `/github-issue-analysis` command.
 
