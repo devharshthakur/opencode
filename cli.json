@@ -1,30 +1,50 @@
 {
+  "$schema": "https://opencode.ai/v2/cli.json",
   "theme": {
     "name": "opencode",
     "mode": "light"
   },
+
+  "hints": {
+    "tips": true
+  },
+  
   "diffs": {
     "wrap": "none",
     "tree": false,
-    "view": "unified"
+    "view": "unified",
+    "single": true
   },
+
   "session": {
     "sidebar": "hide",
     "scrollbar": false,
     "thinking": "hide",
     "grouping": "auto",
     "verbosity": "low",
+    "image_preview": true,
+    "permissions": "autoaccept"
+  },
+  "prompt": {
+    "paste": "compact",
+    "editor": true,
     "image_preview": true
   },
   "tabs": {
-    "mode": "off"
+    "mode": "off",
+    "layout": "horizontal",
+    "indicators": "numbers"
   },
   "attention": {
+    "notifications": true,
     "sound": true
   },
-  "hints": {
-    "tips": true
+  "animations": false,
+  "scroll": {
+    "speed": 3,
+    "acceleration": true
   },
-  "animations": true,
-  "scroll": { "speed": 3, "acceleration": true }
+  "debug": {
+    "devtools": false
+  }
 }

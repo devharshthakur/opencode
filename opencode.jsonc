@@ -1,0 +1,139 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "opencode-go/deepseek-v4.1-flash",
+  "default_agent": "edit",
+  "agents": {
+    "plan": { "disabled": true },
+    "build": { "disabled": true },
+    "explore": {
+      "model": "opencode/big-pickle",
+    },
+    "general": {
+      "model": "opencode-go/deepseek-v4.1-flash#high",
+    },
+  },
+  "permissions": [
+    { "action": "external_directory", "resource": "*", "effect": "allow" },
+    { "action": "read", "resource": "*.env", "effect": "ask" },
+    { "action": "read", "resource": "*.env.*", "effect": "ask" },
+    { "action": "read", "resource": "*.env.example", "effect": "allow" },
+    { "action": "read", "resource": "*.pem", "effect": "ask" },
+    { "action": "read", "resource": "*.key", "effect": "ask" },
+    { "action": "read", "resource": "*.p12", "effect": "ask" },
+    { "action": "read", "resource": "*.pfx", "effect": "ask" },
+    { "action": "read", "resource": "*.ppk", "effect": "ask" },
+    { "action": "read", "resource": "*.ssh/*", "effect": "ask" },
+    { "action": "read", "resource": "*id_rsa", "effect": "ask" },
+    { "action": "read", "resource": "*id_ed25519", "effect": "ask" },
+    { "action": "read", "resource": "*id_ecdsa", "effect": "ask" },
+    { "action": "read", "resource": "*.netrc", "effect": "ask" },
+    { "action": "read", "resource": "*.npmrc", "effect": "ask" },
+    { "action": "read", "resource": "*.pypirc", "effect": "ask" },
+    { "action": "read", "resource": "*.aws/credentials*", "effect": "ask" },
+  ],
+  "experimental": {
+    "batch_tool": true,
+    "disable_paste_summary": false,
+    "continue_loop_on_deny": true,
+  },
+  "mcp": {
+    "aws-mcp": {
+      "type": "local",
+      "command": [
+        "uvx",
+        "mcp-proxy-for-aws@latest",
+        "https://aws-mcp.us-east-1.api.aws/mcp",
+        "--metadata",
+        "AWS_REGION=us-west-2",
+      ],
+      "enabled": false,
+      "timeout": 100000,
+    },
+
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "enabled": true,
+      "headers": {
+        "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}",
+      },
+    },
+    "github": {
+      "type": "remote",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "enabled": false,
+      "oauth": false,
+      "headers": {
+        "Authorization": "Bearer {env:GITHUB_MCP_TOKEN}",
+      },
+    },
+
+    "gcloud": {
+      "type": "local",
+      "command": ["npx", "-y", "@google-cloud/gcloud-mcp"],
+      "enabled": false,
+    },
+    "gcloud-backupdr": {
+      "type": "local",
+      "command": ["npx", "-y", "@google-cloud/backupdr-mcp"],
+      "enabled": false,
+    },
+    "gcloud-observability": {
+      "type": "local",
+      "command": ["npx", "-y", "@google-cloud/observability-mcp"],
+      "enabled": false,
+    },
+    "gcloud-storage": {
+      "type": "local",
+      "command": ["npx", "-y", "@google-cloud/storage-mcp"],
+      "enabled": false,
+    },
+    "homebrew": {
+      "type": "local",
+      "command": ["brew", "mcp-server"],
+      "enabled": false,
+    },
+    "vercel": {
+      "type": "remote",
+      "url": "https://mcp.vercel.com",
+      "enabled": false,
+    },
+
+    "canva": {
+      "type": "local",
+      "command": ["npx", "-y", "mcp-remote@latest", "https://mcp.canva.com/mcp"],
+      "enabled": false,
+      "timeout": 60000,
+    },
+    "notion": {
+      "type": "remote",
+      "url": "https://mcp.notion.com/mcp",
+      "enabled": false,
+    },
+
+    "chrome-devtools": {
+      "type": "local",
+      "command": ["npx", "-y", "chrome-devtools-mcp@latest"],
+      "enabled": false,
+    },
+
+    "cloudflare-api": {
+      "type": "remote",
+      "url": "https://mcp.cloudflare.com/mcp",
+      "enabled": false,
+    },
+
+    "linkedin": {
+      "type": "local",
+      "command": ["uvx", "mcp-server-linkedin@latest"],
+      "enabled": false,
+      "environment": { "UV_HTTP_TIMEOUT": "300" },
+    },
+    "kite": {
+      "type": "remote",
+      "url": "https://mcp.kite.trade/mcp",
+      "enabled": false,
+    },
+  },
+  "shell": "zsh",
+}
