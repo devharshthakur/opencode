@@ -1,6 +1,6 @@
 # OpenCode Config
 
-My personal setup for [OpenCode V2](https://opencode.ai/v2/docs/). Three agents, a few reusable workflows, and terminal settings that keep the noise down.
+My personal setup for [OpenCode V2](https://opencode.ai/v2/docs/). Focused agents, reusable workflows, and terminal settings that keep the noise down.
 
 Most days, I use **`ask` to understand the code** and **`edit` to change it**. When a task needs more structure, there are commands for planning first or taking it all the way to a pull request.
 
@@ -40,6 +40,7 @@ Most days, I use **`ask` to understand the code** and **`edit` to change it**. W
 | `chat` | General questions, brainstorming, and web research | None |
 | `ask` | Understanding code, diagnosing problems, and discussing plans | Read-only work |
 | `edit` | Making changes, running checks, and Git/GitHub tasks | Full access, subject to permissions |
+| `planner` | The strict `/plan` workflow | Read/search and web only; no shell or delegation |
 
 For example:
 
@@ -52,16 +53,25 @@ For example:
 <details>
 <summary>Models and access boundaries</summary>
 
-The three primary agents inherit the default model, currently `opencode-go/deepseek-v4.1-flash`. Built-in subagents have their own overrides:
+The primary agents inherit the default model, currently `opencode-go/deepseek-v4.1-flash`. Subagents have their own model overrides:
 
 - `explore`: `opencode/big-pickle`
 - `general`: `opencode-go/deepseek-v4.1-flash#high`
 
-`chat` cannot read project files, run shell commands, or launch subagents. `ask` denies file edits and can use the read-only `explore` subagent. Its shell access is broad: avoiding commands that write files is an instruction, not a shell permission restriction.
+`chat` has web access but no local tools, shell, MCP, Code Mode, or delegation. `ask` allows
+native discovery, web tools, skill loading, questions, exact read-only Git inspection commands,
+and the restricted `explore` profile. Other tool actions are denied, with external-directory
+access requiring approval. `planner` also denies shell and delegation.
+Read-only profiles deny Code Mode because session/worktree utilities do not all perform
+individual permission checks; they use official web docs rather than Code Mode MCP tools.
+Git status disables optional index writes and filesystem-monitor helpers; diffs disable external
+diff/text conversion helpers. Use native tools for inspections outside the exact shell allowlist.
 
 `edit` adds no agent-specific tool restrictions. Global permissions, project permissions, and policies still apply.
 
-The built-in `plan` and `build` agents are disabled in this config. Planning and building use skills instead; a project's configuration can override the agent settings.
+The built-in `plan` and `build` agents are disabled. `/plan` selects `planner`; `/build` selects
+`edit`. Agent permissions use native V2 arrays. Later project configuration can override these
+profiles, so this preset is not an immutable security policy.
 
 </details>
 
@@ -71,8 +81,12 @@ Choose how much control you want over the task:
 
 | Command | What happens |
 | --- | --- |
-| `/plan <task>` | `ask` writes a plan for you to review |
+| `/plan <task>` | `planner` writes a plan in conversation for you to review |
 | `/build [plan or phase]` | `edit` carries out a plan you've explicitly approved |
+| `/fix <bug>` | `ask` reports the root cause and a fix plan without writes |
+| `/fix:branch <bug>` | `edit` diagnoses, repairs, and validates on a feature branch; no staging or commits |
+| `/fix:worktree <bug>` | The same local repair workflow in a retained worktree |
+| `/fix:pr <bug or issue>` | Diagnoses and repairs through commits, push, a verified PR, and CI checks |
 | `/commit [constraints]` | Plans local commits and asks for approval before staging or committing |
 | `/commit:auto [constraints]` | Creates scoped local commits without routine confirmation; never pushes |
 | `/implement <task>` | Implements, validates, commits, pushes, and opens or updates a PR in a separate worktree |
@@ -92,9 +106,41 @@ Use this when you want to review the approach before anything changes.
 
 Planning doesn't edit files, run shell commands, or launch subagents. Building only starts when the plan, approval, and scope are clear. It includes validation, but **commits, pushes, and PRs need separate approval**.
 
+### Diagnose or repair a bug
+
+```text
+/fix Login sometimes times out; explain the cause without changing files
+/fix:branch Fix the login timeout and add regression coverage
+/fix:worktree Fix the login timeout without touching my current checkout
+/fix:pr Fix the timeout reported in issue #42
+```
+
+- **Diagnosis only:** `/fix` selects `ask` and loads `fix-diagnosis`. It inspects the current checkout
+  read-only, distinguishes evidence from hypotheses, and stops at a fix plan. Tests, builds, setup,
+   and servers that could write files are excluded. Ask's shell access is narrowly permission-controlled.
+- **Local repair:** `/fix:branch` and `/fix:worktree` select `edit` and authorize `git-isolation`,
+  `fix-diagnosis`, and `surgical-patch`. They report the cause before repairing, then proceed without routine approval
+  when the cause and intended behavior are clear. They do not stage, commit, push, or create PRs.
+- **PR delivery:** `/fix:pr` also explicitly loads `implement`, uses a worktree by default, and
+  authorizes its scoped commit/push/PR workflow. Explicit branch-only, base, and delivery limits win.
+  It never merges or deploys by default, and required local checks must be verified before publishing.
+- **Base and existing work:** repair starts from freshly fetched, verified remote `main`, falling
+  back to the verified remote default branch if necessary; an explicit base overrides this. Branch
+  switching stops on a dirty checkout. Worktree repair preserves the original checkout and never
+  copies its dirty files. A bug depending on uncommitted changes requires clarification.
+- **Proof and boundaries:** repairs use the narrowest responsible layer. Where a suitable test seam
+  exists, prove the regression fails before the fix and passes afterward. Report missing proof and
+  failing/unrun checks honestly. Uncertain causes, ambiguous behavior, new dependencies, migrations,
+  or broader scope require a decision. Retain branches/worktrees; cleanup is a separate request.
+
+These regression practices draw on Matt Pocock's installed `diagnosing-bugs` and `tdd` skills without
+loading those workflows automatically. No repair command authorizes destructive Git operations.
+
 ### Commit locally
 
-Both `/commit` and `/commit:auto` use the shared `commit` skill. The commands own the approval
+Both `/commit` and `/commit:auto`, plus autonomous delivery, use the shared `commit` skill.
+Commit style has one owner: concise Conventional Commit headers, useful bodies by default,
+lowercase prose, and identifier casing preserved inside backticks. The commands own the approval
 policy: `/commit` requires approval of the exact files and messages; `/commit:auto` authorizes
 scoped local commits without routine confirmation. Both stop for unclear scope, secrets, or
 unrelated staged changes and honor tool permissions. Neither pushes or creates PRs; pushing is
@@ -136,7 +182,12 @@ You can narrow that permission in the request:
 
 The approved-plan `/build` workflow also checks dirty-checkout state, scope, and validation. It doesn't automatically create branches or worktrees, stage changes, or publish anything.
 
-All six commands run in the current session. If the task or required approval is missing, they ask before changing the repository. `/commit:auto` skips routine commit approval, not safety checks. Use a fresh session when returning from autonomous delivery to ordinary editing.
+All workflow commands run in the current session. If the task or required approval is missing,
+they ask before changing the repository. `/commit:auto` skips routine commit approval, not safety
+checks. Command files reload automatically; global and upward-discovered `AGENTS.md` updates are
+detected before the next model request. Already-loaded nested instruction files do not automatically
+refresh; use a fresh session for those changes, or to validate changed agent permissions or skill instructions;
+this redesign does not restart the service automatically.
 
 Skills describe how to work; they don't grant tool permissions or bypass approvals.
 
@@ -152,8 +203,8 @@ The main files are split by responsibility:
 | [`opencode.sample.jsonc`](opencode.sample.jsonc) | Template to copy to `opencode.jsonc` |
 | [`cli.json`](cli.json) | Terminal appearance and interaction settings |
 | [`AGENTS.md`](AGENTS.md) | Shared rules for development, documentation, and verification |
-| [`agents/`](agents/) | The `chat`, `ask`, and `edit` definitions |
-| [`commands/`](commands/) | The six workflow commands |
+| [`agents/`](agents/) | Primary roles plus the restricted `explore` subagent |
+| [`commands/`](commands/) | Workflow command prompts and their selected agents |
 | [`skills/`](skills/) | Reusable workflow instructions |
 
 The terminal uses a light theme, unified diffs, and low verbosity. Thinking output and the sidebar are hidden, and tabs are off.
@@ -187,7 +238,11 @@ The global rules request approval before reading environment files, private keys
 
 ## Skills
 
-Agents load relevant skills when they need them, rather than loading every workflow at the start of a session.
+`AGENTS.md` defines a narrow method-skill allowlist for ordinary requests. Commands name their
+own bounded dependency lists, and skills cannot expand those lists. `opencode` and
+`writing-for-agents` are reusable domain references; heavyweight external `tdd`,
+`diagnosing-bugs`, and `code-review` workflows stay opt-in until their gates are adapted.
+Reading or discussing a skill never grants execution or delivery authority.
 
 <details>
 <summary>Browse the repository's skills</summary>
@@ -199,15 +254,17 @@ Agents load relevant skills when they need them, rather than loading every workf
 | `implement` | Deliver a task through validation and a PR |
 | `commit` | Inspect, group, and create safe commits under the caller's approval policy |
 | `fix-diagnosis` | Find the root cause and write a fix plan without edits |
-| `investigate-first` | Gather evidence when the cause isn't clear |
-| `lean-build` | Build a focused feature without overbuilding |
+| `git-isolation` | Shared published-base selection and branch/worktree preparation |
 | `migration` | Make reversible, compatibility-safe transitions |
 | `safe-refactor` | Change structure while preserving behavior |
 | `surgical-patch` | Fix a bug at the responsible layer |
 | `verify-and-stop` | Check acceptance criteria without expanding scope |
 | `tanstack-cli` | Work with TanStack scaffolding, add-ons, and templates |
 
-`plan`, `build`, and `implement` require explicit invocation. Their metadata sets `opencode/autoinvoke: false`, and the workflow commands load them directly. Reading or discussing a skill doesn't authorize running it.
+Command-only skills use `metadata.opencode/autoinvoke: false` to reduce discovery noise while
+remaining loadable by authorized exact ID. `investigate-first` was folded into `fix-diagnosis`;
+`lean-build` was retired after retaining its end-to-end scope principle in the global rules.
+Isolation references live under `git-isolation`; `tanstack-cli` routes to task-specific references.
 
 For standalone commits, use `/commit` for explicit confirmation or `/commit:auto` for local-only
 commits without routine confirmation. Loading the `commit` skill alone does not authorize
@@ -216,6 +273,31 @@ committing. For GitHub issue analysis, ask `ask`; there's no local `/github-issu
 Built-in or externally installed skills may also be available in your session. They aren't maintained in this repository.
 
 </details>
+
+## Validation and inspection
+
+The shared helper runs only through an authorized shell tool, never a command-template shell block:
+
+```sh
+sh /path/to/skills/git-isolation/scripts/preflight.sh
+```
+
+Set the working directory to the checkout. It reports bounded repository/branch/HEAD, status,
+diff statistics, and worktrees without remote URLs or file contents. Truncation is explicit;
+it does not prove ownership or replace full task-diff review. It uses Git, POSIX `sh`, and `awk`.
+
+Run the repository checks without installing dependencies:
+
+```sh
+ruby tests/workflow_test.rb
+python3 tests/preflight_test.py
+git diff --check
+```
+
+The workflow checks validate frontmatter, references, permission rules, and written scenario gates;
+they do not prove model behavior or live OpenCode enforcement. Helper fixtures exercise clean,
+dirty, detached, unborn, multiple-worktree, truncation, and error cases without mutating Git;
+a real checkout smoke test checks unchanged status and index bytes.
 
 ## License
 

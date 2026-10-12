@@ -5,25 +5,35 @@ description: bug, stack trace, screenshot, repro, error log. Use for read-only r
 
 # Fix Diagnosis
 
-Use for bug reports, stack traces, screenshots, failing commands, or broken behavior.
+Use for bug reports, stack traces, screenshots, failing commands, or broken behavior. This skill is
+read-only and grants no authority; the invoking command defines scope and whether implementation is
+authorized.
 
 ## Workflow
 
-1. Parse symptom, repro, logs, screenshots, and broken expectation.
-2. Ask for missing info only when diagnosis would otherwise be guesswork.
-3. Inspect only relevant code and tests.
-4. Trace symptom → failing path → incorrect state/data/control flow → root cause.
-5. Compare competing hypotheses when more than one cause fits.
-6. Present a concrete fix plan.
+1. Parse the symptom, repro, logs, screenshots, and broken expectation. Separate observed facts from
+   inferred cause.
+2. Ask for missing information only when diagnosis would otherwise be guesswork.
+3. Inspect only relevant code, tests, and configuration.
+4. Trace the symptom through the failing path to the state, data, or control flow that explains it.
+5. Rank competing hypotheses by supporting evidence and cheap falsification value, and test the
+   cheapest discriminating check first. Do not overclaim: report a confirmed root cause only when the
+   evidence uniquely supports it; otherwise name the leading hypotheses, their evidence, and the
+   smallest next diagnostic step.
+6. Present a concrete fix plan for the leading cause.
 
 ## Output format
 
 ```md
 ## Bug: <one-line summary>
 
-**Symptom**: <what user sees>
+**Symptom**: <what the user sees>
 
-**Root Cause**: <deepest cause and evidence>
+**Root Cause**: <deepest confirmed cause and evidence>
+
+## Leading Hypotheses
+
+- <hypothesis> — <evidence, cheap falsification, next check>
 
 ## Fix Plan
 
@@ -35,5 +45,6 @@ Use for bug reports, stack traces, screenshots, failing commands, or broken beha
 **Risks/Edge Cases**: <notable concerns>
 ```
 
-Keep the plan detailed enough for manual implementation or a narrow handoff to `edit`; use
-`/build` with `edit` for explicitly approved fix-plan execution.
+Use `Root Cause` when confirmed; otherwise use `Leading Hypotheses` and state the uncertainty. Keep
+the plan detailed enough for manual implementation or a narrow handoff to `edit`; use `/build` with
+`edit` for explicitly approved fix-plan execution.

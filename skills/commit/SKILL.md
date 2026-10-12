@@ -1,145 +1,103 @@
 ---
 name: commit
 description: Use when asked to commit changes or create a git commit; inspect changes, group Conventional Commits, and commit safely under the caller's approval policy.
+metadata:
+  opencode/autoinvoke: false
 ---
 
 # Commit
 
-This skill defines safe commit mechanics; the invoking command or explicit user request defines authorization and whether commit-plan confirmation is required. Loading or discussing this skill alone does not authorize staging or committing. Follow the caller's approval policy and any commit-specific instructions the user provides (for example, `api only`, `single commit`, `no split`, `scope: api`, or `message: ...`).
+Defines safe commit mechanics and message style; it grants no authority. The invoking command or
+explicit user request defines authorization and whether commit-plan confirmation is required. Loading
+or discussing this skill alone does not authorize staging or committing. Follow the caller's approval
+policy and any commit-specific instructions (for example `api only`, `single commit`, `no split`,
+`scope: api`, or `message: ...`).
 
-## Step 0 — Hard rules (never break)
+## Hard rules (never break)
 
-- NEVER run destructive git: `reset --hard`, `clean -fd`, `rebase`, `checkout .`, `restore` of unstaged work, or force push.
-- NEVER commit secrets: `.env*`, credentials, tokens, keys, `*.pem`, `*.key`, `id_rsa*`, `.npmrc`, `.netrc`, service-account files.
-- NEVER stage files unrelated to the described change.
-- Amend, push, and PR creation are outside ordinary commit authorization. Never perform them without separate explicit authorization; a caller's local-only restriction still applies.
-- NEVER invent a scope or a footer value. Use only scopes and facts you can verify.
-- NEVER write `BREAKING CHANGE` or `!` unless the change really is incompatible.
-- If scope is unclear, secrets are present, or unrelated changes are staged, stop before mutation and use the `question` tool. Skipping routine confirmation never bypasses safety checks or tool permissions.
+- Never run destructive git: `reset --hard`, `clean -fd`, `rebase`, `checkout .`, `restore` of
+  unstaged work, or force push.
+- Never commit secrets: `.env*`, credentials, tokens, keys, `*.pem`, `*.key`, `id_rsa*`, `.npmrc`,
+  `.netrc`, service-account files.
+- Never stage files unrelated to the described change.
+- Amend, push, and PR creation are outside ordinary commit authorization; never perform them without
+  separate explicit authorization, and honor any caller local-only restriction.
+- Never invent a scope or a footer value; use only scopes and facts you can verify.
+- Never write `BREAKING CHANGE` or `!` unless the change really is incompatible.
+- Never bypass a hook, weaken checks, or disable validation to make a commit succeed; resolve task
+  hook failures properly instead.
+- If scope is unclear, secrets are present, or unrelated changes are staged, stop before mutation and
+  use `question`. Skipping routine confirmation never bypasses safety checks or tool permissions.
 
-## Step 1 — Inspect (read-only)
+## Inspect (read-only)
 
-Run and read the output of:
+With shell permission, run `sh <this-skill-base>/../git-isolation/scripts/preflight.sh` in
+the checkout; this invokes inspection only. Inspect full staged/unstaged diffs, untracked
+contents, and recent commit history separately. Identify every modified, added, deleted,
+renamed, and untracked change. If none exist, report "nothing to commit" and stop.
+
+## Conventions and scopes
+
+- Prefer a real top-level folder as scope (`web`, `api`, `shared`, `packages`, `agents`, `commands`);
+  the meta scopes `deps`, `docs`, `config`, `ci`, `build` are allowed when no folder fits.
+- Scope is a single verified noun in parentheses, `fix(parser):`, and is OPTIONAL: omit it rather than
+  guess. Never put backticks in the scope. Match the repo's existing commit style when it has one.
+
+## Format (Conventional Commits 1.0.0)
+
+`<type>[optional scope][!]: <description>` followed by an optional blank-line-separated body and
+footers.
+
+- `type` is a required noun: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`,
+  `ci`, `chore`, `revert`. Only `feat` and `fix` carry SemVer meaning.
+- `description` is required: short, imperative, no trailing period, header about 72 characters.
+- `body` begins one blank line after the description, explains what and why, and wraps near 72 chars.
+- `footer(s)` begin one blank line after the body; tokens use `-` rather than spaces (`Acked-by`,
+  `Reviewed-by`, `Refs`), except the uppercase `BREAKING CHANGE`.
+- Mark a real incompatibility with `!` and/or a `BREAKING CHANGE:` footer. If a change fits more than
+  one type, split it into multiple commits.
+
+### Message style
+
+- Write the description as a short imperative "what" (well under 72 chars) and move concrete detail —
+  files, modules, identifiers, versions, configuration, rationale — into the body.
+- Include a body by default when the change carries detail a reader would otherwise dig for; the body
+  is optional for trivial, self-explanatory changes. Keep it to one or two short sentences unless the
+  detail genuinely needs more.
+- Write prose in lowercase, including acronyms (`mcp`, `cli`, `ui`, `api`), except the casing inside
+  code spans. Wrap package names, paths, and library or tool names in backticks, preserving their real
+  casing: `Nuxt`, `ImageKit`, `@prisma/orm-postgres`, `pnpm-workspace.yaml`.
+
+Example:
 
 ```
-git status
-git status --porcelain
-git branch --show-current
-git diff
-git diff --cached
-git log --oneline -15
+fix(prisma): type-check `Prisma` config files
+
+include `prisma.config.ts` in the `Nuxt` node tsconfig and `prisma/**/*.ts`
+in the server tsconfig so typecheck covers them.
 ```
 
-List every change: modified, added, deleted, renamed, untracked. If there are no changes, report "nothing to commit" and stop.
+## Plan and commit
 
-## Step 2 — Learn repo conventions
-
-- Detect valid scopes from top-level directories and from recent history (`git log --oneline -30`).
-  Prefer a real folder name (`web`, `api`, `shared`, `packages`, `agents`, `commands`, ...).
-- Meta scopes are allowed when no folder fits: `deps`, `docs`, `config`, `ci`, `build`.
-- A scope MUST be a single noun describing a section of the codebase, inside parentheses, e.g. `fix(parser):`.
-- Match the repo's existing commit style when it has one.
-- Scope is OPTIONAL: if it is unclear, omit it. Never guess.
-
-## Step 3 — Conventional Commits 1.0.0 format
-
-Every commit message MUST follow this structure:
-
-```
-<type>[optional scope][!]: <description>
-
-[optional body]
-
-[optional footer(s)]
-```
-
-Required element rules:
-
-- `type` is REQUIRED and is a noun (`feat`, `fix`, ...), immediately followed by an OPTIONAL scope, OPTIONAL `!`, then a REQUIRED colon + space, then the description.
-- `description` is REQUIRED, is a short summary, uses imperative mood, has no trailing period, and the whole header line SHOULD stay within 72 characters.
-
-Optional element rules:
-
-- `scope`: a noun in parentheses, e.g. `feat(parser):`.
-- `!`: place immediately before `:` to flag a breaking change, e.g. `feat(api)!: ...`.
-- `body`: MAY be added, MUST begin one blank line after the description; free-form, any number of paragraphs; explain what and why; wrap near 72 chars.
-- `footer(s)`: MAY be added, MUST begin one blank line after the body. Each footer is a token, then either `: ` or ` #`, then a value, e.g. `Refs: #123`, `Reviewed-by: Z`, `Acked-by: Q`.
-  - Footer tokens use `-` instead of spaces (`Acked-by`, `Reviewed-by`, `Refs`). The only exception is `BREAKING CHANGE`.
-  - A footer value MAY contain spaces and newlines.
-
-Breaking changes (MUST be marked when compatibility breaks):
-
-- Either append `!` in the type/scope prefix, or add a footer `BREAKING CHANGE: <description>`.
-- `BREAKING CHANGE` MUST be uppercase. `BREAKING-CHANGE` is an equivalent token.
-- If `!` is used, the `BREAKING CHANGE:` footer MAY be omitted; the description then describes the break.
-- A breaking change can belong to a commit of any type.
-
-Types (the spec only assigns meaning to `feat` and `fix`; others are allowed):
-
-| type       | use                                  | SemVer effect |
-| ---------- | ------------------------------------ | ------------- |
-| `feat`     | a new feature                        | MINOR         |
-| `fix`      | a bug fix                            | PATCH         |
-| `docs`     | documentation only                   | none          |
-| `style`    | formatting/whitespace, no logic      | none          |
-| `refactor` | code change that is neither feat/fix | none          |
-| `perf`     | performance improvement              | none          |
-| `test`     | tests                                | none          |
-| `build`    | build system or dependencies         | none          |
-| `ci`       | CI configuration                     | none          |
-| `chore`    | other maintenance                    | none          |
-| `revert`   | revert a previous commit             | none          |
-
-- Casing is not significant to tools, EXCEPT `BREAKING CHANGE`, which MUST be uppercase.
-- For a revert, prefer the `revert` type and reference the reverted commits in a footer, e.g.:
-
-  ```
-  revert: remove experimental caching
-
-  Refs: 676104e, a215868
-  ```
-
-- If a change fits more than one type, split it into multiple commits.
-
-## Step 4 — Plan small commits
-
-- Split changes into small, logically coherent commits: one concern per commit.
-- Do not mix unrelated areas.
-- Order commits so earlier ones are prerequisites (deps/config before code).
-- For each commit define:
-  - `type` (required)
-  - `scope` (optional; must be real, else omit)
-  - breaking? (`!` prefix and/or `BREAKING CHANGE:` footer)
-  - `description` (required; imperative; no trailing period; header ≤ ~72 chars)
-  - optional `body` (what and why; wrap ~72 chars)
-  - optional `footer(s)` (only verifiable values, e.g. `Refs: #123`, `Reviewed-by: Z`)
-
-## Step 5 — Present plan
-
-- Show the full plan: files per commit, plus the exact header, body, and footers.
-- Apply the caller's approval policy before staging or committing. This skill adds no routine confirmation gate of its own.
-- If authorization or the approval policy is missing or unclear, stop and request it.
-
-## Step 6 — Commit
-
-For each authorized commit, in order:
-
-1. Stage only that commit's files explicitly:
-   `git add -- <path> <path> ...`
-   For deletions use `git add -- <path>` (git records the removal).
-2. Verify staging: `git status --short` and `git diff --cached --stat`.
-3. If an unintended file or secret is staged, unstage it (`git restore --staged <path>`) and stop.
-4. Commit with one `-m` per paragraph. The first `-m` is the header; each later `-m` becomes a new paragraph (body first, then footers). Never put `\n` inside a single `-m`.
-
-   Header only:
-   `git commit -m "<type>(<scope>): <description>"`
-   With body:
-   `git commit -m "<type>(<scope>): <description>" -m "<body paragraph>"`
-   With footer:
-   `git commit -m "<type>(<scope>): <description>" -m "<body>" -m "Refs: #123"`
-   Breaking change:
-   `git commit -m "feat(api)!: drop legacy auth" -m "BREAKING CHANGE: tokens are now required"`
-
-5. Verify the full message is correct: `git log -1 --format=%B`.
+- Split changes into small, logically coherent commits: one concern per commit, unrelated areas
+  separate, prerequisites first, and no knowingly broken commit. For each commit define `type`, an
+  optional verified `scope`, a breaking flag, `description`, `body`, and only verifiable footers.
+- Show the full plan: files per commit plus the exact header, body, and footers. Apply the caller's
+  approval policy before staging or committing; this skill adds no routine confirmation gate of its
+  own. If authorization or the approval policy is unclear, stop and request it.
+- For each authorized commit, in order:
+  1. Stage only its files explicitly: `git add -- <path> <path> ...` (deletions included).
+   2. Verify staging with `git status --short`, statistics, and the **full staged diff**; confirm
+      every staged path/hunk belongs to this commit and contains no secrets.
+  3. If an unintended file or secret is staged, unstage it (`git restore --staged <path>`) and stop.
+  4. Commit with one `-m` per paragraph: header first, then body, then footers. Never put `\n` inside
+     a single `-m`. Examples:
+     - `git commit -m "fix(api): reject expired tokens"`
+     - `git commit -m "fix(api): reject expired tokens" -m "<body paragraph>"`
+     - `git commit -m "feat(api)!: drop legacy auth" -m "BREAKING CHANGE: tokens are now required"`
+  5. Verify the message with `git log -1 --format=%B`.
 
 Never use `git add -A`, `git add .`, or `git commit -a`; stage each commit's files explicitly.
+
+**Done when:** each authorized commit's hashes, full messages, and included files are verified;
+report these with actual checks and remaining changes. Do not edit source or automatically publish.

@@ -39,7 +39,7 @@
     "notifications": true,
     "sound": true
   },
-  "animations": false,
+  "animations": true,
   "scroll": {
     "speed": 3,
     "acceleration": true
