@@ -1,0 +1,230 @@
+{
+  "$comment": "Descriptive metadata contract for the deterministic approval/handoff pilot core. This is NOT executable JSON Schema and is not used for validation at runtime; core.mjs is the source of truth. It exists to document the closed shapes and to be tested for agreement with core.mjs constants (see tests/workflow_pilot_test.mjs).",
+  "contract": "workflow-pilot",
+  "format": "descriptive-metadata",
+  "executable_json_schema": false,
+  "version": 1,
+  "module": "extensions/workflow-pilot/core.mjs",
+  "states": [
+    "awaiting-approval",
+    "approved",
+    "dispatching",
+    "running",
+    "completed",
+    "blocked",
+    "cancelled"
+  ],
+  "terminal_states": ["completed", "blocked", "cancelled"],
+  "transitions": {
+    "awaiting-approval": ["approved", "blocked", "cancelled"],
+    "approved": ["dispatching", "blocked", "cancelled"],
+    "dispatching": ["running", "blocked", "cancelled"],
+    "running": ["completed", "blocked", "cancelled"],
+    "completed": [],
+    "blocked": [],
+    "cancelled": []
+  },
+  "fixed_policy": {
+    "workflow": "build",
+    "isolation": "current",
+    "base_kind": "local",
+    "delivery_policy": "local",
+    "commit_confirmation": "required"
+  },
+  "proposal": {
+    "closed": true,
+    "fields": {
+      "title": { "type": "string", "required": true, "non_empty": true },
+      "revision": { "type": "integer", "required": true, "minimum": 1, "format": "safe-integer" },
+      "kind": { "type": "enum", "required": true, "values": ["implementation", "repair"] },
+      "repository": { "type": "string", "required": true, "format": "absolute-path" },
+      "original_checkout": { "type": "string", "required": true, "format": "absolute-path" },
+      "origin_session": { "type": "string", "required": true, "non_empty": true },
+      "plan": { "type": "string", "required": true, "non_empty": true },
+      "phases": { "type": "string[]", "required": true, "unique": true, "min_items": 1 },
+      "operation_limits": { "type": "object", "required": true, "ref": "#/operation_limits" }
+    }
+  },
+  "operation_limits": {
+    "closed": true,
+    "keys": {
+      "edit": { "type": "boolean", "forbidden": false },
+      "validate": { "type": "boolean", "forbidden": false },
+      "create_branch": { "type": "boolean", "forbidden": true },
+      "create_worktree": { "type": "boolean", "forbidden": true },
+      "commit": { "type": "boolean", "forbidden": true },
+      "push": { "type": "boolean", "forbidden": true },
+      "create_or_update_pr": { "type": "boolean", "forbidden": true }
+    }
+  },
+  "approval_receipt": {
+    "$comment": "Supplied by a trusted adapter. In this pilot it is a simulated input; the digest binds it to the frozen proposal but does not authenticate a human.",
+    "closed": true,
+    "fields": {
+      "proposal_digest": { "type": "string", "required": true, "non_empty": true, "binds": "proposal_digest" },
+      "approved_phases": {
+        "type": "string[]",
+        "required": true,
+        "min_items": 1,
+        "unique": true,
+        "subset_of": "proposal.phases"
+      },
+      "approved_by": { "type": "string", "required": true, "non_empty": true },
+      "approved_at": { "type": "string", "required": true, "non_empty": true },
+      "repository": { "type": "string", "required": true, "equals": "proposal.repository" },
+      "origin_session": { "type": "string", "required": true, "equals": "proposal.origin_session" },
+      "simulated": { "type": "boolean", "required": false }
+    }
+  },
+  "record": {
+    "closed": true,
+    "required": [
+      "contract_version",
+      "state",
+      "proposal",
+      "digest",
+      "approval",
+      "dispatch",
+      "result",
+      "history",
+      "reason"
+    ],
+    "nested_closed": {
+      "approval": {
+        "required": [
+          "proposal_digest",
+          "approved_phases",
+          "approved_by",
+          "approved_at",
+          "repository",
+          "origin_session",
+          "source",
+          "simulated"
+        ],
+        "invariants": [
+          "proposal_digest equals the record digest",
+          "repository equals proposal.repository",
+          "origin_session equals proposal.origin_session",
+          "source is trusted-adapter",
+          "approved_phases is a non-empty unique subset of proposal.phases"
+        ]
+      },
+      "dispatch": {
+        "required": ["dispatch_id", "idempotency_key", "reservation_state", "worker_id", "reserved_at"],
+        "reservation_states": ["reserved", "attributed", "running"],
+        "invariants": [
+          "dispatch_id equals sha256(digest + '\\n' + idempotency_key) truncated to 16 hex chars",
+          "worker_id is null or a non-empty string"
+        ],
+        "idempotency": "A repeated reservation with the same idempotency_key is a no-op; a different key while dispatching is rejected as a duplicate."
+      },
+      "result": {
+        "required": ["evidence", "judgment", "approved_phases"],
+        "invariants": [
+          "evidence is a non-empty string",
+          "judgment is a closed acceptance judgment",
+          "approved_phases is a non-empty unique subset of proposal.phases"
+        ]
+      },
+      "judgment": {
+        "$comment": "Semantic completion requires an affirmative acceptance judgment plus evidence. Worker success alone is not proof, and this does not establish semantic truth.",
+        "closed": true,
+        "required": ["decision"],
+        "optional": ["rationale"],
+        "decision_values": ["accept"],
+        "rejects": ["reject", "rejected", "negative decisions", "unknown decisions", "unknown fields", "non-object values"]
+      },
+      "history": {
+        "closed": true,
+        "required": ["at", "from", "to", "reason"],
+        "invariants": [
+          "begins with from=null, to=awaiting-approval",
+          "each entry continues the previous state and follows allowed transitions",
+          "the final entry equals the record state"
+        ]
+      }
+    },
+    "state_consistency": {
+      "awaiting-approval": "no approval, dispatch, or result",
+      "approved": "approval present; no dispatch or result",
+      "dispatching": "approval and dispatch present; no result",
+      "running": "approval and a worker-attributed dispatch present; no result",
+      "completed": "approval, a worker-attributed dispatch, and result present",
+      "blocked": "no result",
+      "cancelled": "no result"
+    }
+  },
+  "digest": {
+    "algorithm": "sha256",
+    "encoding": "hex",
+    "input": "stable JSON with object keys sorted recursively, over the full normalized proposal",
+    "note": "Detects change and binds approval to the exact proposal. Does not authenticate a human."
+  },
+  "revision": {
+    "$comment": "revise() rejects active or unresolved dispatch and never mutates the original record.",
+    "allowed_states": ["awaiting-approval", "approved", "completed", "cancelled"],
+    "allowed_blocked_when": "blocked with an attributable worker id",
+    "rejected_states": ["dispatching", "running"],
+    "rejected": "any record whose dispatch has no attributable worker id (uncertain/blocked)"
+  },
+  "acceptance_decisions": ["accept"],
+  "error_codes": [
+    "invalid-field",
+    "invalid-path",
+    "invalid-revision",
+    "invalid-kind",
+    "invalid-phases",
+    "duplicate-phase",
+    "missing-proposal-field",
+    "unknown-proposal-field",
+    "missing-operation-limit",
+    "unknown-operation-limit",
+    "invalid-operation-limit",
+    "forbidden-operation",
+    "invalid-proposal",
+    "invalid-operation-limits",
+    "unserializable-value",
+    "invalid-record",
+    "unknown-record-field",
+    "missing-record-field",
+    "unsupported-contract-version",
+    "invalid-state",
+    "invalid-record-state",
+    "invalid-approval",
+    "invalid-approved-phases",
+    "invalid-dispatch",
+    "invalid-result",
+    "invalid-judgment",
+    "invalid-history",
+    "digest-mismatch",
+    "invalid-transition",
+    "invalid-receipt",
+    "missing-receipt-field",
+    "unknown-receipt-field",
+    "stale-approval",
+    "wrong-repository",
+    "wrong-session",
+    "no-approval",
+    "revision-not-advanced",
+    "revision-blocked",
+    "missing-idempotency-key",
+    "duplicate-dispatch",
+    "dispatch-mismatch",
+    "missing-worker-id",
+    "conflicting-worker-id",
+    "semantic-evidence-required",
+    "semantic-judgment-required",
+    "semantic-judgment-rejected",
+    "handoff-requires-approval",
+    "invalid-serialization"
+  ],
+  "boundaries": {
+    "multi_process_atomicity": false,
+    "durable_storage_guarantee": false,
+    "exactly_once_dispatch": false,
+    "permission_enforcement": false,
+    "sandbox": false,
+    "human_authentication": false,
+    "semantic_truth": false
+  }
+}
