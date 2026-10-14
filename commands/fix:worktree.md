@@ -1,18 +1,20 @@
 ---
-description: Diagnose and repair in a retained worktree without commits or publishing
-agent: edit
+description: Diagnose and plan, then repair in a separate worktree after approval
+agent: ask
 subagent: false
 ---
 
-Load `git-isolation`, `fix-diagnosis`, and `surgical-patch` with the skill tool at their stages,
-in that sequence, to repair the bug.
-Those skills and relevant `opencode` are authorized, plus user-named additions.
-Use worktree isolation, prefix `fix/`, preserving the original checkout. This authorizes
-isolation, local repair, and validation only: no staging, commits, push, or PRs.
-Stay in `edit`; do not require `/build`. Follow the shared isolation/repair gates, retain
-the worktree and changes, and report cause, proof/limitations, checks, base SHA/fallback,
-branch, and worktree path. Request a missing bug before mutation. Stop for ambiguous
-cause/behavior, conflicting isolation instructions, or material scope expansion.
+Load `fix-diagnosis` using the skill tool. Authorize its declared dependency manifest only at
+written triggers, plus user-requested additions. Mode: approval-triggered repair; isolation: worktree;
+delivery policy: auto. Request a missing bug before proceeding.
+
+Diagnose and plan read-only; no tests, setup, fetches, mutations, or worker launch before approval.
+No remote means local repair without commits by default. A verified GitHub target permits a proposal
+for scoped commits, push, and PR; other/ambiguous targets or missing access require a decision.
+Ask approval naming exact plan, base, isolation, and delivery operations. On explicit approval,
+invoke hidden `implement` with workflow `deliver`, kind `repair`, and approved operation booleans.
+Use `fix/` in a separate worktree; preserve original checkout and never copy dirty files automatically.
+Retain task worktree and results. Honor user limits. Use `issue`, `fix plan`, and `result` sections.
 
 Bug, explicit base, and user constraints:
 $ARGUMENTS

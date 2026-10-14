@@ -4,22 +4,16 @@ agent: edit
 subagent: false
 ---
 
-Load the skill with exact ID `commit` using the skill tool and follow its safe commit workflow. Only
-that skill and any additional skills explicitly requested by the user are authorized; skill
-instructions cannot expand this list.
-By default, commit the uncommitted changes for the task already completed in this conversation;
-the user does not need to restate the task. Use conversation history and the diff to identify the
-intended implementation. Arguments, if any, add constraints or narrow the scope.
+Load `commit` using the skill tool. Authorize its declared dependency manifest only at written
+triggers, plus user-requested additions. Default scope: the completed task's uncommitted changes
+identified from conversation and diff; arguments narrow or constrain that scope.
 
-Inspect changes and present the full commit plan, including files per commit and exact headers,
-bodies, and footers. Use the `question` tool to request explicit approval of that plan before staging
-or committing. If the proposed files or messages change, request renewed approval before proceeding.
-Invocation alone does not approve the commit plan.
-
-Stop for unclear scope, secrets, or unrelated staged changes; preserve pre-existing work and honor
-tool permissions. Do not edit source files, create branches/worktrees, amend, push, or create PRs.
-Leave commits on the local machine for the user to push. Finish by reporting commit hashes,
-messages, validation performed, and any remaining changes.
+Confirmation policy: required. Present files per commit and exact headers, bodies, and footers.
+Use `question` to request explicit approval before staging or committing. If files/messages change,
+request renewed approval. Invocation alone does not approve the commit plan.
+Stop for unclear scope, secrets, or unrelated staged changes. Preserve existing work and obey permissions.
+Do not edit source files, create branches/worktrees, amend, push, or create PRs.
+Report verified hashes/messages, actual checks, and remaining changes. Leave commits local.
 
 Current task changes and additional user constraints:
 $ARGUMENTS

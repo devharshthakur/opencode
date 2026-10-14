@@ -1,6 +1,8 @@
 ---
 name: migration
 description: Implement reversible compatibility-safe transitions. Use for schema, data, API, protocol, configuration, or dependency migrations requiring rollback and preservation proof.
+metadata:
+  opencode/autoinvoke: false
 ---
 
 # Migration
@@ -15,3 +17,7 @@ Map current readers, writers, data shape, compatibility window, and ownership be
 - Verify old and new paths at required transition stages.
 
 Stop after requested stage passes; do not perform later destructive contraction implicitly.
+
+## Dependencies
+
+None. This method does not authorize mutation; destructive contraction needs separate authority.

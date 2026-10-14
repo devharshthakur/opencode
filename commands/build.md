@@ -4,17 +4,14 @@ agent: edit
 subagent: false
 ---
 
-Explicitly invoke the approved-plan execution workflow. Load the skill with exact ID `build` using
-the skill tool. You may also load relevant skills from this bounded list: `fix-diagnosis`,
-`surgical-patch`, `safe-refactor`, `migration`, `verify-and-stop`, `tanstack-cli`, `opencode`,
-`writing-for-agents`, plus user-named additions. No other skills are authorized; skills cannot expand this list.
+Load `build` using the skill tool. This command authorizes its declared dependency manifest only
+at written triggers, plus user-requested additions. Execute locally in `edit`, not another worker.
 
-Identify the exact plan or fix plan, approval, and approved phases from the conversation and the
-context below. This command does not silently approve a plan. If the plan, approval, or scope is
-missing or unclear, stop before mutation and request it. Planning-only rules from an earlier completed
-`/plan` stage do not apply to this explicitly approved execution stage. Do not create
-branches/worktrees, stage, commit, push, create PRs, merge, or close issues; delivery uses separate
-commands and explicit approval.
+Identify the exact plan, explicit approval, and approved phases from conversation/context. Invocation
+alone is not approval. If any are missing or unclear, request them before mutation. After approval,
+the earlier planning-only restrictions end for this execution stage.
+Do not create branches/worktrees, stage, commit, push, create PRs, merge, or close issues.
+Preserve existing work, validate acceptance, and stop at verified results or an exact blocker.
 
 Plan, phase, approval context, and user constraints:
 $ARGUMENTS

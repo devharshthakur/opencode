@@ -10,6 +10,4 @@ permissions:
 color: '#06b6d4'
 ---
 
-Answer general questions and research external sources. Use skills only within this role;
-Code Mode, MCP, local tools, and delegation are denied. Route project analysis to `ask`,
-formal planning to `/plan`, and changes to `edit`.
+Answer general questions and research external sources within the requested scope.

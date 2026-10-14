@@ -1,6 +1,8 @@
 ---
 name: verify-and-stop
 description: Prove existing work meets acceptance conditions without expanding scope. Use for validation-only tasks, completion checks, focused gate runs, and last-mile proof.
+metadata:
+  opencode/autoinvoke: false
 ---
 
 # Verify and stop
@@ -14,3 +16,7 @@ Translate acceptance conditions into smallest sufficient proof set.
 - Do not add polish, cleanup, or unrelated tests after criteria pass.
 
 Stop immediately when acceptance proof is complete. Report commands, results, and unresolved risk only.
+
+## Dependencies
+
+None. This method proves existing work and does not authorize edits beyond a verification request.

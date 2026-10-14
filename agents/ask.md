@@ -1,9 +1,8 @@
 ---
-description: Read-only project questions, diagnosis, and discussion
+description: Project questions, planning, and approved execution handoffs without direct edits
 mode: primary
 permissions:
   - { action: '*', resource: '*', effect: deny }
-  - { action: external_directory, resource: '*', effect: ask }
   - { action: read, resource: '*', effect: allow }
   - { action: read, resource: '*.env', effect: ask }
   - { action: read, resource: '*.env.*', effect: ask }
@@ -27,25 +26,16 @@ permissions:
   - { action: websearch, resource: '*', effect: allow }
   - { action: skill, resource: '*', effect: allow }
   - { action: question, resource: '*', effect: allow }
-  - { action: shell, resource: 'git --no-optional-locks -c core.fsmonitor=false status --short', effect: allow }
-  - { action: shell, resource: 'git --no-optional-locks -c core.fsmonitor=false status --porcelain=v1', effect: allow }
-  - { action: shell, resource: 'git branch --show-current', effect: allow }
-  - { action: shell, resource: 'git rev-parse --show-toplevel', effect: allow }
-  - { action: shell, resource: 'git rev-parse HEAD', effect: allow }
-  - { action: shell, resource: 'git --no-pager --no-lazy-fetch diff --no-ext-diff --no-textconv', effect: allow }
-  - { action: shell, resource: 'git --no-pager --no-lazy-fetch diff --no-ext-diff --no-textconv --stat', effect: allow }
-  - { action: shell, resource: 'git --no-pager --no-lazy-fetch diff --cached --no-ext-diff --no-textconv', effect: allow }
-  - { action: shell, resource: 'git --no-pager --no-lazy-fetch diff --cached --no-ext-diff --no-textconv --stat', effect: allow }
-  - { action: shell, resource: 'git --no-pager --no-lazy-fetch log --oneline -15', effect: allow }
-  - { action: shell, resource: 'git worktree list --porcelain', effect: allow }
+  - { action: shell, resource: '*', effect: allow }
+  - { action: execute, resource: '*', effect: allow }
+  - { action: '*_*', resource: '*', effect: allow }
+  - { action: external_directory, resource: '*', effect: ask }
+  - { action: edit, resource: '*', effect: deny }
+  - { action: browser, resource: '*', effect: deny }
   - { action: subagent, resource: explore, effect: allow }
+  - { action: subagent, resource: implement, effect: allow }
 color: '#8b5cf6'
 ---
 
-# Ask Agent
-
-Answer project questions and diagnose read-only. Use the permitted Git inspections or native
-file tools; run no tests, setup, servers, or instrumentation. Delegate only read-only discovery
-to `explore`, passing the same limits. Code Mode and MCP are denied because their broader
-capabilities are not needed here; use official web documentation. Use `/plan` for formal
-planning and `edit` for changes. Follow `AGENTS.md` for skill selection.
+Answer project questions and plan without directly changing files or external state, including through shell or MCP.
+Follow the invoked command; dispatch execution only when that command's explicit approval gate passes.

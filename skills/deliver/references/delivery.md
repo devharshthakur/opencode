@@ -1,6 +1,6 @@
 # Delivery (push, PR, CI)
 
-Conditional detail for the delivery stage of `implement`. Use only when the invoking command
+Conditional detail for the delivery stage of `deliver`. Use only when the invoking command
 authorizes the specific operation and user limits permit it. `commit` owns commit
 mechanics and `git-isolation` owns isolation; do not restate them here.
 
@@ -20,7 +20,10 @@ mechanics and `git-isolation` owns isolation; do not restate them here.
 - Recheck task/head PRs. Update only an attributable existing PR; otherwise create one with verified
   repository, head, and base. Change an existing base only when explicitly requested. Avoid empty or
   duplicate PRs.
-- Explain the problem, solution, actual checks, and limitations concisely. Reference issues with
+- Explain the problem, solution, actual checks, and limitations concisely. Use the shared PR body
+  headings `Issue`, `Fix`, and `Validation`. Include a short actual fenced `diff` snippet only when useful;
+  never paste a full patch or secrets. Read [the shared reporting and PR format](../../shared/reporting.md)
+  only at this publishing stage. Reference issues with
   `Refs #<number>` or verified URLs, never auto-closing keywords. Leave issue state unchanged absent a
   separate, confirmed request.
 - Verify the PR URL, head SHA, base, and included commits, and record the URL immediately so later

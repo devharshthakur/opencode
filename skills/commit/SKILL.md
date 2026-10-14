@@ -101,3 +101,7 @@ Never use `git add -A`, `git add .`, or `git commit -a`; stage each commit's fil
 
 **Done when:** each authorized commit's hashes, full messages, and included files are verified;
 report these with actual checks and remaining changes. Do not edit source or automatically publish.
+
+## Dependencies
+
+None. This skill defines commit mechanics and message style only and grants no authority.

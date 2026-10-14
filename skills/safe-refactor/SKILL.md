@@ -1,6 +1,8 @@
 ---
 name: safe-refactor
 description: Restructure code while preserving behavior. Use for extraction, consolidation, ownership moves, or cleanup where verification must bracket structural edits.
+metadata:
+  opencode/autoinvoke: false
 ---
 
 # Safe refactor
@@ -14,3 +16,7 @@ Define behavior-preservation boundary and establish verification before structur
 - Avoid dependency or configuration growth without correctness need.
 
 Run same proof after change. Stop when behavior matches and requested structure is achieved.
+
+## Dependencies
+
+None. This method preserves behavior only and does not authorize feature or destructive changes.

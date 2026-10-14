@@ -19,11 +19,14 @@
     "plan": { "disabled": true },
     "build": { "disabled": true },
 
-    // Override the model used by built-in subagents.
+    // Keep discovery separate; pin execution subagents to DeepSeek Flash with high thinking.
     "explore": {
       "model": "opencode/big-pickle"
     },
     "general": {
+      "model": "opencode-go/deepseek-v4.1-flash#high"
+    },
+    "implement": {
       "model": "opencode-go/deepseek-v4.1-flash#high"
     }
   },

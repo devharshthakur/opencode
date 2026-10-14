@@ -1,6 +1,8 @@
 ---
 name: tanstack-cli
 description: Use for any task involving the TanStack CLI (tanstack / @tanstack/cli) — creating TanStack Start and Router projects, working with add-ons, templates, or the agent introspection commands (create, add, add-on, template, libraries, doc, search-docs, ecosystem, pin-versions).
+metadata:
+  opencode/autoinvoke: false
 ---
 
 # TanStack CLI
@@ -24,3 +26,7 @@ Each reference holds the full technical detail; open only what the task needs.
 | Look up libraries, fetch docs, search docs, browse the ecosystem, pin versions | [references/introspection.md](references/introspection.md) |
 | Author add-ons and templates, programmatic generation, env/config schema | [references/authoring.md](references/authoring.md) |
 | Migrate off the removed `tanstack mcp` (legacy only) | [references/mcp-migration.md](references/mcp-migration.md) |
+
+## Dependencies
+
+None. Open only the reference the task needs; do not select unrelated skills automatically.

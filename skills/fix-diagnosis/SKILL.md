@@ -1,50 +1,55 @@
 ---
 name: fix-diagnosis
 description: bug, stack trace, screenshot, repro, error log. Use for read-only root-cause diagnosis and detailed fix plans before edit or the approved-plan /build workflow.
+metadata:
+  opencode/autoinvoke: false
 ---
 
 # Fix Diagnosis
 
-Use for bug reports, stack traces, screenshots, failing commands, or broken behavior. This skill is
-read-only and grants no authority; the invoking command defines scope and whether implementation is
-authorized.
+Use for bug reports, stack traces, screenshots, failing commands, or broken behavior. This skill
+is read-only and grants no authority; loading or discussing it never authorizes a dispatch. The
+invoking command selects the mode and defines scope.
 
-## Workflow
+## Mode comes from the command
 
-1. Parse the symptom, repro, logs, screenshots, and broken expectation. Separate observed facts from
-   inferred cause.
-2. Ask for missing information only when diagnosis would otherwise be guesswork.
-3. Inspect only relevant code, tests, and configuration.
-4. Trace the symptom through the failing path to the state, data, or control flow that explains it.
-5. Rank competing hypotheses by supporting evidence and cheap falsification value, and test the
-   cheapest discriminating check first. Do not overclaim: report a confirmed root cause only when the
-   evidence uniquely supports it; otherwise name the leading hypotheses, their evidence, and the
-   smallest next diagnostic step.
-6. Present a concrete fix plan for the leading cause.
+- `/fix` is diagnosis-only even after an explicit "yes": it stops without an execution approval
+  question. This is the diagnosis-only `/fix` path; suggest `/fix:branch` or `/fix:worktree` for repair.
+- `/fix:branch`, `/fix:worktree`, and `/fix:pr` are approval-triggered repair modes: diagnose and
+  plan read-only, then on explicit approval dispatch hidden `implement` with workflow `deliver`,
+  kind `repair`.
+- When a `deliver` worker loads this skill only to refresh evidence, it returns findings to that
+  existing workflow. "Do not request another execution approval or dispatch another worker." A
+  materially changed cause or scope returns to the parent for a revised plan and approval.
 
-## Output format
+## Diagnosis (read-only)
 
-```md
-## Bug: <one-line summary>
+1. Parse the symptom, repro, logs, screenshots, and broken expectation. Separate observed facts
+   from inferred cause.
+2. Ask for missing information only when diagnosis would otherwise be guesswork; request
+   user-captured evidence when an executable reproduction is needed.
+3. Inspect only relevant code, tests, and configuration with native read/search. Read-only Git
+   inspection is allowed only when the invoking command permits it. Before approval: no tests,
+   setup, instrumentation, fetches, Git mutations, or external-state changes.
+4. Trace the symptom through the failing path to the state, data, or control flow that explains
+   it. Rank competing hypotheses by supporting evidence and cheap falsification value. Report a
+   confirmed root cause only when the evidence uniquely supports it; otherwise name the leading
+   hypotheses, their evidence, and the smallest next diagnostic step.
 
-**Symptom**: <what the user sees>
+## Output
 
-**Root Cause**: <deepest confirmed cause and evidence>
+Read [the shared reporting reference](../shared/reporting.md) and report exactly the `issue`,
+`fix plan`, and `result` sections. State "Diagnosis only; no changes made." for diagnosis-only mode.
 
-## Leading Hypotheses
+For an eligible repair mode, read [the shared approval and handoff reference](../shared/approval-handoff.md)
+before requesting approval. The fix plan states the symptom, mechanism certainty, path-level
+changes, proof, risks, and the proposed isolation (base kind and base), delivery operations, and
+limits. With no remote, use a valid local `HEAD` and default to an uncommitted repair. A verified
+GitHub target permits a proposal for scoped commits, push, and PR; ambiguous or non-GitHub
+targets, or missing access, require a decision. A required PR does not silently fall back to
+local-only.
 
-- <hypothesis> — <evidence, cheap falsification, next check>
+## Dependencies
 
-## Fix Plan
-
-- `<file/function>` — <exact change and why>
-- `<file>` — <test or validation update>
-
-**Validation**: <commands or manual checks>
-
-**Risks/Edge Cases**: <notable concerns>
-```
-
-Use `Root Cause` when confirmed; otherwise use `Leading Hypotheses` and state the uncertainty. Keep
-the plan detailed enough for manual implementation or a narrow handoff to `edit`; use `/build` with
-`edit` for explicitly approved fix-plan execution.
+- `deliver`: execution worker only, after an explicit repair command authorizes execution.
+- `opencode`: OpenCode bug diagnosis only, for current V2 behavior.

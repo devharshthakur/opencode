@@ -1,6 +1,8 @@
 ---
 name: surgical-patch
 description: Fix bugs and small behavior changes at the narrowest responsible layer. Use when regression proof, preserved surrounding behavior, and task-relevant tests matter.
+metadata:
+  opencode/autoinvoke: false
 ---
 
 # Surgical patch
@@ -28,10 +30,15 @@ authorizes.
 ## Proof and stop
 
 - At a suitable seam, add a regression test and observe it fail for the reported bug before the fix,
-   then pass after, and rerun the original reproduction. When no seam exists, use the strongest available proof:
-  reproduce it before and after, and document the missing-test limitation honestly rather than
-  claiming a test ran or passed.
-- With the cause clear, proceed without routine approval; otherwise stop.
+  then pass after, and rerun the original reproduction. When no seam exists, use the strongest
+  available proof: reproduce it before and after, and document the missing-test limitation honestly
+  rather than claiming a test ran or passed.
+- With the cause clear AND repair authority already granted, proceed without additional routine
+  approval; otherwise stop and request the missing authority.
 - Run focused proof plus the nearest affected gate. Stop when the failure is fixed and the regression
   proof passes; remove task-created temporary instrumentation and stop processes/containers started
   for the task.
+
+## Dependencies
+
+None. This method cannot authorize a repair; it proceeds only under existing repair authority.
