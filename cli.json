@@ -5,10 +5,6 @@
     "mode": "light"
   },
 
-  "hints": {
-    "tips": true
-  },
-  
   "diffs": {
     "wrap": "none",
     "tree": false,
@@ -21,9 +17,10 @@
     "scrollbar": false,
     "thinking": "hide",
     "grouping": "auto",
-    "verbosity": "low",
-    "image_preview": true,
-    "permissions": "autoaccept"
+    "image_preview": false,
+    "tps": false,
+    "permissions": "autoaccept",
+    "verbosity": "low"
   },
   "prompt": {
     "paste": "compact",
