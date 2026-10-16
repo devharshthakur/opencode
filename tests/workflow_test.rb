@@ -1,6 +1,6 @@
-# Static V2 contract checks; this is not a live OpenCode permission evaluator.
+# Offline contracts, not a live OpenCode permission evaluator or obedience test.
 require 'yaml'
-require 'digest'
+require 'json'
 
 ROOT = File.expand_path('..', __dir__)
 CHECKS = []
@@ -15,13 +15,70 @@ def text(path)
 end
 
 def frontmatter(path)
-  document = text(path).match(/\A---\n(.*?)\n---\n/m)
-  raise "Missing frontmatter: #{path}" unless document
-  YAML.safe_load(document[1], aliases: false)
+  match = text(path).match(/\A---\n(.*?)\n---\n/m)
+  raise "Missing frontmatter: #{path}" unless match
+  YAML.safe_load(match[1], aliases: false)
 end
 
 def body(path)
   text(path).sub(/\A---\n.*?\n---\n/m, '').strip
+end
+
+# Strip comments and trailing commas without altering strings (including URLs
+# and literal ',}' text). Parse ignored config privately; never print its values.
+def jsonc(path)
+  source = text(path)
+  cleaned = +''
+  i = 0
+  quoted = false
+  escaped = false
+  while i < source.length
+    char = source[i]
+    if quoted
+      cleaned << char
+      if escaped
+        escaped = false
+      elsif char == '\\'
+        escaped = true
+      elsif char == '"'
+        quoted = false
+      end
+      i += 1
+    elsif source[i, 2] == '//'
+      i = source.index("\n", i) || source.length
+    elsif source[i, 2] == '/*'
+      finish = source.index('*/', i + 2)
+      raise "Unterminated JSONC comment: #{path}" unless finish
+      cleaned << ' '
+      i = finish + 2
+    else
+      quoted = char == '"'
+      cleaned << char
+      i += 1
+    end
+  end
+  result = +''
+  quoted = false
+  escaped = false
+  cleaned.each_char.with_index do |char, index|
+    if quoted
+      result << char
+      if escaped
+        escaped = false
+      elsif char == '\\'
+        escaped = true
+      elsif char == '"'
+        quoted = false
+      end
+    else
+      quoted = char == '"'
+      next if char == ',' && cleaned[(index + 1)..-1].lstrip.match?(/\A[}\]]/)
+      result << char
+    end
+  end
+  JSON.parse(result)
+rescue JSON::ParserError
+  raise "Invalid JSONC: #{path} (contents withheld)", cause: nil
 end
 
 def matches?(pattern, value)
@@ -29,251 +86,316 @@ def matches?(pattern, value)
   Regexp.new("\\A#{source}\\z", Regexp::MULTILINE).match?(value)
 end
 
-def effect(profile, action, resource)
+BASE_RULES = [
+  { 'action' => '*', 'resource' => '*', 'effect' => 'allow' },
+  { 'action' => 'external_directory', 'resource' => '*', 'effect' => 'ask' },
+  { 'action' => 'read', 'resource' => '*.env', 'effect' => 'ask' },
+  { 'action' => 'read', 'resource' => '*.env.*', 'effect' => 'ask' },
+  { 'action' => 'read', 'resource' => '*.env.example', 'effect' => 'allow' },
+].freeze
+
+def effect(profile, action, resource, global = [])
   result = 'ask'
-  profile.fetch('permissions').each do |rule|
-    result = rule.fetch('effect') if matches?(rule.fetch('action'), action) && matches?(rule.fetch('resource'), resource)
+  (BASE_RULES + global + profile.fetch('permissions', [])).each do |rule|
+    if matches?(rule.fetch('action'), action) && matches?(rule.fetch('resource'), resource)
+      result = rule.fetch('effect')
+    end
   end
   result
 end
 
 def profiles(pattern)
   Dir.glob(File.join(ROOT, pattern)).to_h do |path|
-    relative = path.delete_prefix(ROOT + '/')
-    [File.basename(path, '.md'), frontmatter(relative)]
+    [File.basename(path, '.md'), frontmatter(path.delete_prefix(ROOT + '/'))]
   end
 end
 
-def dependencies(id)
-  section = body("skills/#{id}/SKILL.md").split("## Dependencies\n", 2).fetch(1).split(/^## /, 2).first
-  section.scan(/^- `([a-z0-9-]+)`:/).flatten
-end
-
-def configured_agent_model(path, id)
-  # Inspect only the config prefix; never read or print MCP credentials farther down.
-  prefix = File.foreach(File.join(ROOT, path)).take_while { |line| !line.match?(/^  "permissions":/) }.join
-  prefix[/"#{Regexp.escape(id)}"\s*:\s*\{\s*"model"\s*:\s*"([^"]+)"/, 1]
-end
-
-commands = profiles('commands/*.md')
 agents = profiles('agents/*.md')
-skill_paths = Dir.glob(File.join(ROOT, 'skills/**/SKILL.md'))
-skills = skill_paths.to_h do |path|
+commands = profiles('commands/*.md')
+skills = Dir.glob(File.join(ROOT, 'skills/**/SKILL.md')).to_h do |path|
   [File.basename(File.dirname(path)), frontmatter(path.delete_prefix(ROOT + '/'))]
 end
-entry_skills = {
-  'plan' => 'plan', 'plan:branch' => 'plan', 'plan:worktree' => 'plan', 'build' => 'build', 'fix' => 'fix-diagnosis',
-  'fix:branch' => 'fix-diagnosis', 'fix:worktree' => 'fix-diagnosis', 'fix:pr' => 'fix-diagnosis',
-  'deliver:worktree' => 'deliver', 'deliver:branch' => 'deliver',
-  'commit' => 'commit', 'commit:auto' => 'commit',
-}
-check('exact command set with delivery names') { commands.keys.sort == entry_skills.keys.sort }
-check('exact local skill set') do
-  skills.keys.sort == %w[plan build deliver commit fix-diagnosis surgical-patch git-isolation migration safe-refactor verify-and-stop tanstack-cli worker-style].sort
+check('exactly four profiles') { agents.keys.sort == %w[chat dev explore implement] }
+check('exactly two primary profiles') do
+  agents.select { |_, data| data['mode'] == 'primary' }.keys.sort == %w[chat dev]
 end
-check('exact agent set without resurrecting planner') { agents.keys.sort == %w[ask chat edit explore implement].sort }
+check('twelve workflow commands') do
+  commands.keys.sort == %w[ask build commit commit:auto fix fix:branch fix:worktree plan plan:branch plan:worktree pr quick].sort
+end
+check('six explicit-only local workflow skills') do
+  skills.keys.sort == %w[build commit fix git-isolation plan pr]
+end
 
-skills.each do |id, data|
-  check("#{id}: portable name matches folder") { data['name'] == id && id.match?(/\A[a-z0-9-]+\z/) }
-  check("#{id}: explicit-only discovery") { data.fetch('metadata').fetch('opencode/autoinvoke') == false }
-  check("#{id}: explicit dependency manifest") { body("skills/#{id}/SKILL.md").include?("## Dependencies\n") }
+# Written PR contracts, not live GitHub/CLI behavior or model obedience proof.
+pr = text('skills/pr/SKILL.md')
+offer = text('skills/shared/pr-offer.md')
+templates = text('skills/pr/references/templates.md')
+pr_command = body('commands/pr.md')
+check('pr: explicit-only, current-session command with arguments') do
+  skills.fetch('pr').dig('metadata', 'opencode/autoinvoke') == false &&
+    commands.fetch('pr') == { 'description' => 'Commit task changes, push a verified head branch, and create or update a GitHub PR', 'subagent' => false } &&
+    pr_command.include?('Load `pr` using the skill tool') && pr_command.include?('$ARGUMENTS')
 end
-external = %w[opencode writing-for-agents caveman ultracave]
-skills.each_key do |id|
-  dependencies(id).each do |dependency|
-    check("#{id}: known dependency #{dependency}") { skills.key?(dependency) || external.include?(dependency) }
+check('pr: strict base/draft shorthand and new-PR main default') do
+  ['yes :<branch>', 'yes draft', 'yes :<branch> draft', '/pr [:<base>] [draft]',
+   'reject unknown/duplicate arguments and empty bases', 'Bare branch names are not shorthand',
+   '`main` is the default for new PRs only'].all? { |phrase| offer.include?(phrase) }
+end
+check('pr: completion offer is plain text and parent-only') do
+  offer.include?('plain-text statement, never the `question` tool') &&
+    offer.include?('Only the parent `dev` session') &&
+    ['read-only answers', 'unfinished tasks', 'worker/Todo reports', 'completed PR delivery',
+     'no-PR/no-push/no-commit'].all? { |phrase| offer.include?(phrase) }
+end
+check('pr: approval is separate from local-only build authority') do
+  offer.include?('latest unambiguous pending PR') && offer.include?('Earlier plan') &&
+    offer.include?('does not authorize PR delivery') && offer.include?('never rewrite a local-only worker') &&
+    offer.include?('load `pr` using the skill tool')
+end
+check('pr: scoped commit dependency does not publish or emit recursive offers') do
+  pr.include?('load `commit` using the skill tool') && pr.include?('Confirmation policy: not-required') &&
+    pr.include?('inner commit stops at local verification') &&
+    text('skills/commit/SKILL.md').include?('do not emit an inner completion offer')
+end
+check('pr: verified remotes, forks, main existence, and complete outgoing history') do
+  ['do not assume `origin`', 'base repository from the head/push repository',
+   'A missing base is a blocker', 'complete outgoing diff and history',
+   'Unrelated commits', 'Preserve unrelated work'].all? { |phrase| pr.include?(phrase) }
+end
+check('pr: avoid base pushes and destructive publication') do
+  ['Never push directly to a base/protected branch', 'no stash, reset, clean',
+   'non-fast-forward rejection blocks delivery', 'No force-push', 'No new worktree'].all? { |phrase| pr.include?(phrase) }
+end
+check('pr: matching open PR reuse, state preservation, and uncertain-outcome reconciliation') do
+  ['Reuse a matching existing open PR', 'retain their base/draft state',
+   'Preserve human-written', 'stop if ownership is unclear',
+   'recheck for an existing matching open PR', 'inspect remote state before any',
+   'Never duplicate a PR'].all? { |phrase| pr.downcase.include?(phrase.downcase) }
+end
+check('pr: create type labels only when missing and preserve metadata') do
+  pr.include?('Create it only if absent') && pr.include?('never use `--force`') &&
+    pr.include?('colors/descriptions') && pr.include?('silently omit the requested label')
+end
+check('pr: conventional title, explicit create targets, and verified URL ending') do
+  ['Conventional Commit', '--repo', '--base', '--head', '--draft', '--label',
+   '--body-file', 'published head SHA', 'verified PR URL is the',
+   'final line', 'Do not emit a PR offer'].all? { |phrase| pr.include?(phrase) }
+end
+check('pr: adaptable fix template uses requested human-readable sections') do
+  fix = templates.split('## Fix', 2).last.split('## Performance', 2).first
+  ['## Issue', '## Root Cause', '## The Fix', '## Validation Checklist',
+   '## Review Checklist', '“Cause”'].all? { |phrase| fix.include?(phrase) } &&
+    templates.include?('rename/reorder headings') && pr.include?('templates') && pr.include?('references, not forms')
+end
+check('pr: other type templates and honest GFM evidence') do
+  ['## Performance', '## Feature', '## Refactor / Style',
+   '## Chore / Docs / Test / Build / CI / Revert', '<details>', '> [!IMPORTANT]',
+   'No Mermaid unless requested', 'no Merge Danger section'].all? { |phrase| templates.include?(phrase) } &&
+    pr.include?('pending reviewer actions stay unchecked') && pr.include?('not fabricated') &&
+    pr.include?('separate explicit closure authorization')
+end
+check('pr: completion integrations point to the shared protocol') do
+  ['skills/shared/reporting.md', 'skills/shared/approval-handoff.md', 'skills/commit/SKILL.md'].all? do |path|
+    text(path).include?('pr-offer.md')
+  end && text('commands/quick.md').include?('~/.config/opencode/skills/shared/reporting.md') &&
+    text('AGENTS.md').include?('~/.config/opencode/skills/shared/pr-offer.md')
+end
+
+agents.each do |id, profile|
+  check("#{id}: native V2 metadata") do
+    (profile.keys & %w[permission tools prompt maxSteps temperature]).empty? &&
+      profile.fetch('permissions').all? do |rule|
+        rule.keys.sort == %w[action effect resource] && %w[allow ask deny].include?(rule['effect'])
+      end
   end
+  check("#{id}: concise nonempty role") { body("agents/#{id}.md").split.size.between?(1, 70) }
+  check("#{id}: model has one authoritative config location") { !profile.key?('model') }
 end
-check('plan authorizes execution only through build') { dependencies('plan').sort == %w[build opencode writing-for-agents].sort }
-check('diagnosis has explicit worker workflow') { dependencies('fix-diagnosis').sort == %w[deliver opencode].sort }
-check('build authorizes isolation but no delivery dependencies') do
-  dependencies('build').include?('git-isolation') && (dependencies('build') & %w[commit deliver]).empty?
-end
-check('delivery owns isolation and commits') { %w[git-isolation commit surgical-patch].all? { |id| dependencies('deliver').include?(id) } }
-check('voice dependencies are explicit and conditional') { dependencies('worker-style').sort == %w[caveman ultracave].sort }
-
-commands.each do |name, data|
-  content = body("commands/#{name}.md")
-  check("#{name}: valid V2 command metadata") { (data.keys - %w[description agent model subagent subtask]).empty? && data['subagent'] == false }
-  check("#{name}: selected agent exists") { agents.key?(data['agent']) }
-  check("#{name}: explicit entry skill tool call") { content.include?("Load `#{entry_skills.fetch(name)}` using the skill tool") }
-  check("#{name}: manifest authorization retained") { content.include?('dependency manifest') || content.include?('declared dependencies') }
-  check("#{name}: arguments retained") { content.include?('$ARGUMENTS') }
-  check("#{name}: no permission-bypassing shell template") { !content.include?('!`') }
-  check("#{name}: bounded prompt") { content.split.size <= 150 }
-end
-%w[plan plan:branch plan:worktree fix fix:branch fix:worktree fix:pr].each do |name|
-  check("#{name}: planner remains ask") { commands[name]['agent'] == 'ask' }
-end
-%w[build deliver:branch deliver:worktree commit commit:auto].each do |name|
-  check("#{name}: direct execution remains edit") { commands[name]['agent'] == 'edit' }
+%w[explore implement].each do |id|
+  check("#{id}: subagent-only, discoverable") do
+    agents[id]['mode'] == 'subagent' && agents[id]['hidden'] == false
+  end
+  check("#{id}: no recursive delegation") { effect(agents[id], 'subagent', '*') == 'deny' }
 end
 
-%w[ask chat explore implement].each do |name|
-  profile = agents.fetch(name)
-  check("#{name}: no V1 permission fields") { (profile.keys & %w[permission tools prompt maxSteps]).empty? }
-  check("#{name}: ordered V2 permission rules") do
-    profile['permissions'].is_a?(Array) && profile['permissions'].all? do |rule|
-      rule.keys.sort == %w[action effect resource] && %w[allow ask deny].include?(rule['effect'])
+configs = ['opencode.sample.jsonc']
+configs << 'opencode.jsonc' if File.file?(File.join(ROOT, 'opencode.jsonc'))
+configs.each do |path|
+  config = jsonc(path)
+  check("#{path}: root defaults") do
+    config['default_agent'] == 'dev' && config['model'] == 'opencode-go/deepseek-v4.1-flash'
+  end
+  check("#{path}: supported model-level low default") do
+    config.dig('providers', 'opencode-go', 'models', 'deepseek-v4.1-flash', 'settings', 'reasoningEffort') == 'low'
+  end
+  expected_models = {
+    'dev' => 'opencode-go/deepseek-v4.1-flash#low',
+    'chat' => 'opencode-go/deepseek-v4.1-flash#high',
+    'explore' => 'opencode-go/muse-spark-1.3-contributor#medium',
+    'implement' => 'opencode-go/deepseek-v4.1-flash#high',
+  }
+  expected_models.each do |id, model|
+    check("#{path}: #{id} model pin") { config.dig('agents', id, 'model') == model }
+  end
+  %w[build plan general].each do |id|
+    check("#{path}: unused builtin #{id} disabled") { config.dig('agents', id, 'disabled') == true }
+  end
+  check("#{path}: no retired model profiles") { (config.fetch('agents').keys & %w[ask edit]).empty? }
+  servers = config.dig('mcp', 'servers')
+  check("#{path}: native MCP shape") { servers.is_a?(Hash) && config['mcp'].keys == ['servers'] }
+  check("#{path}: only Context7 enabled") do
+    servers.reject { |_, server| server['disabled'] }.keys == ['context7']
+  end
+  check("#{path}: integration definitions retained") { servers.length == 15 }
+  servers.each do |id, server|
+    check("#{path}: #{id} native enablement/timeouts") do
+      !server.key?('enabled') && [true, false].include?(server['disabled']) &&
+        (!server.key?('timeout') || server['timeout'].is_a?(Hash))
     end
   end
-  check("#{name}: cannot delegate to general") { effect(profile, 'subagent', 'general') == 'deny' }
-end
-%w[chat explore].each do |name|
-  %w[edit execute browser github_create_pull_request aws_delete_resource unknown_mutating_tool].each do |action|
-    check("#{name}: denies #{action}") { effect(agents[name], action, '*') == 'deny' }
+  check("#{path}: standard summary-compaction tail") do
+    config.dig('compaction', 'auto') == false && config.dig('compaction', 'keep', 'tokens') == 30000 && !config.key?('warming')
   end
-  check("#{name}: denies shell and delegation") { effect(agents[name], 'shell', 'git status') == 'deny' && effect(agents[name], 'subagent', 'explore') == 'deny' }
-end
-check('ask denies direct edits and browser') { %w[edit browser].all? { |action| effect(agents['ask'], action, '*') == 'deny' } }
-check('ask retains full shell') { ['git status', 'git push', 'pnpm test', 'rm -rf build'].all? { |command| effect(agents['ask'], 'shell', command) == 'allow' } }
-check('ask retains Code Mode and MCP') { %w[execute github_create_pull_request aws_delete_resource context7_query_docs].all? { |action| effect(agents['ask'], action, '*') == 'allow' } }
-check('ask allows only named execution/discovery profiles') do
-  %w[explore implement].all? { |id| effect(agents['ask'], 'subagent', id) == 'allow' } &&
-    effect(agents['ask'], 'subagent', 'unknown-worker') == 'deny'
-end
-%w[ask explore].each do |name|
-  check("#{name}: sensitive reads and directory approval preserved") do
-    effect(agents[name], 'read', 'src/app.ts') == 'allow' && effect(agents[name], 'read', '.env') == 'ask' &&
-      effect(agents[name], 'read', '.env.example') == 'allow' &&
-      effect(agents[name], 'read', '/home/user/.aws/credentials') == 'ask' &&
-      effect(agents[name], 'external_directory', '/outside/*') == 'ask'
+  check("#{path}: unsupported experiments removed") { !config.key?('experimental') }
+  %w[shell edit execute subagent unknown_mutating_tool].each do |action|
+    check("#{path}: dev allows #{action}") { effect(agents['dev'], action, '*', config['permissions']) == 'allow' }
+  end
+  check("#{path}: dev overrides sensitive/external asks by explicit choice") do
+    effect(agents['dev'], 'read', '.env', config['permissions']) == 'allow' &&
+      effect(agents['dev'], 'external_directory', '/outside/*', config['permissions']) == 'allow'
   end
 end
-check('chat denies project reads') { effect(agents['chat'], 'read', 'README.md') == 'deny' }
-check('worker hidden, subagent-only, model managed in configuration') { agents['implement']['hidden'] == true && agents['implement']['mode'] == 'subagent' && !agents['implement'].key?('model') }
-config_paths = ['opencode.sample.jsonc']
-config_paths << 'opencode.jsonc' if File.file?(File.join(ROOT, 'opencode.jsonc'))
-config_paths.each do |path|
-  %w[general implement].each do |id|
-    check("#{path}: #{id} uses DeepSeek Go high") { configured_agent_model(path, id) == 'opencode-go/deepseek-v4.1-flash#high' }
-  end
+check('sample contains no inline credentials') do
+  sample = jsonc('opencode.sample.jsonc')
+  sample.dig('mcp', 'servers', 'context7', 'headers', 'CONTEXT7_API_KEY') == '{env:CONTEXT7_API_KEY}' &&
+    sample.dig('mcp', 'servers', 'github', 'headers', 'Authorization') == 'Bearer {env:GITHUB_MCP_TOKEN}'
 end
-check('worker blocks nested delegation and browser') { effect(agents['implement'], 'subagent', 'explore') == 'deny' && effect(agents['implement'], 'browser', '*') == 'deny' }
-check('worker asks for external directory access') { effect(agents['implement'], 'external_directory', '/outside/*') == 'ask' }
-check('explore file remains byte-identical') { Digest::SHA256.hexdigest(text('agents/explore.md')) == '899ef617d72067ac797e048361f37ab24adf0950723aeea2245aacae3070c7c7' }
-check('sample explore model retained') { text('opencode.sample.jsonc').match?(/"explore"\s*:\s*\{\s*"model"\s*:\s*"opencode\/big-pickle"/) }
-%w[ask chat edit].each do |name|
-  check("#{name}: nonempty minimal role prompt") { body("agents/#{name}.md").split.size.between?(1, 60) }
-end
-check('worker prompt bounded') { body('agents/implement.md').split.size.between?(1, 100) }
-check('global instructions bounded') { text('AGENTS.md').split.size <= 600 }
+check('local credential-bearing configuration stays ignored') { text('.gitignore').lines.map(&:strip).include?('opencode.jsonc') }
 
-# These assertions preserve written gates. They cannot establish that a model obeys them.
+%w[shell edit execute browser subagent skill github_create_pull_request unknown_mutating_tool].each do |action|
+  check("explore denies #{action}") { effect(agents['explore'], action, '*') == 'deny' }
+end
+%w[read glob grep webfetch websearch].each do |action|
+  check("explore permits native #{action}") { effect(agents['explore'], action, 'src/auth.ts') == 'allow' }
+end
+%w[.env .env.local secret.pem .npmrc .pypirc opencode.jsonc /home/u/.config/opencode/opencode.jsonc /home/u/.aws/credentials].each do |resource|
+  check("explore protects #{resource}") { effect(agents['explore'], 'read', resource) == 'deny' }
+end
+check('explore permits an example env file') { effect(agents['explore'], 'read', '.env.example') == 'allow' }
+%w[read glob grep shell edit subagent opencode_models github_create_pull_request].each do |action|
+  check("chat denies project action #{action}") { effect(agents['chat'], action, '*') == 'deny' }
+end
+check('chat permits only approved documentation through Code Mode') do
+  effect(agents['chat'], 'execute', '*') == 'allow' &&
+    effect(agents['chat'], 'context7_query_docs', '*') == 'allow'
+end
+check('CLI prompts protect non-dev profiles') { jsonc('cli.json').dig('session', 'permissions') == 'prompt' }
+
+commands.each do |id, data|
+  content = body("commands/#{id}.md")
+  check("#{id}: current session/model retained") do
+    (data.keys - %w[description subagent]).empty? && data['subagent'] == false
+  end
+  check("#{id}: arguments preserved") { content.include?('$ARGUMENTS') }
+  check("#{id}: no permission-bypassing command shell interpolation") { !content.include?('!`') }
+  check("#{id}: concise command") { content.split.size <= 150 }
+end
+skills.each do |id, data|
+  check("#{id}: portable explicit-only skill") do
+    data['name'] == id && data.dig('metadata', 'opencode/autoinvoke') == false
+  end
+  check("#{id}: staged dependency manifest") { body("skills/#{id}/SKILL.md").include?('## Dependencies') }
+end
+check('ask is read-only, not unsolicited planning') do
+  content = body('commands/ask.md')
+  content.include?('No shell execution, edits, implementation dispatch, or external mutation') &&
+    content.include?('Do not create an implementation plan unless asked')
+end
+check('quick bypasses planning without authorizing delivery') do
+  content = body('commands/quick.md')
+  content.include?('regardless of complexity') && content.include?('not isolation, staging, commits, or publishing') &&
+    content.include?('Do not delegate implementation')
+end
+check('manual build is direct and needs prior approval') do
+  content = body('commands/build.md')
+  content.include?('invocation alone is not approval') && content.include?('does not prepare isolation') &&
+    content.include?('do not launch an implementation worker')
+end
+%w[plan plan:branch plan:worktree].each do |id|
+  content = body("commands/#{id}.md")
+  check("#{id}: planning is read-only but can explore") do
+    content.include?('No shell, edits, or implementation dispatch before approval') && content.include?('`explore`')
+  end
+  check("#{id}: dependency manifest and one approval-bound worker") do
+    content.include?('dependency manifest') && content.include?('approval dispatches one `implement` worker')
+  end
+end
+%w[fix fix:branch fix:worktree].each do |id|
+  content = body("commands/#{id}.md")
+  check("#{id}: diagnoses on temp branch and cleans up before approval") do
+    content.include?('`fix/diag-<slug>`') && content.include?('`diag-branch.sh`') &&
+      content.include?('delete the temporary branch and switch back to the parent branch before asking for approval')
+  end
+  check("#{id}: uses Markdown Todo checklist and approval-bound implement worker") do
+    content.include?('dependency manifest') && content.include?('Markdown Todo checklist') &&
+      content.include?('`single-worker`') && content.include?('`per-todo-worker`') &&
+      content.include?('Approval dispatches `implement`')
+  end
+end
+check('branch mode never creates worktrees') do
+  %w[plan:branch fix:branch].all? { |id| text("commands/#{id}.md").include?('Create no worktrees') }
+end
+check('worktree mode preserves original work') do
+  %w[plan:worktree fix:worktree].all? { |id| text("commands/#{id}.md").include?('never copy dirty files or credentials') }
+end
+check('fix skill defines temp-branch diagnosis, Todo checklist, and adaptive worker dispatch') do
+  fix_skill = text('skills/fix/SKILL.md')
+  ['diag-branch.sh enter', 'diag-branch.sh leave', 'diagnosing-bugs', 'Markdown',
+   'single-worker', 'per-todo-worker', 'fix/<task-slug>'].all? { |phrase| fix_skill.include?(phrase) }
+end
+check('commit confirmation policies differ') do
+  text('commands/commit.md').include?('Confirmation policy: required') &&
+    text('commands/commit:auto.md').include?('Confirmation policy: not-required')
+end
+check('commit scope is attributable, not whole workspace') do
+  %w[commit commit:auto].all? { |id| text("commands/#{id}.md").include?('not every workspace change') }
+end
+check('commits preserve hooks and explicit-path staging') do
+  text('skills/commit/SKILL.md').include?('never disable them') && text('skills/commit/SKILL.md').include?('Stage explicit paths only')
+end
 handoff = text('skills/shared/approval-handoff.md')
-reporting = text('skills/shared/reporting.md')
-diagnosis = text('skills/fix-diagnosis/SKILL.md')
-delivery = text('skills/deliver/SKILL.md')
-publish = text('skills/deliver/references/delivery.md')
 %w[planning awaiting-approval approved running completed blocked cancelled].each do |state|
-  check("handoff state: #{state}") { handoff.include?("`#{state}`") }
+  check("handoff state #{state}") { handoff.include?("`#{state}`") }
 end
-%w[plan plan:branch plan:worktree].each do |name|
-  content = text("commands/#{name}.md")
-  check("#{name}: forbids shell and dispatch during planning") { content.match?(/During planning, do not edit files, run shell commands, launch subagents/) }
-  check("#{name}: build worker waits for explicit approval") { content.include?('On explicit approval') && content.include?('hidden `implement` with workflow `build`') }
-  check("#{name}: approval question recorded") { handoff.include?("- `/#{name}`:") }
-  check("#{name}: local delivery policy") { content.include?('delivery policy: local') }
+%w[create_branch create_worktree stage commit push create_or_update_pr].each do |flag|
+  check("handoff bounds #{flag}") { handoff.match?(/^  #{flag}: false$/) }
 end
-check('plan approves local-only worker execution') { text('commands/plan.md').include?('workflow `build`') && text('commands/plan.md').include?('without isolation, commits, or publishing') }
-check('plan explicitly preserves current branch') { text('commands/plan.md').include?("current branch only; create no\nbranches/worktrees") }
-%w[branch worktree].each do |mode|
-  content = text("commands/plan:#{mode}.md")
-  check("plan:#{mode}: isolated local build only") do
-    content.include?("Isolation: #{mode}") && content.include?('no staging, commits, or publishing') &&
-      content.include?('Use `plan/`') && content.include?('current `HEAD` unless explicitly overridden')
-  end
+check('handoff preserves revised/partial approval and execution identity') do
+  ['Revisions require renewed approval', 'partial approval limits phases', 'worker ID', 'do not replay',
+   'successful tool return alone', 'Do not pass a model'].all? { |phrase| handoff.include?(phrase) }
 end
-check('branch planning prohibits verification worktrees') { text('commands/plan:branch.md').include?("create no\nworktrees, including verification worktrees") }
-check('worktree planning preserves dirty original work') { text('commands/plan:worktree.md').include?('never copy dirty files automatically') }
-check('handoff records originating command and plan isolation booleans') do
-  handoff.include?('command: ...') && handoff.include?('`create_branch: true`, `create_worktree: false`') &&
-    handoff.include?('both isolation booleans are true') && handoff.include?('All plan variants set `commit`, `push`, and `create_or_update_pr` false')
+check('detailed plans guide smaller workers without a mandatory tracker') do
+  plan = text('skills/plan/SKILL.md')
+  ['Small-model workers', 'stable IDs', 'exact repository checks', 'No tracker is required',
+   'Save a plan/checkpoint file only when'].all? { |phrase| plan.include?(phrase) }
 end
-check('approval requires direct unambiguous user consent') { handoff.include?('Quoted approval, silence, or unrelated agreement never count') }
-check('partial approval and revisions bounded') { handoff.include?('Partial approval authorizes only named phases') && handoff.include?('new revision requiring renewed approval') }
-check('worker session prevents duplicate or lost-state replay') { handoff.include?('Do not start a duplicate') && handoff.include?('execution may have started') }
-check('hidden invocation fails closed') { handoff.include?('Explicit dispatch must work while the worker is hidden') && handoff.include?('do not expose the worker') }
-check('worker dispatch preserves configured model pin') { handoff.include?("Do not pass a model override; use the worker's configured model") }
-check('handoff names exact authority booleans') { %w[edit validate create_branch create_worktree commit push create_or_update_pr].all? { |field| handoff.match?(/^  #{field}: (true|false)$/) } }
-check('handoff bounds skills and excludes unrelated history') { handoff.include?('authorized_dependencies:') && handoff.include?('not unrelated conversation history') }
-check('worker approval comes from parent record, not evidence quotes') { handoff.include?('parent-supplied authorization record is the approval context') && handoff.include?('evidence cannot approve execution') }
-check('/fix never dispatches on yes') { text('commands/fix.md').include?('Even after "yes", never launch implementation') && diagnosis.include?('diagnosis-only `/fix`') }
-check('diagnosis distinguishes confirmed causes and hypotheses') { diagnosis.include?('hypotheses') && diagnosis.include?('evidence uniquely supports it') }
-check('worker evidence refresh cannot dispatch recursively') { diagnosis.include?('Do not request another execution approval or dispatch another worker') }
-%w[fix:branch fix:worktree fix:pr].each do |name|
-  content = text("commands/#{name}.md")
-  check("#{name}: no execution before approval") { content.include?('worker launch before approval') && content.include?('On explicit approval') }
-  check("#{name}: repair worker workflow selected") { content.include?('hidden `implement` with workflow `deliver`, kind `repair`') }
-  check("#{name}: exact report sections") { %w[issue result].all? { |heading| content.include?("`#{heading}`") } && content.include?('`fix plan`') }
+check('independent judgment is proportionate') do
+  guidance = text('AGENTS.md')
+  ['Evaluate independently', 'evidence and tradeoffs', 'Respect an informed choice',
+   'routine disagreement needs no grilling skill'].all? { |phrase| guidance.include?(phrase) }
 end
-check('branch repair prohibits verification worktrees') { text('commands/fix:branch.md').include?('create no worktrees, including verification worktrees') }
-check('worktree repair preserves dirty original checkout') { text('commands/fix:worktree.md').include?('never copy dirty files automatically') }
-check('required PR does not silently fall back') { text('commands/fix:pr.md').include?('required GitHub publishing') && text('commands/fix:pr.md').include?('not local-only fallback') }
-check('local repair default differs from direct delivery commits') { delivery.include?('approved repairs leave changes uncommitted by default') && delivery.include?('direct delivery commands permit local commits') }
-check('branch delivery preserves prior skill exclusion') { text('commands/deliver:branch.md').include?('Exclude `tanstack-cli` unless the user explicitly requests it') }
-check('manual build still needs explicit approval') { text('skills/build/SKILL.md').include?('exact plan, approved phases, and explicit approval') && text('commands/build.md').match?(/Invocation\s+alone is not approval/) }
-check('local build does not authorize isolation or delivery') { text('commands/build.md').include?('Do not create branches/worktrees, stage, commit, push, create PRs, merge, or close issues') }
-check('local build has no delivery subsystem') { text('skills/build/SKILL.md').include?('no delivery subsystem') }
-check('build rejects unauthorized or inconsistent isolation') do
-  text('skills/build/SKILL.md').include?('mismatches isolation and operation booleans') &&
-    text('skills/build/SKILL.md').include?('explicit approval from `/plan:branch` or `/plan:worktree`')
-end
-check('build isolation dependency is conditional on worker approval') do
-  text('skills/build/SKILL.md').include?('`git-isolation`: worker-only, after validating an explicitly approved') &&
-    text('skills/build/SKILL.md').include?('never for `/plan` or direct `/build`')
-end
-check('build isolation has readiness and local-base gates') do
-  text('skills/build/SKILL.md').include?('readiness gate before tests, setup, or edits') &&
-    text('skills/build/SKILL.md').include?('no fetch or published-base')
-end
-isolation = text('skills/git-isolation/SKILL.md')
-check('local and published bases distinguished') { isolation.include?('`base_kind: local`') && isolation.include?('`base_kind: published`') }
-check('unborn repositories stop without implicit setup') { isolation.include?('Stop for an unborn repository') && isolation.include?('never create an initial commit or remote implicitly') }
-check('fetch failure cannot become local fallback') { isolation.include?('A fetch failure is not a no-remote') && isolation.include?('local/stale refs are not a substitute') }
-check('dirty branch switching blocked') { text('skills/git-isolation/references/branch.md').include?('dirty checkout blocks switching') }
-check('worktree preserves original changes') { text('skills/git-isolation/references/worktree.md').include?('Do not stash, reset, clean, discard, switch, or copy') }
-check('delivery validation gates publishing') { delivery.include?('Unverified acceptance or required local checks stop delivery') }
-check('publishing failures retained and reported') { delivery.include?('not a successful local-only fallback') }
-check('delivery uses scoped commit procedure') { delivery.include?('Load `commit` using the skill tool') }
-check('base and cumulative CI budget survive resumption') { delivery.include?('preserve the recorded') && publish.include?('across retries and resumption') }
-check('CI bounded and history append-only') { publish.include?('three') && publish.include?('15 minutes') && publish.include?('append-only') }
-check('repair reruns original reproduction') { text('skills/surgical-patch/SKILL.md').include?('rerun the original reproduction') }
-check('commit style retains lowercase and optional trivial body') { text('skills/commit/SKILL.md').include?('lowercase') && text('skills/commit/SKILL.md').include?('self-explanatory') && text('skills/commit/SKILL.md').include?('backticks') }
-check('commit confirmation policies differ') { text('commands/commit.md').include?('Confirmation policy: required') && text('commands/commit:auto.md').include?('Confirmation policy: not-required') }
-check('changed commit plan requires renewed approval') { text('commands/commit.md').include?('request renewed approval') }
-check('delivery invocation authorizes without routine commit approval') { %w[deliver:branch deliver:worktree].all? { |name| text("commands/#{name}.md").include?('Commit-plan confirmation is not required') } }
-check('delivery-limit semantics remain global') { ['`no commits` excludes staging, push, and PRs', '`no push` excludes PRs', '`no PR` still permits authorized commits and push'].all? { |rule| text('AGENTS.md').include?(rule) } }
-check('manual and dependency-only skill loading remains allowed') { text('AGENTS.md').include?('Ordinary requests do not trigger unsolicited skill loading') && text('AGENTS.md').include?('User-named additions are permitted') && effect(agents['ask'], 'skill', 'custom-user-skill') == 'allow' }
-check('repair format has exactly three top-level sections') do
-  sample = reporting[/```markdown\n(.*?)\n```/m, 1]
-  sample.scan(/^## (.+)$/).flatten == ['issue', 'fix plan', 'result']
-end
-check('diagnosis-only result explicit') { reporting.include?('Diagnosis only; no changes made') }
-check('PR format and optional root diff documented') { publish.include?('`Issue`, `Fix`, and `Validation`') && publish.include?('fenced `diff` snippet only when useful') }
-check('PR URL reporting and issue closure remain gated') { reporting.include?('verified URL is the final line') && delivery.include?('`question`') && delivery.include?('exact repository and issue') && publish.include?('never auto-closing keywords') }
-check('voice fallback cannot claim unavailable ultra') { text('skills/worker-style/SKILL.md').include?('never install') || text('skills/worker-style/SKILL.md').include?('Never install') }
-check('external skill directories never modified by voice workflow') { text('skills/worker-style/SKILL.md').include?('modify `.agents/`') && text('skills/worker-style/SKILL.md').include?('claim ultra mode was loaded when unavailable') }
+check('global instructions stay bounded') { text('AGENTS.md').split.size <= 450 }
+check('contributor privacy is documented') { text('README.md').include?('training') && text('README.md').include?('not zero-data-retention') }
+check('pilot remains inactive') { text('README.md').include?('inactive') && !text('plugins/skill-policy.js').include?('workflow-pilot') }
 
-active_paths = Dir.glob(File.join(ROOT, '{commands,skills,agents}/**/*.md')) + [File.join(ROOT, 'README.md'), File.join(ROOT, 'AGENTS.md')]
-active_paths.each do |path|
-  relative = path.delete_prefix(ROOT + '/')
-  content = File.read(path)
-  check("#{relative}: no obsolete command/skill references") { !content.match?(%r{(?<![\w/])/implement(?:\b|:)|skills/implement/|`implement` (?:skill|using)|Load `implement`}) }
-  check("#{relative}: no blanket skill selection") { !content.match?(/load (?:any |all )?relevant skills|load whatever seems relevant/i) }
-  check("#{relative}: no unexplained Native Core terminology") { !content.include?('Native Core') }
-end
-
-# Check explicit Markdown reference links relative to their owning file.
 Dir.glob(File.join(ROOT, 'skills/**/*.md')).each do |path|
   File.read(path).scan(/\]\(([^)]+)\)/).flatten.each do |link|
     next if link.match?(%r{\A(?:https?://|#)})
     target = link.split('#', 2).first
-    check("reference resolves: #{path.delete_prefix(ROOT + '/')} -> #{target}") { File.exist?(File.expand_path(target, File.dirname(path))) }
-  end
-  File.read(path).scan(/`((?:\.\.\/)?(?:git-isolation\/)?(?:references|scripts)\/[\w\/-]+\.(?:md|sh))`/).flatten.each do |target|
-    check("code reference resolves: #{path.delete_prefix(ROOT + '/')} -> #{target}") { File.exist?(File.expand_path(target, File.dirname(path))) }
+    check("reference resolves: #{path.delete_prefix(ROOT + '/')} -> #{target}") do
+      File.exist?(File.expand_path(target, File.dirname(path)))
+    end
   end
 end
 
-puts "PASS: #{CHECKS.length} static workflow checks (no live model/enforcement claims)"
+puts "PASS: #{CHECKS.length} offline workflow contracts (live behavior still needs fresh-session validation)"
