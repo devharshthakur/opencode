@@ -1,20 +1,11 @@
 ---
-description: Plan with ask, then implement on a feature branch after explicit approval
-agent: ask
+description: Plan with the current model; approval implements on a local feature branch
 subagent: false
 ---
 
-Load `plan` using the skill tool. This command authorizes its declared dependency manifest only at
-written triggers, plus user-requested additions. Isolation: branch; delivery policy: local.
-Request a missing task before proceeding.
+Load `plan` using the skill tool. Authorize its dependency manifest only at written triggers. Isolation: branch. Base: current local HEAD unless explicitly overridden; no fetch. Delivery: local, uncommitted. Preserve the selected session model and agent; use `dev`.
 
-During planning, do not edit files, run shell commands, launch subagents, or perform delivery.
-Output the plan in conversation. Use the shared handoff's branch approval question, naming exact
-phases and local base (current `HEAD` unless explicitly overridden). On explicit approval, invoke
-hidden `implement` with workflow `build` and exact approved phases. Approval authorizes branch
-isolation, edits, and validation only; no staging, commits, or publishing. Use `plan/`; create no
-worktrees, including verification worktrees. Retain task branch and results. Parent stays in `ask`.
-Revisions require renewed approval; prevent duplicate dispatch.
+Plan through read-only discovery, optionally using `explore`. No shell, edits, or implementation dispatch before approval. Resolve dependencies on dirty work before approval. Ask: "Approve and implement this plan on a feature branch, without commits or publishing?" Direct approval dispatches one `implement` worker through the shared handoff procedure. Create no worktrees, including verification worktrees. Never replay uncertain or completed work.
 
-Task, explicit local base, and user constraints:
+Task:
 $ARGUMENTS

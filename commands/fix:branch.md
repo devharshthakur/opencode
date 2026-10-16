@@ -1,20 +1,11 @@
 ---
-description: Diagnose and plan, then repair on a feature branch after approval
-agent: ask
+description: Diagnose on a temporary branch and plan a Todo fix; approval implements on a local feature branch
 subagent: false
 ---
 
-Load `fix-diagnosis` using the skill tool. Authorize its declared dependency manifest only at
-written triggers, plus user-requested additions. Mode: approval-triggered repair; isolation: branch;
-delivery policy: auto. Request a missing bug before proceeding.
+Load `fix` using the skill tool. Authorize its dependency manifest only at written triggers. Isolation: branch. Base: current local HEAD unless explicitly overridden; no fetch. Delivery: local, uncommitted. Preserve the selected session model and agent; use `dev`.
 
-Diagnose and plan read-only; no tests, setup, fetches, mutations, or worker launch before approval.
-No remote means local repair without commits by default. A verified GitHub target permits a proposal
-for scoped commits, push, and PR; other/ambiguous targets or missing access require a decision.
-Ask approval naming exact plan, base, isolation, and delivery operations. On explicit approval,
-invoke hidden `implement` with workflow `deliver`, kind `repair`, and approved operation booleans.
-Use `fix/`; create no worktrees, including verification worktrees. Retain task branch and results.
-Honor user delivery limits. Use `issue`, `fix plan`, and `result` sections.
+Diagnose the issue on a temporary `fix/diag-<slug>` branch using `diag-branch.sh` (carrying and restoring uncommitted changes deterministically via Git) and `diagnosing-bugs`, then delete the temporary branch and switch back to the parent branch before asking for approval. Resolve dependencies on dirty work before approval. Break the repair into a Markdown Todo checklist (`single-worker` for small fixes; sequential `per-todo-worker` for large fixes). Ask: "Approve and implement this plan on a feature branch, without commits or publishing?" Approval dispatches `implement` through the shared handoff procedure. Create no worktrees, including verification worktrees. Never replay uncertain or completed work.
 
-Bug, explicit base, and user constraints:
+Issue:
 $ARGUMENTS

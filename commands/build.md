@@ -1,17 +1,9 @@
 ---
-description: Execute an explicitly approved plan using edit
-agent: edit
+description: Execute an already approved plan directly with the current model
 subagent: false
 ---
 
-Load `build` using the skill tool. This command authorizes its declared dependency manifest only
-at written triggers, plus user-requested additions. Execute locally in `edit`, not another worker.
+Load `build` using the skill tool. Authorize its dependency manifest only at written triggers. Execute directly in `dev` with the current session model; do not launch an implementation worker. Identify the exact approved plan/phases first; invocation alone is not approval. Check that no worker is running, completed, or of uncertain state before executing the same work. Current checkout only: this command does not prepare isolation. No staging, commits, or publishing.
 
-Identify the exact plan, explicit approval, and approved phases from conversation/context. Invocation
-alone is not approval. If any are missing or unclear, request them before mutation. After approval,
-the earlier planning-only restrictions end for this execution stage.
-Do not create branches/worktrees, stage, commit, push, create PRs, merge, or close issues.
-Preserve existing work, validate acceptance, and stop at verified results or an exact blocker.
-
-Plan, phase, approval context, and user constraints:
+Approved plan or phases:
 $ARGUMENTS
