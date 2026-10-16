@@ -1,205 +1,228 @@
-# OpenCode Config
+# Lean OpenCode workflow
 
-Personal [OpenCode V2](https://opencode.ai/v2/docs/) setup: small agents, command-owned authority,
-explicit skill loading, and approval-triggered implementation.
+Personal [OpenCode V2](https://opencode.ai/v2/docs/) setup: two primary agents,
+two subagent-only workers, current-model commands, and deliberate approval boundaries.
 
-## Getting started
+## Agents and models
 
-1. Put this repository in `~/.config/opencode`, or `$XDG_CONFIG_HOME/opencode`.
-2. Copy `opencode.sample.jsonc` to `opencode.jsonc` and adjust models and authentication.
-3. Set `CONTEXT7_API_KEY` in your environment if using the sample Context7 integration.
-4. Install the dependency with the repository's package manager only if needed; workflow checks require no installation.
-5. Open a fresh OpenCode session to validate agent permissions and skill behavior.
-
-`opencode.jsonc`, `opencode.json`, and `service.json` are ignored by Git. Never commit local tokens or service state.
-The sample uses environment substitutions. CLI appearance and interactions belong in `cli.json`, not project configuration.
-
-> [!WARNING]
-> This is not a hardened sandbox. Review permission autoaccept in `cli.json` and global external-directory access.
-> Ask has full shell/MCP access: denying edit tools does not prevent shell or MCP side effects.
-
-## Architecture
-
-| Layer | Owns |
-| --- | --- |
-| `agents/` | Minimal role prompts and tool permissions |
-| `commands/` | Workflow selection, authority, isolation, and approval policy |
-| `skills/` | Explicit entry procedures and conditional dependency manifests |
-| Plain skill references | Stage-specific details loaded only when needed |
-| `AGENTS.md` | Shared safety, evidence, skill-loading, and stopping rules |
-
-**`edit` is the default.** Ordinary questions and edits need no command or unsolicited skill loading.
-
-| Agent | Purpose | Access |
+| Agent | Where | Model policy |
 | --- | --- | --- |
-| `chat` | General conversation and external research | Web, questions, explicit skills; no project tools |
-| `ask` | Project questions, planning, and approval-gated worker dispatch | Reads, shell, MCP; direct edit tools denied |
-| `edit` | Direct edits and explicitly invoked execution workflows | Subject to global/project permissions |
-| `explore` | Cited read-only discovery | No shell, Code Mode, edits, or delegation; model unchanged |
-| `implement` | Execute an authorized handoff | Hidden subagent; no nested delegation; pinned execution model |
+| `dev` | Primary; default | DeepSeek V4.1 Flash low by default; ordinary questions or direct edits |
+| `chat` | Primary | DeepSeek V4.1 Flash high preference; external conversation/research, no project tools |
+| `explore` | Subagent only | Muse Spark 1.3 Contributor medium; bounded cited discovery |
+| `implement` | Subagent only | DeepSeek V4.1 Flash high; approved-plan execution |
 
-Built-in `plan` and `build` agents remain disabled. These are command names, not extra primary agents.
-Ask may dispatch only named `explore` and `implement` profiles; commands further restrict when dispatch is authorized.
-Global/project rules and policies remain binding. Children use their own permissions, not a subset of their parent's.
+Shift+Tab should cycle only `dev` and `chat`. Workers use `mode: subagent` with
+`hidden: false`: the model can discover/delegate to them without adding primary modes.
+Unused built-in `build`, `plan`, and `general` profiles are disabled.
 
-Configuration pins execution subagents `implement` and built-in `general` to
-`opencode-go/deepseek-v4.1-flash#high`. The `explore` model stays unchanged.
-Worker dispatch does not supply a model override. Add an explicit configuration pin for any new execution subagent.
+### Model selection
 
-`hidden: true` removes the implementation worker from listings and the subagent catalog, not security checks.
-Workflows name it explicitly. Verify hidden invocation in a fresh session; if unavailable or denied, report the blocker.
-Do not expose it or route around a denial. `/build` remains a separately invoked manual alternative.
+The root default selects DeepSeek Flash; its model-level `reasoningEffort: low`
+also covers fresh sessions where the root default does not retain a variant.
+Agent pins live in configuration, not duplicated in agent files or commands.
+
+Commands omit both `agent` and `model` and force current-session execution. Use
+development commands in `dev`. They must preserve a manually selected session
+model. Selecting an agent and selecting a session model are separate in V2:
+switching to `chat` alone does not guarantee a model switch. Use `/models` to
+select a different model when wanted. Existing sessions keep their selected model.
+
+### Privacy and permission boundaries
+
+**Muse Contributor permits prompts/completions to be used for training and is
+not zero-data-retention.** Exploration may send repository source to that provider;
+availability is regional. No silent fallback to another model. Choose a different
+explorer model explicitly before sending code whose data policy is incompatible.
+
+**`dev` is allow-all, including shell, sensitive reads, and external directories.**
+This is the user's explicit choice, not a hardened sandbox. `/ask` and planning
+limits are instruction-based: commands do not revoke tools. Untrusted repository
+text cannot authorize work, but these prompts are not a security boundary.
+
+CLI permissions remain `prompt` so other profiles retain their safeguards.
+`explore` denies shell, edits, Code Mode, delegation, and known secret-bearing
+reads; it is not a complete secret scanner (searches/briefs can still expose data).
+`implement` cannot recursively delegate. `chat` denies project tools, permitting
+web research and Context7 documentation through Code Mode. Managed policies and
+permission denials remain binding even for `dev`.
 
 ## Commands
 
 | Command | Behavior |
 | --- | --- |
-| `/plan <task>` | Plan in `ask`; explicit approval implements on the current branch |
-| `/plan:branch <task>` | Same approval flow; implement on a retained feature branch |
-| `/plan:worktree <task>` | Same approval flow; implement in a separate retained worktree |
-| `/build [plan/phase]` | Execute an already approved plan directly through `edit` |
-| `/fix <bug>` | Diagnose and propose a fix; never dispatch implementation, even after “yes” |
-| `/fix:branch <bug>` | Diagnose, request approval, then repair through a worker on a feature branch |
-| `/fix:worktree <bug>` | Same approval flow in a separate retained worktree |
-| `/fix:pr <bug>` | Same approval flow; GitHub publishing required unless the user revises scope |
-| `/deliver:worktree <task>` | End-to-end execution/delivery, with worktree isolation by default |
-| `/deliver:branch <task>` | End-to-end execution/delivery with branch-only isolation |
-| `/commit [limits]` | Approve exact files/messages before local staging and commits |
-| `/commit:auto [limits]` | Scoped local commits without routine confirmation; never publish |
+| `/ask <question>` | Read-only project answer; no shell, edits, or unsolicited implementation plan |
+| `/plan <task>` | Detailed plan; approval dispatches `implement` on the current branch |
+| `/plan:branch <task>` | Same, with explicitly approved local branch isolation |
+| `/plan:worktree <task>` | Same, with explicitly approved local worktree isolation |
+| `/fix <issue>` | Temp-branch root-cause diagnosis + Todo repair plan; approval implements on the current branch |
+| `/fix:branch <issue>` | Same, with explicitly approved local `fix/<slug>` branch isolation |
+| `/fix:worktree <issue>` | Same, with explicitly approved local `fix/<slug>` worktree isolation |
+| `/quick <task>` | Direct execution using the current model; bypass planning regardless of complexity |
+| `/build [plan/phases]` | Execute an already approved plan directly; no worker or isolation preparation |
+| `/commit [scope]` | Approve exact files/messages before local staging and commits |
+| `/commit:auto [scope]` | Explicitly authorize scoped local commits without routine confirmation |
+| `/pr [:<base>] [draft]` | Task-scoped commits/push and create or update a GitHub PR; new PR base defaults to `main` |
 
-Use the delivery names above; no deprecated command aliases are retained.
+The old delivery and `:pr` families remain retired. `/fix`, `/fix:branch`, and
+`/fix:worktree` diagnose on a temporary `fix/diag-<slug>` branch (carrying and
+restoring uncommitted changes deterministically via Git), delete the temporary
+branch before asking for approval, break the repair into a Markdown Todo checklist,
+and dispatch `implement` (`single-worker` for small cohesive fixes or sequential
+`per-todo-worker` with parent validation between Todos for large fixes). No command
+here publishes, amends, merges, deploys, closes issues, or performs destructive
+cleanup automatically.
 
-### Plan and approve
+### Optional GitHub PR delivery
 
-```text
-/plan Add password reset to the authentication flow
-```
+After a completed code/repair/commit task with unpublished work and a verified
+GitHub remote, the parent offers PR delivery in plain text (not the question tool).
+Reply `yes`, `yes :develop`, `yes draft`, or `yes :develop draft`; standalone `/pr`
+accepts the same optional `:<base>` and `draft` arguments. Bare branch names and
+unknown/duplicate arguments are rejected. New PRs explicitly default to `main`;
+existing open PRs retain their base/draft state unless explicitly changed.
 
-Planning uses read/search and read-only documentation queries: no shell, edits, reproductions, or worker launch.
-The final question is: **Approve and implement this plan locally, without isolation, commits, or publishing?**
-An unambiguous “yes” dispatches one foreground worker using the local `build` skill. Ask remains the parent.
-No manual switch to `edit` is required. `/build` still works for explicit approved-plan execution.
+That separate reply or `/pr` invocation authorizes a safe task branch when needed,
+attributable commits, normal push, missing type-label creation, and PR creation or
+update. Ordinary implementation/plan approval never approves publishing. Unclear
+scope, unrelated outgoing commits, secrets, ambiguous fork/remotes, missing base,
+or non-fast-forward push stop delivery. No force-push or automatic merge/cleanup.
 
-Use `/plan:branch` or `/plan:worktree` for approval-triggered isolation with `plan/` branches.
-Their approval questions name the selected isolation; both use current local `HEAD` unless an explicit
-local base is supplied, even when remotes exist. The worker verifies that base after approval without
-fetching. Branch mode blocks dirty switching and creates no worktrees; worktree mode preserves the
-original checkout and never copies dirty files automatically. Resolve dependencies on uncommitted
-work before approval. All plan variants leave changes uncommitted: no staging, commits, push, or PRs.
-Direct `/build` stays on the current branch and never prepares isolation.
+The local explicit-only `pr` skill owns delivery, using `commit` only when needed.
+It follows configured push/upstream relationships rather than assuming `origin`,
+reuses matching open PRs, preserves human-written descriptions and existing labels,
+and ends with a verified PR URL. Only the parent offers, never workers, inner
+commits, read-only answers, unfinished tasks, or an already completed PR workflow.
+Explicit no-PR/no-push/no-commit limits suppress the offer.
 
-Approval identifies title/revision and phases. Revisions require renewed approval; partial approval limits execution.
-Quoted approval, silence, unrelated agreement, or `/build` invocation alone never approve execution.
-The parent records worker session/state and avoids duplicate dispatch after repeated approval or interruptions.
-If execution may already have started but state is missing, ask rather than replay the task.
-Approval dispatch is instruction-driven, not a guaranteed runtime event hook.
+Titles use Conventional Commits with a matching type label (`feat`, `fix`, `perf`,
+`refactor`, `style`, `chore`, `docs`, `test`, `build`, `ci`, or `revert`). Existing
+label metadata is never overwritten. Adaptable GFM templates prioritize human
+readability; fix PRs start from Issue / Root Cause or Cause / The Fix / Review or
+Validation Checklist. No Mermaid unless requested and no Merge Danger section.
+Template references live in `skills/pr/references/templates.md` independently of
+the external `~/.agents/skills/pr`, which this setup does not delete. Native global
+skills take precedence over compatibility skills with the same ID; verify local
+skill loading in a fresh session before deleting the external reference yourself.
 
-### Diagnose and repair
+Ordinary `dev` requests may edit directly. `/quick` is a deliberate planning bypass,
+not a permission to expand the task, discard work, or publish. Genuine blockers,
+missing requirements, destructive-operation confirmations, and user limits still apply.
+Commit scope is explicit or attributable to the current task, never all changes by default.
 
-```text
-/fix Explain why login times out without changing files
-/fix:branch Repair the login timeout
-/fix:worktree Repair it without changing my current checkout
-/fix:pr Repair it and publish a GitHub PR after approval
-```
+### Planning and handoff
 
-Diagnosis distinguishes confirmed causes from hypotheses. No tests, setup, instrumentation, fetches, or mutations
-run before approval. Repair planning may use read-only Git inspection to identify base and delivery choices.
-Executable reproduction needs captured user evidence until execution is authorized.
+Planning uses native discovery/documentation and optionally the read-only explorer;
+no shell, reproductions, edits, or implementation worker before approval. Plans have
+a stable title/revision, current/desired behavior, exclusions, inspected paths and
+interfaces, ordered phases/dependencies, observable acceptance, exact validation,
+isolation/base intent, preservation decisions, risks, and rollback where relevant.
 
-- **No remote:** use explicit valid local base or verified local `HEAD`. Repair commands leave changes uncommitted
-  unless approval explicitly permits commits. Never create an initial commit, remote, or GitHub repository implicitly.
-- **Remote present:** verify remote type, base, push target, GitHub repository, and access. A remote alone is not
-  proof of a usable GitHub target. Other/ambiguous targets or missing access require a decision.
-- **GitHub repair:** approval names isolation, target, scoped commits, push, and PR. Required publishing cannot
-  silently fall back locally. Publishing failures remain blockers with useful local state preserved.
-- **Bases:** published `main`, or verified remote default branch when absent, unless the user overrides it.
-  After approval, fetch and verify the exact base. Failed fetches do not authorize stale/local fallback.
-- **Existing work:** dirty branch switching stops. Worktrees preserve the original checkout and never copy dirty
-  files automatically. A bug depending on uncommitted original work requires a preservation decision.
-- **Proof:** repair the narrow responsible layer; observe suitable red/green regression proof and rerun the
-  original reproduction. Report missing proof and baseline failures honestly.
+The approval question names current/branch/worktree execution and excludes commits
+and publishing. Direct approval dispatches one foreground `implement` worker with
+the exact plan, limits, and relevant evidence—not the transcript. The parent
+retains its selected model. Revisions need renewed approval; partial approval limits
+phases. Repeated approval never launches duplicates. Missing execution identity
+after interruption blocks replay until reconciled. This is instruction-driven,
+not an exactly-once runtime state machine.
 
-Fix reports use exactly `issue`, `fix plan`, and `result` sections. Diagnosis-only results say “Diagnosis only;
-no changes made.” Implementation results include actual checks, limitations, retained branch/worktree, delivery
-state, and verified PR URL when available.
+`/build` remains the explicitly selected direct alternative, not approval itself.
+Do not execute it while a worker owns the task. A user can explicitly approve
+direct execution instead of dispatch. Plan loading alone authorizes nothing.
 
-### Deliver a task
+Branch/worktree plans default to verified local `HEAD`, even with remotes; no
+implicit fetch. Dirty branch switching blocks. Worktrees preserve the original
+checkout and never copy dirty files or credentials automatically. Resolve tasks
+depending on uncommitted original work before approval. Retain/report task isolation;
+no automatic verification isolation or cleanup. Isolation is not delivery approval.
 
-Delivery command invocation authorizes isolation, implementation, validation, scoped commits, normal push, and
-PR creation/update within user limits. No routine plan or commit-plan confirmation is required.
-With no remote, delivery permits local commits only. Non-GitHub/ambiguous remotes and missing publishing access
-require a decision. `/deliver:branch` retains its narrower skill selection: TanStack CLI requires a user request.
+## Skills and context
 
-`no commits` also means no staging, push, or PR; `no push` also means no PR; `no PR` still permits authorized push.
-Required local proof stops publishing when failing or unverified. Review full task diffs for unrelated work and secrets.
-Push only task branches, never force-push. Published history is append-only. CI checking is bounded to three repair
-rounds and 15 minutes total waiting across resumptions; report pending/failing/unavailable CI honestly.
+Six local entry skills own orchestration: `plan`, `fix`, `build`, `commit`, `git-isolation`, `pr`.
+They are explicit-only. Commands authorize dependencies only at written triggers;
+`/ask` and `/quick` need no unconditional workflow-skill load.
 
-PR bodies contain **Issue**, **Fix**, and **Validation**. A short actual fenced `diff` is optional when it explains
-the root fix; do not paste entire patches. Reference issues without auto-closing keywords.
-Merging, deployment, issue closure, destructive Git, and cleanup need separate authority and applicable confirmation.
-Branches/worktrees are retained. Verified task PR URLs end the result when available, including after later blockers.
+The `local.skill-policy` plugin filters discovery at prompt admission, after
+filesystem skill sources are ready. It intends to advertise only these external methods:
+`codebase-design`, `diagnosing-bugs`, `domain-modeling`, `tdd`, and `writing-for-agents`.
+Built-in OpenCode guidance remains available. Upstream explicit-only settings stay
+explicit-only. Other installed external skills remain registered/manual, including
+useful optional review, research, prototype, grilling, handoff, and wizard methods.
+Publisher files are untouched; same-named project/native skills are not filtered.
+Edit the curated list in `extensions/skill-policy/core.mjs` deliberately.
+Before a location's first admitted prompt, a raw skill-registry listing may still
+show the unfiltered source definitions. Verify filtering after an actual prompt;
+plugin-active status and passing pure-helper tests alone do not prove it works.
 
-## Explicit skills only
+Skills supply methods, not authority. Their tracker, branch, commit, or delegation
+assumptions cannot expand the invoking task. Routine disagreement does not trigger
+grilling. Challenge material mistakes with evidence and alternatives; respect an
+informed user choice instead of agreeing automatically or debating indefinitely.
 
-Every local `skills/**/SKILL.md` sets `metadata.opencode/autoinvoke: false`. Hidden skills remain loadable by exact ID.
-Commands explicitly load their entry skill and authorize its declared dependency manifest within command limits.
-Each dependency has a written stage/task trigger. Do not load all dependencies at startup or select unlisted skills.
-Skills do not grant execution authority. There is no documented command configuration field for automatic skill preload.
+Use one task per session where practical. Read known small files directly; delegate
+only bounded discovery that avoids substantial parent-context noise. Require
+path:line evidence and honest search limits. Native glob/grep/read are enough;
+`tree` is optional orientation, not the exclusive exploration tool. `ast-grep` may
+help structural searches later; neither is installed or required by this setup.
 
-Ordinary requests load no skills unless the user explicitly asks. You may manually request other installed skills,
-or define project-local commands with their own explicit loading instructions. Nothing installs skills automatically.
-External `.agents/` skills are made explicit-only by `plugins/external-skills-manual.js`, which sets
-`autoinvoke` false on registered entries whose path is under `~/.agents/skills`. Matching is by path, not
-by ID, so same-named project skills are unaffected. Publisher files stay untouched, and those skills
-remain registered and loadable by exact ID.
+Direct `/quick` and `/build` retain history. Plan files/checkpoints are written
+only when requested. Manual compaction (`auto: false`) keeps a recent 30k-token tail;
+it is lossy and cannot shrink fixed instructions/tool schemas. No fixed universal
+"smart context" threshold or claimed percentage savings. Compare parent + worker
+usage, retries, latency, and acceptance quality before claiming savings.
 
-| Skill | Owner |
-| --- | --- |
-| `plan` | Plan creation and approval-triggered handoff |
-| `build` | Approved-plan execution; optional explicitly approved plan isolation, no delivery |
-| `fix-diagnosis` | Evidence, hypotheses, cause, and repair planning |
-| `surgical-patch` | Narrow repair and regression proof |
-| `git-isolation` | Local/published base and branch/worktree readiness |
-| `commit` | Scoped staging, commit mechanics, and message style |
-| `deliver` | Authorized execution and conditional publishing orchestration |
-| `worker-style` | Concise worker communication without lost evidence |
-| `safe-refactor`, `migration`, `verify-and-stop` | Explicit task-specific methods |
-| `tanstack-cli` | Explicit TanStack CLI task and selected references |
+For genuinely project-independent chat, start a fresh session outside a repository.
+Changing agents does not erase existing history or ambient project instructions.
 
-Plain shared references own approval/handoff and reporting; they are not additional discoverable skills.
-Worker style requests exact available `ultracave`, otherwise `caveman`, only when authorized. If neither is available,
-local concise rules apply. It never installs/modifies external skills or claims unavailable ultra mode.
-Persisted code, documentation, commits, and PRs retain clear grammar and complete technical facts.
+## Configuration and authentication
 
-## Validation
+Copy `opencode.sample.jsonc` to the ignored local `opencode.jsonc` and connect your
+accounts. The tracked sample uses environment references. This user's local file
+retains existing inline secrets by explicit choice; never print or commit them.
+Gitignore prevents ordinary tracking, not exposure through tools, backups, or sharing.
+`service.json` is also ignored and remains untouched.
+
+**Only Context7 is enabled by default.** All other MCP definitions remain configured
+but disabled. Opt into others deliberately; avoid duplicating native filesystem
+tools with extra MCP schemas. CLI preferences belong in `cli.json`.
+
+Repository scripts/package managers take precedence. Otherwise prefer `pnpm` for
+JS/TS and `uv` for Python environment/package work. Stack-specific methods stay
+task-local rather than always-loaded global framework instructions.
+
+## Checks and rollout
 
 ```sh
 ruby tests/workflow_test.rb
 python3 tests/preflight_test.py
+python3 tests/diag_branch_test.py
+node --test tests/skill_policy_test.mjs
+node --test tests/workflow_pilot_test.mjs
 git diff --check
 ```
 
-Static checks cover metadata, explicit skill loading, references, permission ordering, workflow contracts, and prompt
-bounds. They do not prove model obedience or live enforcement. Preflight tests include fixture cases and unchanged
-checkout status/index proof. The helper uses bounded read-only inspection, not ownership proof or complete diff review.
+Offline checks cover contracts, simulated permission ordering, references, pure
+skill-filter behavior, and unchanged-checkout preflight. They do not prove live
+model obedience, plugin effectiveness, model-request effort, or UI behavior.
 
-Fresh-session scenarios: hidden worker invocation; current/branch/worktree plan handoffs; approval/rejection;
-revised/partial approval; duplicate prevention; diagnosis-only “yes”; local branch/worktree repair;
-GitHub target approval; missing access; configured worker model.
-Use disposable repositories for mutation checks. Do not publish a real PR merely to test this setup.
+Commands/configuration/CLI preferences normally reload automatically. Use a fresh
+session for role/permission/skill validation; loaded instructions/history may remain.
+Plugin helper changes outside watched directories can require an explicit reload
+or service restart; this setup does not restart the shared service automatically.
 
-Command files reload automatically. Use fresh sessions for changed agent permissions and skill instructions.
-This repository does not restart the service automatically. Record live tests separately from static checks.
+Fresh-session acceptance checklist (record actual results, not assumptions):
 
-## Experimental pilot
+- Shift+Tab shows two primaries; both workers remain discoverable subagents.
+- Fresh development defaults to DeepSeek low; manually selected planning/direct models persist.
+- `/ask` makes no changes; `/quick` does not impose planning; `/build` requires approval.
+- Explorer uses Muse medium, returns useful citations, and cannot shell/edit/delegate.
+- Approved automatic handoff uses DeepSeek high; rejection/revision/partial/repeated approval behave correctly.
+- Curated skill advertisement, manual loading, and non-dev permission prompts work.
+- Only Context7 connects by default; inline local credentials remain private.
+- Live branch/worktree scenarios need separately authorized disposable tests; do not publish to test setup.
 
-`extensions/workflow-pilot/` holds an inactive, runtime-independent deterministic
-approval/handoff core and its offline tests. It is not loaded as a plugin and is not
-wired into any command. See `extensions/workflow-pilot/README.md`; run the checks with
-`node --test tests/workflow_pilot_test.mjs`.
+Restore only affected files from a protected local backup if rollback is needed;
+preserve subsequent user work and session/service data. Never reset Git to simplify rollback.
 
-## License
-
-MIT
+`extensions/workflow-pilot/` remains an **inactive** historical offline experiment.
+It is not imported by the active plugin or wired into commands. Its tests are retained.
