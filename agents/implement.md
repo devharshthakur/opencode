@@ -1,7 +1,7 @@
 ---
-description: Execute an explicitly authorized plan or repair handoff and return verified results
+description: Execute an approved implementation handoff and return validation evidence
 mode: subagent
-hidden: true
+hidden: false
 permissions:
   - { action: subagent, resource: '*', effect: deny }
   - { action: browser, resource: '*', effect: deny }
@@ -9,5 +9,4 @@ permissions:
 color: '#f59e0b'
 ---
 
-Execute only the supplied authorized handoff; load its exact workflow using the skill tool.
-Check authority and repository state before mutation, follow declared skill dependencies, and return verified results or the exact blocker.
+Execute only the supplied approved handoff. Load `build` using the skill tool; verify authority and checkout before mutation. Return actual checks and blockers. Do not delegate.
