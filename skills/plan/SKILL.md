@@ -1,59 +1,63 @@
 ---
 name: plan
-description: Produce an approval-ready plan and dispatch implementation in the command-selected checkout
+description: Create a detailed implementation plan and an explicit approval-bound handoff
 metadata:
   opencode/autoinvoke: false
 ---
 
 # Plan
 
-Produce the plan in conversation, using the command-selected read-only profile. Ordinary
-questions need no formal plan; small edits can go directly to `edit` unless planning was
-requested. The parent `ask` session never edits.
+Preserve the current model. Request a missing task; clarify essential ambiguity.
+Use this workflow in `dev`. If invoked in `chat`, ask the user to select `dev`
+without silently switching the model or broadening chat's permissions.
 
-## Procedure
+## Discover and design
 
-1. Identify the task from arguments/history; request it if missing. Clarify material ambiguity
-   in goals, constraints, acceptance, exclusions, rollout, and rollback.
-2. Inspect relevant instructions, code, tests, and configuration with native read/search tools,
-   plus read-only documentation and MCP for current external behavior. Before approval the
-   planning stage runs no shell commands, reproductions, edits, or subagent delegation.
-   Authorized method skills provide planning constraints, not executable steps.
-3. Compare viable approaches and material tradeoffs. Identify responsible files, existing seams,
-   dependencies, side effects, and edge cases. Break substantial work into reviewable phases
-   with observable validation gates; separate any requested delivery from implementation.
-4. Present `## Plan: <title>` with a stable **title** and **revision** (starting at 1), plus
-   **Goal**, **Scope**, **Approach**, **Changes** (paths and why), **Validation**, **Risks/Tradeoffs**,
-   and **Rollback** when relevant. For OpenCode changes, specify feature-appropriate reload
-   checks and a fresh session for permission/skill validation.
-5. Before requesting approval, read [the shared approval and handoff reference](../shared/approval-handoff.md)
-   and use its exact question for the command-selected isolation. `/plan` uses the current branch;
-   `/plan:branch` and `/plan:worktree` propose local isolation from current `HEAD` unless the user
-   explicitly selects another local base. Record that base intent; the worker resolves/verifies its
-   SHA after approval, without fetching. All three stop before staging, commits, or publishing.
-   If the task depends on dirty original-checkout files, resolve preservation before approval;
-   never assume those changes will follow isolation.
+1. Read relevant instructions, configuration, code, and tests. Use native reads,
+   search, and read-only documentation; no shell, edits, reproductions, installs,
+   or external mutation. An `explore` call may investigate a bounded question;
+   no implementation worker may run before approval. Read
+   [exploration](references/exploration.md) when delegating substantial discovery.
+2. Compare viable approaches. Challenge material assumptions with evidence and
+   recommend an alternative when better; do not turn every task into an interview.
+3. Produce the plan in conversation. Save a plan/checkpoint file only when
+   explicitly requested, after its write is authorized. No tracker is required.
+
+## Required plan
+
+Use `## Plan: <stable title>` and a revision starting at 1. Include:
+
+- **Goal/Scope:** current and desired behavior, exclusions, assumptions, open questions.
+- **Approach:** decisions, alternatives, relevant interfaces and existing patterns.
+- **Changes:** inspected paths and ordered edits; mark paths/evidence as current,
+  not immutable. Small-model workers should not have to reconstruct the discussion.
+- **Phases:** stable IDs, real prerequisites, concrete steps, observable acceptance.
+  Prefer complete vertical slices where useful; avoid a task graph for trivial work.
+  Wide compatibility changes may need expand/migrate/contract rather than fake green slices.
+- **Validation:** exact repository checks, expected outcomes, required regression proof,
+  known baseline limitations; distinguish planned checks from observed results.
+- **Execution:** current/branch/worktree, intended local base, preservation decision,
+  authorized operations and skill dependencies. No staging, commits, or publishing.
+- **Risks/Tradeoffs** and **Rollback** when relevant. For OpenCode changes, specify
+  feature-specific reload behavior and fresh-session validation.
+
+For isolated plans, use local `HEAD` unless the user selects another local base.
+The worker verifies its SHA after approval; no fetch. Resolve reliance on dirty
+original-checkout work before approval; never assume it follows isolation.
 
 ## Approval and handoff
 
-Reading or loading this skill alone never approves or dispatches execution. Only the
-command-authorized, approval-triggered mode dispatches a worker, and only after a direct,
-unambiguous user "yes" to the selected question. Quoted approval, silence, unrelated agreement, or a
-`/build` invocation alone never approve.
+Read [approval/handoff](../shared/approval-handoff.md) before requesting approval.
+Use its exact question for the selected isolation. Revisions require renewed
+approval; partial approval authorizes only named phases. Dispatch exactly one
+`implement` worker on direct approval, unless the user explicitly selects direct
+execution. `/build` is the manual current-checkout alternative, not approval itself.
 
-On approval, the parent records the approval and dispatches one hidden `implement` worker with
-workflow `build`, the approved isolation mode, and exact approved phases, using the shared handoff
-record rather than repeated free-form reconstruction. Revisions require renewed approval; partial approval authorizes
-only the named phases. Do not start a duplicate dispatch while a worker runs, after repeated
-approval, or after completion. After interruption or compaction, verify the plan, approval,
-worker state, and Git state rather than replaying. `/build` remains a manual alternative for an
-already approved plan on the current branch; it does not prepare isolation. On results, read
-[the shared reporting reference](../shared/reporting.md) before reporting.
+**Done when:** essential ambiguity is resolved and a complete revision is awaiting
+approval, or an exact blocker is reported. Skill loading never approves execution.
 
 ## Dependencies
 
-- `opencode`: OpenCode planning tasks only, for current V2 behavior and reload guidance.
-- `writing-for-agents`: only when the plan changes agent instructions, commands, or skills.
-- `build`: worker-only, loaded after explicit execution approval. The planning stage before
-  approval never dispatches; dispatch is the separately authorized transition that follows it,
-  not something the planning stage performs.
+- `opencode`: OpenCode tasks, before relying on current V2 behavior.
+- `writing-for-agents`: when designing changes to agent instructions, commands, or skills.
+- `build`: execution only, after explicit approval, in the worker or explicitly selected direct mode.

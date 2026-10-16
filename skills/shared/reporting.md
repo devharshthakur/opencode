@@ -1,52 +1,19 @@
-# Results and repair PRs
+# Completion report
 
-Use only at planning output or completion. State actual facts, not intended checks as completed proof.
+Lead with result or exact blocker. Report:
 
-## Fix commands and repair workers
+- What changed and which acceptance criteria are proved.
+- Actual passing/failing/blocked/unrun checks, including baseline failures.
+- Relevant limitations and pending fresh-session proof for configuration changes.
+- Repository/branch/path, retained isolation or backup resources, staged status,
+  and preserved pre-existing work. Say explicitly when work is uncommitted/local.
 
-Use exactly these top-level sections, in this order. Put additional details inside them.
+Do not invent results, hashes, links, or savings. Keep worker output concise but
+preserve identifiers, uncertainty, authority limits, and evidence. Review is
+against both requirements and repository rules; do not force parallel reviews
+or extra skills for every task. No automatic next-phase execution or publishing.
 
-```markdown
-## issue
-Symptom and confirmed cause with evidence, or leading hypotheses and uncertainty.
-
-## fix plan
-Planned or approved changes, validation, isolation, base, and delivery scope.
-
-## result
-Diagnosis or implementation outcome.
-Checks passed, failed, blocked, or unrun; limitations and remaining work.
-Local/committed/published status, base fallback, branch, retained worktree paths, and cleanup blockers.
-Verified PR URL when available.
-```
-
-For `/fix`, say "Diagnosis only; no changes made." Never ask for execution approval from diagnosis-only mode.
-Before approval-triggered execution, state "Awaiting approval; no changes made" and include the approval
-question under `result`. Final results use the same format and name any partial implementation or blocker.
-If a repair PR exists, its verified URL is the final line inside `result`, including after a later blocker.
-
-## Other workflows
-
-Report changes, actual checks, limitations, repository/base, branch/path, delivery state, and retained
-resources concisely. Local build reports also distinguish pre-existing work and staged status.
-When a task PR was created, updated, or verified, its verified URL is the final line unless the user
-explicitly requests another format. No URL is invented for local-only or failed PR creation.
-
-## PR body
-
-Use clear prose, not compressed worker shorthand. Include only:
-
-```markdown
-## Issue
-What was wrong or missing.
-
-## Fix
-What changed and why it addresses the cause or requirement.
-
-## Validation
-Actual checks and any limitations or pending CI.
-```
-
-A short fenced `diff` snippet is optional only when it explains the root fix better than prose.
-Use the actual reviewed change, no secrets and no complete patch. Reference issues with `Refs #<number>`
-or verified URLs; never use auto-closing keywords without separate explicit closure authority and confirmation.
+At completed development/repair/commit tasks, the parent follows
+[optional PR delivery](pr-offer.md) for the single plain-text GitHub PR offer and
+any later authorization. Worker reports never offer or publish. After authorized
+PR delivery, end with the verified PR URL instead of another offer.
