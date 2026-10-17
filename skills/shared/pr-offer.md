@@ -7,7 +7,8 @@ task (including ordinary direct development), checks for a GitHub remote and
 unpublished task changes/commits. A remote alone is not proof of GitHub hosting:
 inspect fetch/push destinations without printing embedded credentials; verify
 GitHub or a configured GitHub Enterprise host. Use read-only Git/`gh` inspection
-when execution is authorized. Do not run shell during read-only `/ask` or `/plan*`.
+when execution is authorized. Do not run shell during read-only `/ask`; `/plan*`
+shell discovery follows its own boundary and never triggers PR-delivery inspection.
 
 Follow configured upstream/push relationships, not an assumed `origin`. If several
 targets remain ambiguous, resolve that before publishing. Missing authentication

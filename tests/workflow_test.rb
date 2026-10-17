@@ -323,12 +323,66 @@ check('manual build is direct and needs prior approval') do
 end
 %w[plan plan:branch plan:worktree].each do |id|
   content = body("commands/#{id}.md")
-  check("#{id}: planning is read-only but can explore") do
-    content.include?('No shell, edits, or implementation dispatch before approval') && content.include?('`explore`')
+  check("#{id}: bounded shell discovery preserves approval and cleanup gates") do
+    content.include?("under `plan`'s shell boundary") && content.include?('read-only `explore`') &&
+      content.include?('Shell inspection and disposable local services are allowed') &&
+      content.include?('no repository writes, Git mutations, or implementation dispatch before approval') &&
+      content.include?('Follow shared cleanup before requesting approval') &&
+      !content.include?('No shell, edits')
   end
   check("#{id}: dependency manifest and one approval-bound worker") do
     content.include?('dependency manifest') && content.include?('approval dispatches one `implement` worker')
   end
+end
+
+# Written lifecycle contracts only; not live resource teardown or model obedience.
+cleanup = text('skills/shared/cleanup.md').gsub(/\s+/, ' ')
+plan = text('skills/plan/SKILL.md').gsub(/\s+/, ' ')
+build = text('skills/build/SKILL.md').gsub(/\s+/, ' ')
+check('cleanup: early triggers cover global, build, quick, and planning paths') do
+  text('AGENTS.md').include?('Before creating disposable resources in planning or implementation') &&
+    text('AGENTS.md').include?('~/.config/opencode/skills/shared/cleanup.md') &&
+    build.include?('Before tests or other resource creation, read [cleanup]') &&
+    body('commands/quick.md').include?('Before resource creation, read `~/.config/opencode/skills/shared/cleanup.md`') &&
+    plan.include?('Read [cleanup](../shared/cleanup.md) before resource creation')
+end
+check('cleanup: record exact ownership and reconcile interruptions') do
+  ['exact path/container ID/process identity', 'associated ports', 'intended teardown',
+   'Capture returned IDs immediately', 'no mandatory ledger file',
+   'attributable child processes', 'interruption/compaction', 'PID reuse',
+   'not a PID or port alone'].all? { |phrase| cleanup.include?(phrase) }
+end
+check('cleanup: verified graceful teardown and bounded filesystem deletion') do
+  ['bounded wait', 'release of owned', 'exact ID', 'verify stopped state',
+   'does not automatically escalate', 'resolved paths and symlinks', 'Verify absence.',
+   'No broad Docker prune', 'forceful escalation', 'Respect denials'].all? { |phrase| cleanup.include?(phrase) }
+end
+check('cleanup: pre-existing resources, deliverables, persistent data, and isolation survive') do
+  ['Pre-existing resources', 'stay untouched', 'Preserve intended deliverables',
+   'caches, persistent volumes/data', 'backups, branches, and worktrees',
+   'unless separately authorized', 'suggest user shutdown when useful'].all? do |phrase|
+    cleanup.include?(phrase)
+  end && build.include?('Retain approved isolation') && !build.include?('automatic cleanup')
+end
+check('cleanup: planning, implementation, and failure gates require evidence') do
+  ['before the final response or worker handoff', 'before presenting the approval-ready',
+   'failure, cancellation, or a blocker', 'report incomplete cleanup',
+   'missing verification', 'Abrupt crashes or forced termination'].all? { |phrase| cleanup.include?(phrase) } &&
+    text('skills/shared/reporting.md').include?('Cleanup verification:') &&
+    text('skills/shared/approval-handoff.md').include?('Assess worker cleanup evidence') &&
+    build.include?('report exact cleanup blockers')
+end
+check('planning: shell scope allows disposable runtime state, not implementation') do
+  ['without separate confirmation for each start', 'outside the checkout',
+   'keep repository files unchanged', 'read-only repository', 'local-only listeners',
+   'no source/config edits, installs, checkout-writing', 'Git mutations',
+   'including fetch or isolation preparation', 'Ask first for privileged containers',
+   'host-wide changes, persistent storage, or unclear side effects',
+   'Tool permission', 'parent `dev` performs shell operations',
+   'before presenting the approval-ready', 'instruction-based, not a sandbox'].all? { |phrase| plan.include?(phrase) } &&
+    !plan.include?('no shell, edits') &&
+    !text('skills/shared/approval-handoff.md').gsub(/\s+/, ' ').include?('never run shell or fetch') &&
+    !text('skills/shared/pr-offer.md').include?('read-only `/ask` or `/plan*`')
 end
 %w[fix fix:branch fix:worktree].each do |id|
   content = body("commands/#{id}.md")

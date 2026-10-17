@@ -14,14 +14,35 @@ without silently switching the model or broadening chat's permissions.
 ## Discover and design
 
 1. Read relevant instructions, configuration, code, and tests. Use native reads,
-   search, and read-only documentation; no shell, edits, reproductions, installs,
-   or external mutation. An `explore` call may investigate a bounded question;
-   no implementation worker may run before approval. Read
+   search, documentation, and bounded shell discovery under the rules below.
+   An `explore` call stays read-only; parent `dev` performs shell operations.
+   No implementation worker may run before approval. Read
    [exploration](references/exploration.md) when delegating substantial discovery.
 2. Compare viable approaches. Challenge material assumptions with evidence and
    recommend an alternative when better; do not turn every task into an interview.
 3. Produce the plan in conversation. Save a plan/checkpoint file only when
    explicitly requested, after its write is authorized. No tracker is required.
+
+## Planning shell boundary
+
+Shell inspection and reversible, task-scoped local containers/services are allowed
+when directly needed for discovery, without separate confirmation for each start.
+Read [cleanup](../shared/cleanup.md) before resource creation and keep its ownership
+checkpoint. Incidental runtime files belong only in disposable task-owned storage
+outside the checkout; keep repository files unchanged. Use read-only repository
+mounts if needed, local-only listeners, and no persistent storage by default.
+
+Before implementation approval: no source/config edits, installs, checkout-writing
+builds/tests, Git mutations (including fetch or isolation preparation), or external
+mutations. Inspect unfamiliar commands/scripts before running them; a test or
+inspection label is not proof of no writes. Ask first for privileged containers,
+host-wide changes, persistent storage, or unclear side effects. Tool permission
+prompts and denials remain binding. Starting a service never grants implementation
+authority. `/ask` and `explore` retain their own read-only restrictions.
+
+Clean up and verify planning-owned resources before presenting the approval-ready
+plan or reporting a blocker; disclose any incomplete cleanup. Reconcile interrupted
+resources rather than replaying startup. This is instruction-based, not a sandbox.
 
 ## Required plan
 
@@ -54,7 +75,8 @@ approval; partial approval authorizes only named phases. Dispatch exactly one
 execution. `/build` is the manual current-checkout alternative, not approval itself.
 
 **Done when:** essential ambiguity is resolved and a complete revision is awaiting
-approval, or an exact blocker is reported. Skill loading never approves execution.
+approval, or an exact blocker is reported; the cleanup gate is accounted for with
+verification or explicit blockers. Skill loading never approves execution.
 
 ## Dependencies
 

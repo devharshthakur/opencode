@@ -71,6 +71,17 @@ only; commits, pushes, and PRs need their own explicit approval, and the parent
 offers PR delivery only after a completed task (or you run `/pr`). Genuine blockers,
 destructive-operation confirmations, and user limits always apply.
 
+**Planning can inspect via shell and start disposable local services** needed for
+discovery. `/plan*` keeps repository files unchanged and leaves implementation and
+Git mutations behind approval. See the [planning shell boundary](skills/plan/SKILL.md).
+`/ask` and `explore` remain read-only.
+
+**Task-owned resource cleanup is a completion gate**, including during planning.
+Follow the shared [resource lifecycle](skills/shared/cleanup.md) from resource
+creation, not only at the final response. Pre-existing resources and intended
+deliverables stay untouched; cleanup failures are reported, not hidden. This is an
+instruction protocol, not a crash-recovery service or runtime enforcement hook.
+
 CLI permissions stay `prompt` so other profiles keep their safeguards: `explore`
 denies shell, edits, Code Mode, delegation, and known secret-bearing reads; `chat`
 denies project tools; `implement` cannot recursively delegate. Managed policies and
@@ -106,6 +117,13 @@ fresh session to validate role, permission, or skill changes. Plugin helper chan
 outside watched directories can require an explicit reload or service restart, and
 rollback should restore only affected files from a protected backup — never reset
 Git to simplify it.
+
+Fresh-session cleanup proof remains manual: exercise `/plan*` discovery with an
+owned temporary service/file and verify teardown before approval; repeat with
+implementation through `/quick` and `/build`/worker handoff. Verify a pre-existing
+service/file remains untouched, and a failed or uncertain cleanup is reported
+without forceful escalation. Also exercise a failed task and interruption/resume.
+Use disposable local fixtures; Docker is optional, not required for offline checks.
 
 `extensions/workflow-pilot/` remains an **inactive** historical offline experiment:
 it is not imported by the active plugin or wired into commands, though its tests are

@@ -18,8 +18,10 @@ Resolve essential ambiguity before asking. Use `question` when available:
 - `/plan:worktree` and `/fix:worktree`: "Approve and implement this plan in a separate worktree, without commits or publishing?"
 
 Name title/revision, phases/Todos, local base intent (`HEAD` by default), and preservation
-decisions beside the question. Base SHA may await worker verification; never run
-shell or fetch during `/plan*` planning (`/fix*` may run only its temporary
+decisions beside the question. Base SHA may await worker verification. `/plan*`
+permits bounded shell discovery under [plan](../plan/SKILL.md), not repository
+writes, Git mutations, fetch, or implementation. Apply [cleanup](cleanup.md) before
+requesting approval and disclose unresolved cleanup (`/fix*` retains its temporary
 `fix/diag-<slug>` diagnosis and must restore the parent branch before asking).
 Dirty-file dependencies must be resolved first.
 
@@ -46,7 +48,9 @@ explicitly approve exceptions or direct execution; record those exact limits.
    reconcile; do not replay. Do not start direct `/build` while a worker owns the work.
 5. Assess returned evidence against acceptance; successful tool return alone is
    not proof. Inspect risk-relevant changes as needed rather than automatically
-   repeating the worker's entire investigation. Report actual checks and blockers.
+   repeating the worker's entire investigation. Assess worker cleanup evidence
+   under [cleanup](cleanup.md), including retained resources and unresolved cleanup;
+   missing proof is not a clean finish. Report actual checks and blockers.
 
 ## Self-contained worker record
 

@@ -1,10 +1,15 @@
 # Completion report
 
-Lead with result or exact blocker. Report:
+Apply [cleanup](cleanup.md) before the final response or worker handoff, including
+on failures/blockers when execution remains available. Lead with result or exact
+blocker. Report:
 
 - What changed and which acceptance criteria are proved.
 - Actual passing/failing/blocked/unrun checks, including baseline failures.
 - Relevant limitations and pending fresh-session proof for configuration changes.
+- Cleanup verification: resources stopped/removed, or none created; exact retained
+  resources, failed/unverified cleanup, and safe next steps. Preserve pre-existing
+  resources and mention optional user shutdown only when relevant.
 - Repository/branch/path, retained isolation or backup resources, staged status,
   and preserved pre-existing work. Say explicitly when work is uncommitted/local.
 

@@ -31,6 +31,8 @@ separate direct task authorization and has no approved-plan prerequisite.
 3. Only an approved isolated handoff loads `git-isolation` and prepares its selected
    mode. Direct `/build` does not prepare isolation. Verify readiness before tests,
    installs, instrumentation, or edits in a new isolated checkout.
+4. Before tests or other resource creation, read [cleanup](../shared/cleanup.md)
+   and track task-owned resources from creation through verified teardown.
 
 ## Execute and verify
 
@@ -46,11 +48,14 @@ separate direct task authorization and has no approved-plan prerequisite.
 - On interruption, recheck Git and execution state. Resume verified attributable
   work rather than repeating edits or creating new isolation.
 - Review the complete task diff for unrelated changes, artifacts, and secrets.
-  Read [reporting](../shared/reporting.md) at completion and report actual proof.
+  Apply [cleanup](../shared/cleanup.md) after validation and before the final
+  response or worker handoff, including on failure/blockers when execution remains
+  available. Read [reporting](../shared/reporting.md) and report actual proof.
 
 **Done when:** approved acceptance and required checks pass and the diff is reviewed,
 or an exact blocker is reported with useful work preserved. No staging, commits,
-publishing, automatic cleanup, or nested delegation. Retain approved isolation.
+publishing, or nested delegation. Complete verified disposable-resource cleanup or
+report exact cleanup blockers. Retain approved isolation and other protected resources.
 
 ## Dependencies
 
