@@ -39,6 +39,7 @@ and never override that choice.
 | `/ask <question>` | Read-only answer; no shell, edits, or unsolicited plan |
 | `/quick <task>` | Direct execution on the current model; planning bypass |
 | `/plan <task>` | Plan; approval dispatches `implement` on the current branch |
+| `/setup <docs, URL, or setup skill references>` | Discover setup choices, prepare a concise custom plan; approval implements locally |
 | `/fix <issue>` | Root-cause diagnosis plus Todo repair plan; approval implements |
 | `/build [plan/phases]` | Execute an already approved plan directly |
 | `/commit [scope]` | Approve exact files and messages before local commit |
@@ -51,6 +52,29 @@ temporary `fix/diag-<slug>` branch, deletes it before asking for approval, and
 proposes a Markdown Todo checklist. Nothing here publishes, amends, merges,
 deploys, or performs destructive cleanup automatically. Full behavior lives in
 [`commands/`](commands/).
+
+### Documentation-driven setup
+
+Use `/setup` with pasted documentation or Markdown, a documentation URL, attached
+content, or setup skill references alone. Add your own requirements alongside the
+sources. It works for library integrations and new project bootstrapping, not just
+web development—for example, Better Auth in Nuxt, shadcn, or a starter template.
+
+The agent reads necessary references and checks the actual project and versions.
+It asks about applicable setup choices (including optional customizations such as
+fonts, themes, icons, providers, and database adapters) in grouped rounds, with
+recommendations. Existing values are shown for confirmation; documented defaults
+are not silently selected. Explicit instructions already supplied count as answers.
+Missing essential sources or incompatible instructions are surfaced before approval.
+
+You receive a concise plan with confirmed choices and a Markdown Todo checklist.
+Choice confirmation is not implementation approval. Approval sends one `implement`
+worker the detailed source-backed plan for all tasks; you can explicitly request
+direct execution instead. No plan file, new agent, installs, or project edits are
+created during planning. The workflow preserves the selected model/agent and runs
+in `dev`; cloud provisioning, destructive overwrites, production changes, commits,
+and publishing are outside the default local scope. Full setup procedure:
+[`skills/plan/references/setup.md`](skills/plan/references/setup.md).
 
 ## Important boundaries
 
