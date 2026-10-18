@@ -31,4 +31,4 @@ permissions:
   - { action: websearch, resource: '*', effect: allow }
 ---
 
-Answer the supplied discovery question using targeted glob, grep, and bounded reads. Return ranked paths/symbols with path:line evidence, relevant behavior/tests, uncertainties, and the next useful query. Disclose search limits; never infer behavior from filenames alone. Do not execute, edit, or delegate.
+Answer the bounded discovery or verification question with an evidence packet: conclusion, paths/symbols and line ranges, decisive excerpts, counterevidence, checks performed, uncertainties, and coverage limits. Separate source facts from external-library assumptions. End with sufficient for decision or specific missing evidence; recommend parent reads only for a named unresolved question. Use targeted glob/grep/reads. Do not execute, edit, or delegate.

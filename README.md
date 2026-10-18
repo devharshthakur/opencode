@@ -41,6 +41,7 @@ and never override that choice.
 | `/plan <task>` | Plan; approval dispatches `implement` on the current branch |
 | `/setup <docs, URL, or setup skill references>` | Discover setup choices, prepare a concise custom plan; approval implements locally |
 | `/fix <issue>` | Root-cause diagnosis plus Todo repair plan; approval implements |
+| `/improve [scope]` | Evidence-first audit; select findings, then plan and separately approve implementation |
 | `/build [plan/phases]` | Execute an already approved plan directly |
 | `/commit [scope]` | Approve exact files and messages before local commit |
 | `/commit:auto [scope]` | Authorize scoped local commits without routine confirmation |
@@ -52,6 +53,45 @@ temporary `fix/diag-<slug>` branch, deletes it before asking for approval, and
 proposes a Markdown Todo checklist. Nothing here publishes, amends, merges,
 deploys, or performs destructive cleanup automatically. Full behavior lives in
 [`commands/`](commands/).
+
+### Codebase improvement audits
+
+Use these directly, with no prompt required:
+
+| Command | Scope |
+| --- | --- |
+| `/improve` | Standard audit across all nine categories |
+| `/improve:quick` / `/improve:deep` | Hotspot audit / broader package-scoped audit |
+| `/improve:bugs` / `/improve:security` / `/improve:perf` | Correctness / security / performance |
+| `/improve:tests` / `/improve:debt` / `/improve:deps` | Verification / architecture / dependencies and migrations |
+| `/improve:dx` / `/improve:docs` / `/improve:next` | Tooling / documentation / product-direction proposals |
+
+Optional short arguments narrow scope or override depth:
+
+```text
+/improve:quick server/
+/improve:security deep server/api/
+/improve:next
+```
+
+The standalone local `codebase-improve` skill owns the workflow; the external
+`@improve` skill is not required. Configured cheap `explore` agents return evidence
+packets and perform targeted verification. The parent synthesizes sufficient
+evidence, requests follow-ups for gaps, and independently verifies high-risk or
+conflicting claims rather than automatically rereading every cited file. Source
+reads remain available for named gaps and necessary decision/edit/review context.
+
+Audits are read-only under the shared planning boundary. Findings appear in
+conversation; selecting IDs leads to a plan, **not implementation approval**.
+Plans/files, commits, or publication are never created implicitly. A separately
+approved plan uses the existing local `implement` handoff or explicitly selected
+direct `/build`. Current session agent/model choices are preserved. Use `dev`;
+`chat` must ask you to switch rather than silently changing profiles.
+
+Commands normally reload automatically. In a fresh `dev` session, confirm the
+`/improve*` commands and local skill are available; then check a small audit trace
+for evidence reuse and justified parent reads. Offline contracts do not establish
+model obedience or measured token savings.
 
 ### Documentation-driven setup
 
@@ -115,7 +155,7 @@ permission denials remain binding even for `dev`.
 
 - Agents and permissions: [`agents/`](agents/)
 - Commands: [`commands/`](commands/)
-- Orchestration skills: [`skills/`](skills/) — `plan`, `fix`, `build`, `commit`, `git-isolation`, `pr`
+- Orchestration skills: [`skills/`](skills/) — `plan`, `fix`, `codebase-improve`, `build`, `commit`, `git-isolation`, `pr`
 - PR templates: [`skills/pr/references/templates.md`](skills/pr/references/templates.md)
 - Shared guidance: [`AGENTS.md`](AGENTS.md)
 
@@ -126,6 +166,7 @@ ruby tests/workflow_test.rb
 python3 tests/preflight_test.py
 python3 tests/diag_branch_test.py
 node --test tests/skill_policy_test.mjs
+node --test tests/exploration_contract_test.mjs
 node --test tests/workflow_pilot_test.mjs
 git diff --check
 ```

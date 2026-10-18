@@ -119,11 +119,11 @@ check('exactly four profiles') { agents.keys.sort == %w[chat dev explore impleme
 check('exactly two primary profiles') do
   agents.select { |_, data| data['mode'] == 'primary' }.keys.sort == %w[chat dev]
 end
-check('thirteen workflow commands') do
-  commands.keys.sort == %w[ask build commit commit:auto fix fix:branch fix:worktree plan plan:branch plan:worktree pr quick setup].sort
+check('twenty-five workflow commands') do
+  commands.keys.sort == %w[ask build commit commit:auto fix fix:branch fix:worktree improve improve:quick improve:deep improve:bugs improve:security improve:perf improve:tests improve:debt improve:deps improve:dx improve:docs improve:next plan plan:branch plan:worktree pr quick setup].sort
 end
-check('six explicit-only local workflow skills') do
-  skills.keys.sort == %w[build commit fix git-isolation plan pr]
+check('seven explicit-only local workflow skills') do
+  skills.keys.sort == %w[build codebase-improve commit fix git-isolation plan pr]
 end
 
 # Written PR contracts, not live GitHub/CLI behavior or model obedience proof.
