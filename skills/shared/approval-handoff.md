@@ -11,14 +11,28 @@ authorized skills, execution mode, and worker ID/state if dispatched. No trackin
 file unless requested. States: `planning`, `awaiting-approval`, `approved`,
 `running`, `completed`, `blocked`, `cancelled`.
 
-Resolve essential ambiguity before asking. Use `question` when available:
+Resolve essential ambiguity before presenting approval. For `/plan`,
+`/plan:branch`, `/plan:worktree`, and `/setup`, end the conversational plan with a
+plain-text statement, never the `question` tool for implementation approval:
 
-- `/plan` and `/fix`: "Approve and implement this plan locally, without isolation, commits, or publishing?"
-- `/plan:branch` and `/fix:branch`: "Approve and implement this plan on a feature branch, without commits or publishing?"
-- `/plan:worktree` and `/fix:worktree`: "Approve and implement this plan in a separate worktree, without commits or publishing?"
+- Current checkout: "Ready to implement revision <N> locally, without isolation, commits, or publishing. Reply `approve r<N>` to proceed, or describe changes."
+- Branch: "Ready to implement revision <N> on a feature branch, without commits or publishing. Reply `approve r<N>` to proceed, or describe changes."
+- Worktree: "Ready to implement revision <N> in a separate worktree, without commits or publishing. Reply `approve r<N>` to proceed, or describe changes."
+
+Substitute the actual revision number. `approve r<N>` approves only the latest
+unambiguous pending plan revision in this conversation; a stale or ambiguous
+revision requires clarification. Ordinary direct unambiguous approval remains
+valid. Clarification and setup-choice questions may still use `question`;
+confirming a choice is not implementation approval. Stop and await the user's reply.
+
+For `/fix*`, retain question-style approval. Use `question` when available:
+
+- `/fix`: "Approve and implement this plan locally, without isolation, commits, or publishing?"
+- `/fix:branch`: "Approve and implement this plan on a feature branch, without commits or publishing?"
+- `/fix:worktree`: "Approve and implement this plan in a separate worktree, without commits or publishing?"
 
 Name title/revision, phases/Todos, local base intent (`HEAD` by default), and preservation
-decisions beside the question. Base SHA may await worker verification. `/plan*`
+decisions beside the approval statement or question. Base SHA may await worker verification. `/plan*`
 permits bounded shell discovery under [plan](../plan/SKILL.md), not repository
 writes, Git mutations, fetch, or implementation. Apply [cleanup](cleanup.md) before
 requesting approval and disclose unresolved cleanup (`/fix*` retains its temporary

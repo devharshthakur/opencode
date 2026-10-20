@@ -82,8 +82,10 @@ outcomes, preservation decisions, and known gaps. The concise summary must expos
 all material changes and risks; it is not permission for undisclosed work. Expand
 details on request. Detail saves re-investigation, not all handoff token cost.
 
-After planning-owned cleanup is verified, use `plan`'s current-checkout approval
-question. Choice confirmation is not implementation approval. Use the shared
+After planning-owned cleanup is verified, end with `plan`'s current-checkout
+plain-text approval statement and actual revision, without using the `question`
+tool for implementation approval. Choice confirmation is not implementation approval.
+Use the shared
 [approval/handoff](../../shared/approval-handoff.md) procedure with command `setup`,
 the exact approved revision/checklist, and the detailed setup record in `evidence`.
 Preserve the selected parent model/agent; dispatch one configured `implement`

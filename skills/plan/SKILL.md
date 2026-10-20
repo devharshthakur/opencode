@@ -69,8 +69,10 @@ original-checkout work before approval; never assume it follows isolation.
 ## Approval and handoff
 
 Read [approval/handoff](../shared/approval-handoff.md) before requesting approval.
-Use its exact question for the selected isolation. Revisions require renewed
-approval; partial approval authorizes only named phases. Dispatch exactly one
+End the conversational plan with its plain-text approval statement for the selected
+isolation, using the actual revision number; never use the `question` tool for
+implementation approval. Clarification questions remain available. Revisions require
+renewed approval; partial approval authorizes only named phases. Dispatch exactly one
 `implement` worker on direct approval, unless the user explicitly selects direct
 execution. `/build` is the manual current-checkout alternative, not approval itself.
 

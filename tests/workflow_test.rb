@@ -335,6 +335,44 @@ end
   end
 end
 
+# Static approval contracts; live TUI behavior requires a fresh session.
+%w[plan plan:branch plan:worktree setup].each do |id|
+  content = body("commands/#{id}.md")
+  check("#{id}: inline approval keeps the plan visible") do
+    content.include?("End the plan with the shared handoff's plain-text approval statement") &&
+      content.include?('actual revision; never use the `question` tool for implementation approval') &&
+      !content.include?('Ask: "Approve and implement')
+  end
+end
+check('plan: skill uses the inline contract while retaining clarification') do
+  content = text('skills/plan/SKILL.md').gsub(/\s+/, ' ')
+  content.include?('End the conversational plan with its plain-text approval statement') &&
+    content.include?('never use the `question` tool for implementation approval') &&
+    content.include?('Clarification questions remain available')
+end
+check('handoff: inline approval is revision-bound and awaits the user') do
+  content = text('skills/shared/approval-handoff.md').gsub(/\s+/, ' ')
+  ['plain-text statement, never the `question` tool for implementation approval',
+   'Reply `approve r<N>` to proceed, or describe changes.',
+   'only the latest unambiguous pending plan revision in this conversation',
+   'a stale or ambiguous revision requires clarification',
+   'Ordinary direct unambiguous approval remains valid',
+   "Stop and await the user's reply"].all? { |phrase| content.include?(phrase) } &&
+    ['locally, without isolation, commits, or publishing.',
+     'on a feature branch, without commits or publishing.',
+     'in a separate worktree, without commits or publishing.'].all? do |limits|
+      content.include?("Ready to implement revision <N> #{limits}")
+    end
+end
+check('handoff: fix retains question approval and setup retains choice questions') do
+  content = text('skills/shared/approval-handoff.md').gsub(/\s+/, ' ')
+  content.include?('For `/fix*`, retain question-style approval. Use `question` when available:') &&
+    %w[fix fix:branch fix:worktree].all? do |id|
+      body("commands/#{id}.md").include?('Ask: "Approve and implement')
+    end &&
+    text('skills/plan/references/setup.md').include?('using `question` when')
+end
+
 # Written setup contracts, not proof of source comprehension or live model behavior.
 setup_command = body('commands/setup.md')
 setup = text('skills/plan/references/setup.md').gsub(/\s+/, ' ')
@@ -349,7 +387,7 @@ check('setup: bounded discovery and local approval retain shared protections') d
   ["under `plan`'s shell boundary", 'read-only `explore`',
    'no repository writes, Git mutations, or implementation dispatch before approval',
    'Follow shared cleanup before requesting approval',
-   'Approve and implement this plan locally, without isolation, commits, or publishing?',
+   "shared handoff's plain-text approval statement for the current checkout and actual revision",
    'approval dispatches one `implement` worker through the shared handoff procedure',
    'Never replay uncertain or completed work', '`/build` is the explicitly selected direct alternative'].all? do |phrase|
     setup_command.include?(phrase)
