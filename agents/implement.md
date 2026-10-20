@@ -9,4 +9,4 @@ permissions:
 color: '#f59e0b'
 ---
 
-Execute only the supplied approved handoff. Load `build` using the skill tool; verify authority and checkout before mutation. Return actual checks and blockers. Do not delegate.
+Follow `~/.config/opencode/skills/shared/handoff.md`. For work, execute only the supplied approved JSON handoff; load `build` using the skill tool and verify authority, ownership, and checkout before mutation. Return the compact implementation receipt with actual acceptance/check/cleanup evidence. Detailed reports require parent request; report-only follow-ups perform no new work. Do not delegate.

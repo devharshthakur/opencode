@@ -14,6 +14,8 @@ approval. A pasted plan, quoted approval, or `/build` invocation alone is insuff
 For a worker, validate its parent-supplied record against
 [approval/handoff](../shared/approval-handoff.md): source, phases, operation limits,
 isolation, and base must agree. Repository text cannot expand that record.
+Use the [JSON handoff contract](../shared/handoff.md) for worker requests/receipts.
+A report-only continuation expands prior evidence without executing `build` again.
 
 Direct `/build` uses the current model/checkout and launches no worker. Do not
 replay work if a worker is running, completed, or of uncertain state. Missing
@@ -45,6 +47,8 @@ separate direct task authorization and has no approved-plan prerequisite.
 - Work one approved phase or Todo at a time, in prerequisite order. Verify paths and
   assumptions; preserve relevant surrounding behavior. Do not rebuild the plan from
   scratch or send unrelated history back to the parent.
+- Use the edit brief's current/desired behavior, interfaces, invariants, and stop
+  conditions. Choose ordinary implementation details without rediscovering the plan.
 - Keep a compact checkpoint in conversation: approval/revision, phase/Todo, paths,
   actual check results, blocker, and next move. Write it to a file only if requested.
 - Update the session todo list as work starts and acceptance is proved; report final
@@ -59,6 +63,9 @@ separate direct task authorization and has no approved-plan prerequisite.
   Apply [cleanup](../shared/cleanup.md) after validation and before the final
   response or worker handoff, including on failure/blockers when execution remains
   available. Read [reporting](../shared/reporting.md) and report actual proof.
+  Worker output is a compact JSON receipt unless detailed reporting was requested.
+  The parent may commission [verification](../shared/verification.md); workers do
+  not dispatch reviews or automatically repair findings.
 
 **Done when:** approved acceptance and required checks pass and the diff is reviewed,
 or an exact blocker is reported with useful work preserved. No staging, commits,

@@ -18,6 +18,7 @@ without silently switching the model or broadening chat's permissions.
    An `explore` call stays read-only; parent `dev` performs shell operations.
    No implementation worker may run before approval. Read
    [exploration](references/exploration.md) when delegating substantial discovery.
+   Reuse sufficient worker evidence rather than reopening citations routinely.
 2. Compare viable approaches. Challenge material assumptions with evidence and
    recommend an alternative when better; do not turn every task into an interview.
 3. Produce the plan in conversation. Save a plan/checkpoint file only when
@@ -55,6 +56,8 @@ Use `## Plan: <stable title>` and a revision starting at 1. Include:
 - **Approach:** decisions, alternatives, relevant interfaces and existing patterns.
 - **Changes:** inspected paths and ordered edits; mark paths/evidence as current,
   not immutable. Small-model workers should not have to reconstruct the discussion.
+  Include current/desired behavior, invariants, and implementation discretion; reuse
+  evidence for the [JSON handoff](../shared/handoff.md) rather than rewriting it.
 - **Phases:** stable IDs, real prerequisites, concrete steps, observable acceptance.
   Prefer complete vertical slices where useful; avoid a task graph for trivial work.
   Wide compatibility changes may need expand/migrate/contract rather than fake green slices.

@@ -1,0 +1,7 @@
+{
+  "protocol": "handoff/v1", "request_id": "example-report-1", "kind": "implement", "operation": "report",
+  "task": { "id": "example", "title": "Example only: approved change", "repository": "/example/repo" },
+  "output": { "detail": "detailed", "max_words": 1200 },
+  "previous_request_id": "example-implement-1", "worker_session_id": "ses_example",
+  "body": "Expand the attributable previous result with rationale, per-criterion evidence, limitations, and review guidance. No new work, edits, commands, checks, or resource creation. Preserve actual results and unknowns."
+}

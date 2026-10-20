@@ -1,0 +1,11 @@
+{
+  "protocol": "handoff/v1", "request_id": "example-implement-1", "task_id": "example", "kind": "implement",
+  "status": "blocked", "summary": "Example only: no implementation executed.",
+  "evidence": [],
+  "checks": [{ "id": "V1", "command": "node --check src/example.mjs", "status": "unrun", "result": "Example only" }],
+  "todos": [{ "id": "T1", "phase": "P1", "content": "Implement the approved behavior", "status": "pending", "evidence_ids": [] }],
+  "limitations": ["Replace with actual limitations"], "blockers": ["No attributable approval or checkout verified"],
+  "cleanup": { "status": "none_created", "evidence": "No resources created", "retained": [] },
+  "acceptance": [{ "id": "A1", "status": "unverified", "evidence_ids": [], "check_ids": [], "reason": "Example only" }],
+  "changed_paths": [], "checkpoint": "Replace with actual ownership, phase, checkout, next action, and retained-resource state."
+}

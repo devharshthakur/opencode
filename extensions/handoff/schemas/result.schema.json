@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://handoff.invalid/result",
+  "type": "object", "additionalProperties": false,
+  "required": ["protocol", "request_id", "task_id", "kind", "status", "summary", "evidence", "checks", "todos", "limitations", "blockers", "cleanup"],
+  "properties": {
+    "protocol": { "const": "handoff/v1" },
+    "request_id": { "type": "string", "minLength": 1 },
+    "task_id": { "type": "string", "minLength": 1 },
+    "kind": { "enum": ["explore", "implement", "verify"] },
+    "status": { "enum": ["completed", "partial", "blocked"] },
+    "summary": { "type": "string", "minLength": 1 },
+    "evidence": { "type": "array", "items": { "$ref": "handoff/common#/definitions/evidence" } },
+    "checks": { "type": "array", "items": { "$ref": "handoff/common#/definitions/check" } },
+    "todos": { "type": "array", "items": { "$ref": "handoff/common#/definitions/todo" } },
+    "limitations": { "$ref": "handoff/common#/definitions/strings" },
+    "blockers": { "$ref": "handoff/common#/definitions/strings" },
+    "cleanup": { "$ref": "handoff/common#/definitions/cleanup" },
+    "detailed_report": { "type": "string", "minLength": 1 },
+    "acceptance": { "type": "array", "items": { "$ref": "handoff/common#/definitions/assessment" } },
+    "changed_paths": { "$ref": "handoff/common#/definitions/strings" },
+    "checkpoint": { "type": "string", "minLength": 1 },
+    "conclusions": {
+      "type": "array", "items": {
+        "type": "object", "additionalProperties": false, "required": ["claim", "evidence_ids", "decision_supported"],
+        "properties": { "claim": { "type": "string", "minLength": 1 }, "evidence_ids": { "$ref": "handoff/common#/definitions/ids" }, "decision_supported": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "coverage": { "$ref": "handoff/common#/definitions/strings" },
+    "counterevidence": { "$ref": "handoff/common#/definitions/strings" },
+    "hypotheses": { "$ref": "handoff/common#/definitions/strings" },
+    "recommendations": { "$ref": "handoff/common#/definitions/strings" },
+    "sufficiency": { "enum": ["sufficient", "insufficient", "conflicting"] },
+    "next_lookup": { "type": ["string", "null"] },
+    "parent_reads": {
+      "type": "array", "items": {
+        "type": "object", "additionalProperties": false, "required": ["path", "start_line", "end_line", "question"],
+        "properties": { "path": { "type": "string", "minLength": 1 }, "start_line": { "type": "integer", "minimum": 1 }, "end_line": { "type": "integer", "minimum": 1 }, "question": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "snapshot_id": { "type": "string", "minLength": 1 },
+    "freshness": { "enum": ["matched", "unverified", "drifted"] },
+    "findings": {
+      "type": "array", "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["severity", "path", "start_line", "end_line", "description", "impact", "evidence_ids", "criterion_ids"],
+        "properties": {
+          "severity": { "enum": ["critical", "high", "medium", "low"] },
+          "path": { "type": "string", "minLength": 1 },
+          "start_line": { "type": "integer", "minimum": 1 }, "end_line": { "type": "integer", "minimum": 1 },
+          "description": { "type": "string", "minLength": 1 }, "impact": { "type": "string", "minLength": 1 },
+          "evidence_ids": { "$ref": "handoff/common#/definitions/ids" }, "criterion_ids": { "$ref": "handoff/common#/definitions/ids" }
+        }
+      }
+    }
+  },
+  "allOf": [
+    { "if": { "properties": { "kind": { "const": "explore" } } }, "then": {
+      "required": ["conclusions", "coverage", "counterevidence", "hypotheses", "recommendations", "sufficiency", "next_lookup", "parent_reads"],
+      "properties": { "conclusions": true, "coverage": true, "counterevidence": true, "hypotheses": true, "recommendations": true, "sufficiency": true, "next_lookup": true, "parent_reads": true, "acceptance": false, "changed_paths": false, "checkpoint": false, "findings": false, "snapshot_id": false, "freshness": false }
+    } },
+    { "if": { "properties": { "kind": { "const": "implement" } } }, "then": {
+      "required": ["acceptance", "changed_paths", "checkpoint"],
+      "properties": { "acceptance": true, "changed_paths": true, "checkpoint": true, "conclusions": false, "coverage": false, "counterevidence": false, "hypotheses": false, "recommendations": false, "sufficiency": false, "next_lookup": false, "parent_reads": false, "findings": false, "snapshot_id": false, "freshness": false }
+    } },
+    { "if": { "properties": { "kind": { "const": "verify" } } }, "then": {
+      "required": ["acceptance", "findings", "snapshot_id", "freshness"],
+      "properties": { "acceptance": true, "findings": true, "snapshot_id": true, "freshness": true, "conclusions": false, "coverage": false, "counterevidence": false, "hypotheses": false, "recommendations": false, "sufficiency": false, "next_lookup": false, "parent_reads": false, "changed_paths": false, "checkpoint": false }
+    } }
+  ]
+}

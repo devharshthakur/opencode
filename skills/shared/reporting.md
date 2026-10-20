@@ -22,6 +22,16 @@ preserve identifiers, uncertainty, authority limits, and evidence. Review is
 against both requirements and repository rules; do not force parallel reviews
 or extra skills for every task. No automatic next-phase execution or publishing.
 
+## Worker receipts and requested reports
+
+Workers use the [JSON handoff contract](handoff.md). Default output is a compact
+receipt (exploration retains its decisive evidence packet), with identifiers,
+acceptance/check/cleanup proof, uncertainty, and blockers. No default narrative
+`detailed_report`. The parent may request it initially or later in the same
+attributable worker session. A report-only continuation expands existing evidence
+without new edits, commands/checks, resources, or dispatch. The parent validates
+identity/structure and assesses proof; successful tool return is not acceptance.
+
 At completed development/repair/commit tasks, the parent follows
 [optional PR delivery](pr-offer.md) for the single plain-text GitHub PR offer and
 any later authorization. Worker reports never offer or publish. After authorized

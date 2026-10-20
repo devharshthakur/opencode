@@ -4,18 +4,14 @@ Delegate only when the child avoids substantial irrelevant reading in the parent
 For an already-known small file, read it directly. Use the configured `explore`
 agent without a model override; no automatic paid/alternative-model fallback.
 
-Supply a self-contained brief, scoped to a decision rather than a file inventory:
-
-```text
-Question: the specific implementation/call-flow/test fact needed for the decision.
-Scope: relevant areas, exclusions, known symbols and evidence already inspected.
-Return: evidence packet: conclusion, ranked paths/symbols and bounded line ranges,
-        decisive excerpts, behavior/call flow, counterevidence, checks performed,
-        uncertainties, coverage limits, and sufficiency for the requested decision.
-Budget: target roughly 500-900 words or less; prioritize decision-relevant facts.
-        Stop with partial findings when the requested scope/budget is exhausted.
-Constraints: read-only; no shell, tests, edits, installs, or delegation.
-```
+Supply a self-contained JSON brief under the
+[agent handoff contract](../../shared/handoff.md), scoped to a decision rather than
+a file inventory. Use the explore template: `question`, literal path `scope` and
+exclusions, known `evidence`, required `coverage`, and `stop_when`. The parent
+validates before dispatch; the read-only child does not run a validator through shell.
+Target roughly 500-900 words or less for the result; prioritize decision-relevant
+facts. Stop with partial findings when scope/budget is exhausted. No shell, tests,
+edits, installs, or delegation. No implementation approval is needed for this brief.
 
 For multi-step discovery, optionally supply a scoped `todos` snapshot with stable
 IDs, content, and status. The explorer recreates it with `todowrite` in its own
@@ -35,7 +31,9 @@ authorizes implementation, recursive delegation, shell, or broader permissions.
 
 ## Evidence packet
 
-The child uses glob/grep and bounded reads; an exhaustive tree is not evidence of
+Return the JSON exploration result; default compact detail still includes decisive
+evidence, not just a summary. Keep conclusions, hypotheses, and recommendations
+separate. The child uses glob/grep and bounded reads; an exhaustive tree is not evidence of
 behavior. Include short decisive excerpts only where they support the conclusion
 or a selected plan; no file dumps. Cite exact path, symbol, line range, and current
 revision when known. Reuse inspected evidence and report omitted/truncated areas.
@@ -45,9 +43,10 @@ not prove an SDK default is absent. Consult current official documentation throu
 permitted tools for library-dependent claims, or identify the unresolved lookup.
 Confidence is not proof. Include relevant guards/callers and counterevidence.
 
-End with **sufficient for decision** or **specific missing evidence**, naming the
+Express **sufficient for decision** as `sufficiency: sufficient` and `next_lookup:
+null`, or **specific missing evidence** as insufficient/conflicting plus `next_lookup`, naming the
 unresolved question and smallest useful lookup. A parent-read recommendation must
-identify the question and exact bounded range; **none needed** is a valid answer.
+identify the question and exact bounded range; **none needed** is `parent_reads: []`.
 
 ## Parent decision
 

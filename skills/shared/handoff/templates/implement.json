@@ -1,0 +1,31 @@
+{
+  "protocol": "handoff/v1",
+  "request_id": "example-implement-1",
+  "kind": "implement",
+  "operation": "work",
+  "task": { "id": "example", "title": "Example only: approved change", "repository": "/example/repo" },
+  "output": { "detail": "compact", "max_words": 500 },
+  "scope": { "paths": ["src/example.mjs"], "excludes": [] },
+  "authorization": {
+    "source": "explicit user approval",
+    "approval_text": "EXAMPLE ONLY. Replace with actual attributable user approval; this template grants no authority.",
+    "plan_revision": 1,
+    "approved_phases": ["P1"],
+    "edit": true, "validate": true,
+    "create_branch": false, "create_worktree": false,
+    "stage": false, "commit": false, "push": false, "create_or_update_pr": false
+  },
+  "execution": {
+    "workflow": "build", "mode": "worker", "dispatch_mode": "single-worker", "isolation": "current",
+    "base_ref": "HEAD", "base_sha": null, "original_checkout": "/example/repo",
+    "preservation_decision": "Preserve all pre-existing work; stop on unclear overlapping ownership.",
+    "worker_state": "not_started", "worker_session_id": null
+  },
+  "todos": [{ "id": "T1", "phase": "P1", "content": "Implement the approved behavior", "status": "pending", "evidence_ids": [] }],
+  "plan": "Replace with the exact approved plan and assigned phase/Todo steps, not a new interpretation.",
+  "evidence": [],
+  "acceptance": [{ "id": "A1", "description": "Replace with an observable approved outcome", "check_ids": ["V1"] }],
+  "validation": [{ "id": "V1", "command": "node --check src/example.mjs", "workdir": "/example/repo", "expected": "Syntax passes; additional behavioral proof must be specified for the actual task.", "required": true, "baseline": null }],
+  "authorized_skills": ["build"],
+  "body": "## Current and desired behavior\nDescribe the difference.\n## Edit brief and invariants\nName relevant symbols, interfaces to preserve, ordering, pitfalls, and allowed implementation discretion.\n## Stop conditions\nReturn material scope, risk, authority, or ownership changes to the parent."
+}

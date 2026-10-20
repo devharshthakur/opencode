@@ -1,0 +1,8 @@
+{
+  "protocol": "handoff/v1", "request_id": "example-verify-1", "task_id": "example", "kind": "verify",
+  "status": "blocked", "summary": "Example only: independent inspection has not been performed.",
+  "evidence": [], "checks": [], "todos": [], "limitations": ["Replace with actual coverage limits"], "blockers": ["No actual snapshot supplied"],
+  "cleanup": { "status": "none_created", "evidence": "No resources created", "retained": [] },
+  "acceptance": [{ "id": "A1", "status": "unverified", "evidence_ids": [], "check_ids": [], "reason": "Example only" }],
+  "findings": [], "snapshot_id": "replace-with-snapshot-id", "freshness": "unverified"
+}

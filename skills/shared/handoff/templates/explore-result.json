@@ -1,0 +1,8 @@
+{
+  "protocol": "handoff/v1", "request_id": "example-explore-1", "task_id": "example", "kind": "explore",
+  "status": "partial", "summary": "Example only: discovery has not been performed.",
+  "evidence": [], "checks": [], "todos": [], "limitations": ["Replace with actual coverage limits"], "blockers": [],
+  "cleanup": { "status": "none_created", "evidence": "No resources created", "retained": [] },
+  "conclusions": [], "coverage": [], "counterevidence": [], "hypotheses": [], "recommendations": [],
+  "sufficiency": "insufficient", "next_lookup": "Inspect the scoped implementation and its relevant callers.", "parent_reads": []
+}

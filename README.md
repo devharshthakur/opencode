@@ -1,7 +1,7 @@
 # Lean OpenCode workflow
 
 Personal [OpenCode V2](https://opencode.ai/v2/docs/) setup: two primary agents,
-two subagent-only workers, current-model commands, and deliberate approval
+three subagent-only workers, current-model commands, and deliberate approval
 boundaries. This README is an introduction and quick reference — each command and
 skill file stays the authoritative detail.
 
@@ -11,7 +11,8 @@ Copy the tracked `opencode.sample.jsonc` to the ignored `opencode.jsonc`, then
 connect your accounts. The sample uses environment references
 (`{env:CONTEXT7_API_KEY}`, `{env:GITHUB_MCP_TOKEN}`); this user's local file keeps
 existing inline secrets by explicit choice — never print or commit them. Both
-`opencode.jsonc` and `service.json` are gitignored and left untouched.
+`opencode.jsonc` and `service.json` are gitignored; credentials stay untouched.
+The handoff update adds only the `verify` model entry to the local configuration.
 
 **Only Context7 is enabled by default.** Every other MCP definition stays
 configured but disabled; opt in deliberately and avoid duplicating native
@@ -25,8 +26,9 @@ filesystem tools with extra MCP schemas.
 | `chat` | Primary | DeepSeek V4.1 Flash high; external conversation/research, no project tools |
 | `explore` | Subagent only | Muse Spark 1.3 Contributor medium; bounded cited discovery |
 | `implement` | Subagent only | DeepSeek V4.1 Flash high; approved-plan execution |
+| `verify` | Subagent only | DeepSeek V4.1 Flash high; independent read-only change review |
 
-Shift+Tab cycles only `dev` and `chat`; both workers remain discoverable subagents.
+Shift+Tab cycles only `dev` and `chat`; all three workers remain discoverable subagents.
 Selecting an agent and selecting a session model are separate in V2: switching to
 `chat` alone does not switch the model, and existing sessions keep their selected
 model. Use `/models` to pick a different one; commands run in the current session
@@ -35,8 +37,8 @@ and never override that choice.
 ### Session-local todos
 
 The sample enables `experimental.todo`; the local config already enables it.
-Both primary agents and both workers use `todowrite` for multi-step progress,
-skipping trivial requests. `chat` and `explore` have a narrow todo permission
+Both primary agents and all workers use `todowrite` for multi-step progress,
+skipping trivial requests. `chat`, `explore`, and `verify` have a narrow todo permission
 exception; their project-access restrictions remain unchanged. This changes
 session metadata, not repository files or execution authority.
 
@@ -55,13 +57,51 @@ never replaying completed or uncertain work.
 
 Config and instructions normally reload automatically; use fresh sessions to
 validate this experimental feature. Confirm `todowrite` is available to `dev`,
-`chat`, `explore`, and `implement`, while forbidden project tools remain blocked
+`chat`, `explore`, `implement`, and `verify`, while forbidden project tools remain blocked
 for restricted roles. On a separately approved small multi-step task, inspect the
 worker's initial list, status updates, final evidence, and parent reconciliation;
 also check partial assignment and continuation without replay. Offline contracts
 do not prove runtime permission checks or model obedience. Current V2 tools and
 permissions docs do not yet describe this experimental tool; no service restart
 or live proof is implied by a passing static check.
+
+## JSON worker handoffs
+
+The [handoff contract](skills/shared/handoff.md) standardizes `explore`,
+`implement`, and `verify` requests/results as versioned JSON. Structured fields
+carry identity, scope, authority, assignments, and acceptance; a Markdown `body`
+carries task-specific reasoning. The parent validates records with the local Ajv
+utility before dispatch/reconciliation. Native `subagent` still receives a prompt
+string: this is **not** enforced dispatch or authenticated approval.
+
+- **Explore:** decisive excerpts, provenance, guards/callers, counterevidence,
+  coverage, and decision sufficiency. `parent_reads: []` means none needed; gaps
+  name the smallest lookup. No mandatory rereading of citations or hard read quota.
+- **Implement:** exact approved phase/Todo assignment, relevant evidence, edit
+  brief/invariants, observable acceptance, checks, and compact completion receipt.
+  Ordinary implementation choices stay with the worker.
+- **Verify:** independent assessment of actual before/after changes, not just the
+  implementer summary. Selective for risk/conflict or explicit requests; shell,
+  edits, tests, and delegation remain denied. The parent retains acceptance.
+
+Compact output is the default; detailed narrative reports require parent request,
+initially or by resuming the same attributable worker with a report-only JSON
+request. Report-only follow-ups perform no new work. Templates are examples, not
+approval. Current dispatch defaults remain unchanged: plan approval normally uses
+`implement`, including sequential per-todo mode; explicit direct `/build` and
+`/quick` remain direct. No parallel implementers or automatic repair loop is added.
+
+The [review-evidence utility](skills/shared/verification.md) lets the parent collect
+scoped baseline/after artifacts in task-owned temporary storage, returning compact
+paths/digests rather than source to the parent model. It preserves dirty baselines,
+flags unexpected changes and stale evidence, excludes protected files, and reports
+coverage limits. Before/after artifacts are real source and remain subject to
+permissions/privacy policy; they are not a secret scanner or sandbox. Cleanup is
+mandatory after reconciliation. There is no persistent ledger or active plugin.
+
+Fresh-session proof is required for verifier discovery, effective permission
+denials, configured model, and receipt/report behavior. Existing sessions may not
+expose a newly added worker. Offline checks do not prove obedience or token savings.
 
 ## Everyday commands
 
@@ -177,8 +217,8 @@ creation, not only at the final response. Pre-existing resources and intended
 deliverables stay untouched; cleanup failures are reported, not hidden. This is an
 instruction protocol, not a crash-recovery service or runtime enforcement hook.
 
-CLI permissions stay `prompt` so other profiles keep their safeguards: `explore`
-denies shell, edits, Code Mode, delegation, and known secret-bearing reads; `chat`
+CLI permissions are independently configured: `explore` and `verify`
+deny shell, edits, Code Mode, delegation, and known secret-bearing reads; `chat`
 denies project tools; `implement` cannot recursively delegate. Managed policies and
 permission denials remain binding even for `dev`.
 
@@ -189,6 +229,8 @@ permission denials remain binding even for `dev`.
 - Orchestration skills: [`skills/`](skills/) — `plan`, `fix`, `codebase-improve`, `build`, `commit`, `git-isolation`, `pr`
 - PR templates: [`skills/pr/references/templates.md`](skills/pr/references/templates.md)
 - Shared guidance: [`AGENTS.md`](AGENTS.md)
+- JSON handoffs and templates: [`skills/shared/handoff.md`](skills/shared/handoff.md)
+- Independent verification and evidence collection: [`skills/shared/verification.md`](skills/shared/verification.md)
 
 Run the offline checks from the repository root:
 
@@ -201,6 +243,12 @@ node --test tests/exploration_contract_test.mjs
 node --test tests/workflow_pilot_test.mjs
 git diff --check
 ```
+
+Preserve existing tests. Record baseline failures separately; old assertions that
+pin four profiles, the old model map, or YAML handoff text intentionally conflict
+with this update. Do not weaken them to manufacture green results. Validate new
+contracts with temporary external checks and remove those checks after execution;
+no permanent regression coverage is claimed for those disposable checks.
 
 <details>
 <summary>Maintenance notes</summary>

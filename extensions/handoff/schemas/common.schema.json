@@ -1,0 +1,102 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://handoff.invalid/handoff/common",
+  "definitions": {
+    "strings": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "ids": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "task": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "title", "repository"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "title": { "type": "string", "minLength": 1 },
+        "repository": { "type": "string", "minLength": 1 }
+      }
+    },
+    "scope": {
+      "type": "object", "additionalProperties": false,
+      "required": ["paths", "excludes"],
+      "properties": {
+        "paths": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+        "excludes": { "$ref": "#/definitions/strings" }
+      }
+    },
+    "todo": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "phase", "content", "status", "evidence_ids"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "phase": { "type": "string", "minLength": 1 },
+        "content": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["pending", "in_progress", "completed", "cancelled"] },
+        "evidence_ids": { "$ref": "#/definitions/ids" }
+      }
+    },
+    "evidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "path", "symbol", "start_line", "end_line", "excerpt", "revision", "claim", "limitations"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "path": { "type": "string", "minLength": 1 },
+        "symbol": { "type": ["string", "null"] },
+        "start_line": { "type": "integer", "minimum": 1 },
+        "end_line": { "type": "integer", "minimum": 1 },
+        "excerpt": { "type": "string", "minLength": 1 },
+        "revision": { "type": ["string", "null"] },
+        "claim": { "type": "string", "minLength": 1 },
+        "limitations": { "$ref": "#/definitions/strings" }
+      }
+    },
+    "criterion": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "description", "check_ids"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "description": { "type": "string", "minLength": 1 },
+        "check_ids": { "$ref": "#/definitions/ids" }
+      }
+    },
+    "assessment": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "status", "evidence_ids", "check_ids", "reason"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["supported", "contradicted", "unverified"] },
+        "evidence_ids": { "$ref": "#/definitions/ids" },
+        "check_ids": { "$ref": "#/definitions/ids" },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "validation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "command", "workdir", "expected", "required", "baseline"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "command": { "type": "string", "minLength": 1 },
+        "workdir": { "type": "string", "minLength": 1 },
+        "expected": { "type": "string", "minLength": 1 },
+        "required": { "type": "boolean" },
+        "baseline": { "type": ["string", "null"] }
+      }
+    },
+    "check": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "command", "status", "result"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "command": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["passed", "failed", "baseline_failed", "blocked", "unrun"] },
+        "result": { "type": "string", "minLength": 1 }
+      }
+    },
+    "cleanup": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "evidence", "retained"],
+      "properties": {
+        "status": { "enum": ["none_created", "verified", "incomplete"] },
+        "evidence": { "type": "string", "minLength": 1 },
+        "retained": { "$ref": "#/definitions/strings" }
+      }
+    }
+  }
+}

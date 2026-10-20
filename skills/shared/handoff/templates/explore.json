@@ -1,0 +1,15 @@
+{
+  "protocol": "handoff/v1",
+  "request_id": "example-explore-1",
+  "kind": "explore",
+  "operation": "work",
+  "task": { "id": "example", "title": "Example only: locate behavior", "repository": "/example/repo" },
+  "output": { "detail": "compact", "max_words": 700 },
+  "scope": { "paths": ["src/"], "excludes": [] },
+  "question": "Which implementation and callers determine the behavior being changed?",
+  "coverage": ["Relevant implementation, guards, callers, and existing checks"],
+  "stop_when": "Evidence supports the named decision, or a specific smallest missing lookup remains.",
+  "evidence": [],
+  "todos": [],
+  "body": "## Decision context\nReplace this example with the actual question, known symbols, and exclusions.\n## Constraints\nRead-only. Separate observed facts, external-library assumptions, hypotheses, and recommendations."
+}

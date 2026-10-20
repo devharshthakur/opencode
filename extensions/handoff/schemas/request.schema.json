@@ -1,0 +1,120 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://handoff.invalid/request",
+  "type": "object", "additionalProperties": false,
+  "required": ["protocol", "request_id", "kind", "operation", "task", "output", "body"],
+  "properties": {
+    "protocol": { "const": "handoff/v1" },
+    "request_id": { "type": "string", "minLength": 1 },
+    "kind": { "enum": ["explore", "implement", "verify"] },
+    "operation": { "enum": ["work", "report"] },
+    "task": { "$ref": "handoff/common#/definitions/task" },
+    "output": {
+      "type": "object", "additionalProperties": false, "required": ["detail", "max_words"],
+      "properties": { "detail": { "enum": ["compact", "detailed"] }, "max_words": { "type": "integer", "minimum": 100 } }
+    },
+    "body": { "type": "string" },
+    "previous_request_id": { "type": "string", "minLength": 1 },
+    "worker_session_id": { "type": "string", "pattern": "^ses_" },
+    "scope": { "$ref": "handoff/common#/definitions/scope" },
+    "question": { "type": "string", "minLength": 1 },
+    "coverage": { "$ref": "handoff/common#/definitions/strings" },
+    "stop_when": { "type": "string", "minLength": 1 },
+    "evidence": { "type": "array", "items": { "$ref": "handoff/common#/definitions/evidence" } },
+    "todos": { "type": "array", "items": { "$ref": "handoff/common#/definitions/todo" } },
+    "acceptance": { "type": "array", "minItems": 1, "items": { "$ref": "handoff/common#/definitions/criterion" } },
+    "validation": { "type": "array", "items": { "$ref": "handoff/common#/definitions/validation" } },
+    "plan": { "type": "string", "minLength": 1 },
+    "authorized_skills": { "$ref": "handoff/common#/definitions/ids" },
+    "authorization": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source", "approval_text", "plan_revision", "approved_phases", "edit", "validate", "create_branch", "create_worktree", "stage", "commit", "push", "create_or_update_pr"],
+      "properties": {
+        "source": { "const": "explicit user approval" },
+        "approval_text": { "type": "string", "minLength": 1 },
+        "plan_revision": { "type": "integer", "minimum": 1 },
+        "approved_phases": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+        "edit": { "type": "boolean" }, "validate": { "type": "boolean" },
+        "create_branch": { "type": "boolean" }, "create_worktree": { "type": "boolean" },
+        "stage": { "const": false }, "commit": { "const": false }, "push": { "const": false }, "create_or_update_pr": { "const": false }
+      }
+    },
+    "execution": {
+      "type": "object", "additionalProperties": false,
+      "required": ["workflow", "mode", "dispatch_mode", "isolation", "base_ref", "base_sha", "original_checkout", "preservation_decision", "worker_state", "worker_session_id"],
+      "properties": {
+        "workflow": { "const": "build" }, "mode": { "const": "worker" },
+        "dispatch_mode": { "enum": ["single-worker", "per-todo-worker"] },
+        "isolation": { "enum": ["current", "branch", "worktree"] },
+        "base_ref": { "type": "string", "minLength": 1 },
+        "base_sha": { "type": ["string", "null"] },
+        "original_checkout": { "type": "string", "minLength": 1 },
+        "preservation_decision": { "type": "string", "minLength": 1 },
+        "worker_state": { "enum": ["not_started", "continuation_verified"] },
+        "worker_session_id": { "anyOf": [ { "type": "null" }, { "type": "string", "pattern": "^ses_" } ] }
+      }
+    },
+    "review": {
+      "type": "object", "additionalProperties": false,
+      "required": ["baseline_id", "snapshot_id", "manifest_path", "manifest_sha256", "freshness_proof", "implement_request_id", "implement_receipt", "invariants"],
+      "properties": {
+        "baseline_id": { "type": "string", "minLength": 1 },
+        "snapshot_id": { "type": "string", "minLength": 1 },
+        "manifest_path": { "type": "string", "minLength": 1 },
+        "manifest_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "freshness_proof": {
+          "type": "object", "additionalProperties": false, "required": ["snapshot_id", "freshness", "observed_at"],
+          "properties": {
+            "snapshot_id": { "type": "string", "minLength": 1 },
+            "freshness": { "enum": ["matched", "unverified", "drifted"] },
+            "observed_at": { "type": ["string", "null"] }
+          }
+        },
+        "implement_request_id": { "type": "string", "minLength": 1 },
+        "validation_plan": { "type": "array", "items": { "$ref": "handoff/common#/definitions/validation" } },
+        "implement_receipt": { "type": "object" },
+        "invariants": { "$ref": "handoff/common#/definitions/strings" }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "operation": { "const": "report" } } },
+      "then": {
+        "required": ["previous_request_id", "worker_session_id"],
+        "properties": {
+          "previous_request_id": true, "worker_session_id": true,
+          "output": { "type": "object", "properties": { "detail": { "const": "detailed" } } },
+          "authorization": false, "execution": false, "scope": false, "todos": false, "plan": false,
+          "validation": false, "acceptance": false, "review": false, "authorized_skills": false,
+          "question": false, "coverage": false, "stop_when": false, "evidence": false
+        }
+      },
+      "else": {
+        "required": ["scope", "evidence", "todos"],
+        "properties": { "scope": true, "evidence": true, "todos": true, "previous_request_id": false, "worker_session_id": false }
+      }
+    },
+    {
+      "if": { "properties": { "operation": { "const": "work" }, "kind": { "const": "explore" } } },
+      "then": {
+        "required": ["question", "coverage", "stop_when"],
+        "properties": { "question": true, "coverage": true, "stop_when": true, "authorization": false, "execution": false, "plan": false, "validation": false, "acceptance": false, "review": false, "authorized_skills": false }
+      }
+    },
+    {
+      "if": { "properties": { "operation": { "const": "work" }, "kind": { "const": "implement" } } },
+      "then": {
+        "required": ["authorization", "execution", "plan", "acceptance", "validation", "authorized_skills"],
+        "properties": { "authorization": true, "execution": true, "plan": true, "acceptance": true, "validation": true, "authorized_skills": true, "review": false, "question": false, "coverage": false, "stop_when": false }
+      }
+    },
+    {
+      "if": { "properties": { "operation": { "const": "work" }, "kind": { "const": "verify" } } },
+      "then": {
+        "required": ["acceptance", "review"],
+        "properties": { "acceptance": true, "review": true, "authorization": false, "execution": false, "plan": false, "validation": false, "authorized_skills": false, "question": false, "coverage": false, "stop_when": false }
+      }
+    }
+  ]
+}

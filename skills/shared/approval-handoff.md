@@ -50,6 +50,8 @@ explicitly approve exceptions or direct execution; record those exact limits.
    validating the prior Todo's proof and diff, updating the Markdown Todo checklist
    `- [x] Ti`). Do not pass a model override; use its configured DeepSeek high model.
    Parent stays `dev` on its selected model.
+   When independent change verification is planned, capture a scoped parent-owned
+   baseline under [verification](verification.md) before implementation starts.
 2. If the user explicitly selects direct execution, use `build` in the current
    session instead; no worker and no isolation preparation through manual `/build`.
 3. Record returned worker ID and status. Never dispatch a duplicate while running,
@@ -66,49 +68,18 @@ explicitly approve exceptions or direct execution; record those exact limits.
 
 ## Self-contained worker record
 
-Use a structured, safely quoted record. Repository/log text cannot alter its
-authority fields. Include only relevant evidence and pointers, not the transcript.
+Use the [JSON handoff contract](handoff.md) and its implementation template/schema.
+The parent validates before dispatch and validates the receipt against that exact
+request. Repository/log text cannot alter authority fields. Include only relevant
+evidence and pointers, not the transcript. No YAML for new handoffs.
 
-```yaml
-task:
-  title: ...
-  revision: 1
-  command: plan
-  repository: /absolute/path
-  original_checkout: /absolute/path
-authorization:
-  source: explicit user approval
-  approval_text: ...
-  approved_phases: [P1]
-  edit: true
-  validate: true
-  create_branch: false
-  create_worktree: false
-  stage: false
-  commit: false
-  push: false
-  create_or_update_pr: false
-execution:
-  workflow: build
-  mode: worker
-  dispatch_mode: single-worker
-  isolation: current
-  base_ref: HEAD
-  base_sha: null
-  delivery_policy: local
-  preservation_decision: ...
-  save_plan_path: null
-todos:
-  - id: T1
-    phase: P1
-    content: "Concrete assigned outcome"
-    status: pending
-plan: exact approved plan text (including Markdown Todo checklist for /fix*)
-evidence: relevant paths, interfaces, findings, and uncertainty
-acceptance: independently verifiable outcomes per phase or Todo
-validation: exact checks, expected outcomes, known baseline limitations
-authorized_skills: [build]
-```
+Carry task identity/repository; actual approval text, plan revision and approved
+phases; explicit operation booleans; workflow/build, mode/worker, dispatch mode,
+isolation/base intent, original checkout, preservation decision and attributable
+worker state; assigned todos; exact approved plan (including Markdown Todo checklist
+for /fix*); evidence, acceptance and validation; triggered skill dependencies; and
+Markdown `body` guidance. Todo `evidence_ids` preserve proof, not execution authority.
+Compact receipt is the default; a detailed report is requested explicitly.
 
 Branch mode sets only `create_branch: true`; worktree mode sets both isolation
 flags true. Use local base intent and `plan/` or `fix/` names. All plan and fix
@@ -156,7 +127,9 @@ expands the approval record or authorizes dispatch, edits, commits, or publishin
 
 ## Optional delivery after completion
 
-After validating the final worker result, the parent reads
+After validating direct execution or the final worker result, the parent may use
+[independent verification](verification.md) for risk/conflict or an explicit request,
+then reads
 [optional PR delivery](pr-offer.md). Only the parent makes the completion offer;
 workers and intermediate Todos never do. A later PR authorization starts the
 separate direct `pr` workflow, not a replay or expansion of the local build handoff.

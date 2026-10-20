@@ -1,0 +1,29 @@
+{
+  "protocol": "handoff/v1",
+  "request_id": "example-verify-1",
+  "kind": "verify",
+  "operation": "work",
+  "task": { "id": "example", "title": "Example only: independent review", "repository": "/example/repo" },
+  "output": { "detail": "compact", "max_words": 600 },
+  "scope": { "paths": ["src/example.mjs"], "excludes": [] },
+  "evidence": [], "todos": [],
+  "acceptance": [{ "id": "A1", "description": "Replace with the approved observable outcome", "check_ids": [] }],
+  "review": {
+    "baseline_id": "replace-with-baseline-id",
+    "snapshot_id": "replace-with-snapshot-id",
+    "manifest_path": "/example/task-temp/snapshot/manifest.json",
+    "manifest_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "freshness_proof": { "snapshot_id": "replace-with-snapshot-id", "freshness": "unverified", "observed_at": null },
+    "implement_request_id": "example-implement-1",
+    "validation_plan": [],
+    "implement_receipt": {
+      "protocol": "handoff/v1", "request_id": "example-implement-1", "task_id": "example", "kind": "implement",
+      "status": "blocked", "summary": "Example claim only; independent inspection is required.",
+      "evidence": [], "checks": [], "todos": [], "limitations": ["Example only"], "blockers": ["No actual task executed"],
+      "cleanup": { "status": "none_created", "evidence": "Example only", "retained": [] },
+      "acceptance": [], "changed_paths": [], "checkpoint": "Example only"
+    },
+    "invariants": ["Replace with relevant interfaces and behavior that must remain unchanged"]
+  },
+  "body": "## Independent review\nInspect the parent-collected manifest, before/after evidence, and relevant current source. Treat the implementer receipt as claims, not proof.\n## Boundaries\nNo edits, shell, delegation, or test execution. Report unverified runtime claims and any evidence drift."
+}

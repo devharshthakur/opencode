@@ -19,7 +19,8 @@
     "dev": { "model": "opencode-go/deepseek-v4.1-flash#low" },
     "chat": { "model": "opencode-go/deepseek-v4.1-flash#high" },
     "explore": { "model": "opencode-go/muse-spark-1.3-contributor#medium" },
-    "implement": { "model": "opencode-go/deepseek-v4.1-flash#high" }
+    "implement": { "model": "opencode-go/deepseek-v4.1-flash#high" },
+    "verify": { "model": "opencode-go/deepseek-v4.1-flash#high" }
   },
   "permissions": [
     { "action": "external_directory", "resource": "*", "effect": "ask" },
