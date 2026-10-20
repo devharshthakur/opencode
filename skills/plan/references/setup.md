@@ -82,12 +82,10 @@ outcomes, preservation decisions, and known gaps. The concise summary must expos
 all material changes and risks; it is not permission for undisclosed work. Expand
 details on request. Detail saves re-investigation, not all handoff token cost.
 
-After planning-owned cleanup is verified, end with `plan`'s current-checkout
-plain-text approval statement and actual revision, without using the `question`
-tool for implementation approval. Choice confirmation is not implementation approval.
-Use the shared
-[approval/handoff](../../shared/approval-handoff.md) procedure with command `setup`,
-the exact approved revision/checklist, and the detailed setup record in `evidence`.
+After planning-owned cleanup is verified, follow the shared
+[approval/handoff](../../shared/approval-handoff.md) procedure for final-plan
+approval and execution in the current checkout, with command `setup`, the exact
+approved revision/checklist, and the detailed setup record in `evidence`.
 Preserve the selected parent model/agent; dispatch one configured `implement`
 worker, without a model override, for the whole approved checklist. Do not create
 one worker per task. Explicit direct execution instead uses `build` in the current
@@ -95,6 +93,9 @@ session without a worker. Do not replay running, uncertain, or completed executi
 
 Have the executor work tasks in prerequisite order, mark `- [x] Ti` only with
 acceptance evidence, and report completed/blocked tasks, actual checks, cleanup,
-and unresolved manual steps. Use a Todo tool additionally if available; Markdown
-remains sufficient. The parent assesses the evidence and gives a concise result.
+and unresolved manual steps. Use `todowrite` for multi-step session progress and
+transfer assigned todos through the shared handoff's session-local protocol.
+Markdown remains the visible approval checklist and fallback if the tool is
+unavailable/denied. The parent assesses evidence before reconciling its own list
+and gives a concise result.
 Report static contract checks separately from live setup or agent-behavior proof.

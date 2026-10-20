@@ -21,7 +21,10 @@ without silently switching the model or broadening chat's permissions.
 2. Compare viable approaches. Challenge material assumptions with evidence and
    recommend an alternative when better; do not turn every task into an interview.
 3. Produce the plan in conversation. Save a plan/checkpoint file only when
-   explicitly requested, after its write is authorized. No tracker is required.
+   explicitly requested, after its write is authorized. No tracker is required
+   on disk; use session-local `todowrite` for multi-step progress. Planning todos
+   track discovery, not permission to execute. Transfer assigned execution todos
+   only after approval under the shared handoff protocol.
 
 ## Planning shell boundary
 
@@ -68,13 +71,8 @@ original-checkout work before approval; never assume it follows isolation.
 
 ## Approval and handoff
 
-Read [approval/handoff](../shared/approval-handoff.md) before requesting approval.
-End the conversational plan with its plain-text approval statement for the selected
-isolation, using the actual revision number; never use the `question` tool for
-implementation approval. Clarification questions remain available. Revisions require
-renewed approval; partial approval authorizes only named phases. Dispatch exactly one
-`implement` worker on direct approval, unless the user explicitly selects direct
-execution. `/build` is the manual current-checkout alternative, not approval itself.
+Read and follow [approval/handoff](../shared/approval-handoff.md) for final-plan
+approval and execution handoff, using the selected isolation and actual revision.
 
 **Done when:** essential ambiguity is resolved and a complete revision is awaiting
 approval, or an exact blocker is reported; the cleanup gate is accounted for with

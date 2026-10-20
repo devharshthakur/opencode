@@ -11,8 +11,12 @@ authorized skills, execution mode, and worker ID/state if dispatched. No trackin
 file unless requested. States: `planning`, `awaiting-approval`, `approved`,
 `running`, `completed`, `blocked`, `cancelled`.
 
-Resolve essential ambiguity before presenting approval. For `/plan`,
-`/plan:branch`, `/plan:worktree`, and `/setup`, end the conversational plan with a
+## Final-plan approval
+
+This policy owns final implementation-plan approval for all planning workflows,
+including `/plan*`, `/setup`, `/fix*`, and selected `/improve*` work. Commands and
+skills reference this policy rather than defining their own approval wording.
+Resolve essential ambiguity first, then end the conversational plan with a
 plain-text statement, never the `question` tool for implementation approval:
 
 - Current checkout: "Ready to implement revision <N> locally, without isolation, commits, or publishing. Reply `approve r<N>` to proceed, or describe changes."
@@ -25,14 +29,8 @@ revision requires clarification. Ordinary direct unambiguous approval remains
 valid. Clarification and setup-choice questions may still use `question`;
 confirming a choice is not implementation approval. Stop and await the user's reply.
 
-For `/fix*`, retain question-style approval. Use `question` when available:
-
-- `/fix`: "Approve and implement this plan locally, without isolation, commits, or publishing?"
-- `/fix:branch`: "Approve and implement this plan on a feature branch, without commits or publishing?"
-- `/fix:worktree`: "Approve and implement this plan in a separate worktree, without commits or publishing?"
-
 Name title/revision, phases/Todos, local base intent (`HEAD` by default), and preservation
-decisions beside the approval statement or question. Base SHA may await worker verification. `/plan*`
+decisions beside the approval statement. Base SHA may await worker verification. `/plan*`
 permits bounded shell discovery under [plan](../plan/SKILL.md), not repository
 writes, Git mutations, fetch, or implementation. Apply [cleanup](cleanup.md) before
 requesting approval and disclose unresolved cleanup (`/fix*` retains its temporary
@@ -100,6 +98,11 @@ execution:
   delivery_policy: local
   preservation_decision: ...
   save_plan_path: null
+todos:
+  - id: T1
+    phase: P1
+    content: "Concrete assigned outcome"
+    status: pending
 plan: exact approved plan text (including Markdown Todo checklist for /fix*)
 evidence: relevant paths, interfaces, findings, and uncertainty
 acceptance: independently verifiable outcomes per phase or Todo
@@ -114,6 +117,42 @@ only for approved isolated execution; list other dependency IDs at their actual
 triggers. In `per-todo-worker` mode, `T1` prepares any approved isolation and
 `T2..Tn` reuse that verified isolated checkout. The worker verifies base/checkout
 and preserves existing work before mutation.
+
+## Session-local todo transfer
+
+`todos` is an explicit snapshot, not a shared list or an approval receipt. For
+multi-step handoffs, include only tasks assigned to this worker within approved
+phases. Use stable, unique `id` values and a `phase` matching `approved_phases`;
+retain their content/order from the approved plan. If a plan has no task IDs,
+derive IDs from its existing phases without adding scope. A trivial handoff may
+use `todos: []`. Keep parent research, orchestration, and unapproved tasks out.
+For `per-todo-worker`, transfer only the assigned `Ti` (and its scoped steps),
+with prerequisite acceptance evidence in `evidence`, not as additional assignments.
+
+After validating authority and checkout, the worker uses `todowrite` to recreate
+the snapshot in its own session, projecting each entry to
+`{ content: "T1: Concrete assigned outcome", status: "pending" }` (use the actual
+ID/content/status). `id` and `phase` are handoff metadata, not tool arguments.
+Send the complete session list on each change. Use `pending`, `in_progress`,
+`completed`, or `cancelled`; start work with `in_progress`, mark `completed` only
+with acceptance evidence, and use `cancelled` only for explicitly dropped work.
+A blocker is reported separately; it is not a fifth tool status or completion.
+Keep Markdown approval checklists consistent with evidenced progress.
+
+New assignments normally start `pending`. Preserve evidenced completed/cancelled
+entries if included as context; never execute them. Before importing into a
+continued session, reconcile its existing list with the attributable checkpoint
+and Git/worker state. Preserve verified progress; an `in_progress` entry requires
+ownership reconciliation, not automatic restart. Missing or conflicting execution
+state stops execution; reimporting a snapshot cannot authorize replay.
+
+Return final todo entries by stable ID, acceptance evidence for completions, and
+blockers/next steps. The parent assesses that evidence before updating its own
+`todowrite` list or Markdown checklist. Worker tool calls do not update the parent
+session automatically. An unavailable or denied todo tool is reported; continue
+within existing authority using conversational checkpoints/Markdown, without
+bypassing permissions or claiming tool synchronization. Todo content/status never
+expands the approval record or authorizes dispatch, edits, commits, or publishing.
 
 ## Optional delivery after completion
 

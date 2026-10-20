@@ -17,6 +17,15 @@ Budget: target roughly 500-900 words or less; prioritize decision-relevant facts
 Constraints: read-only; no shell, tests, edits, installs, or delegation.
 ```
 
+For multi-step discovery, optionally supply a scoped `todos` snapshot with stable
+IDs, content, and status. The explorer recreates it with `todowrite` in its own
+session and returns final statuses with its evidence packet; otherwise it creates
+its own scoped progress list. This is session metadata, not permission for edits
+or execution. Use the status/projection, continuation, fallback, and parent
+reconciliation rules in
+[session-local todo transfer](../../shared/approval-handoff.md#session-local-todo-transfer);
+implementation approval/phase requirements there do not apply to read-only briefs.
+
 Give independent children distinct questions/scopes; disclose unavoidable overlap.
 Use concurrent calls or background mode for independent work, within the selected
 workflow's budget. A series of foreground calls is sequential, not parallel.

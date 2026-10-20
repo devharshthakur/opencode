@@ -11,13 +11,42 @@ Preserve the current model. Request a missing issue description; clarify essenti
 ambiguity. Use this workflow in `dev`. If invoked in `chat`, ask the user to select
 `dev` without silently switching the model or broadening chat's permissions.
 
+## Diagnostic exception
+
+Invoking `/fix*` authorizes only the existing `diag-branch.sh` diagnostic protocol
+as a narrow exception to global preservation/hook rules and shared cleanup methods.
+This is not implementation approval or a general Git-mutation grant.
+
+- Before `enter`, record the exact checkout, original branch/HEAD, and original
+  staged, unstaged, and untracked state with enough evidence to verify restoration
+  without exposing secrets. After entry, record the snapshot SHA and helper metadata;
+  retain this checkpoint through interruption.
+- Only the unmodified helper may perform its temporary branch creation, staging,
+  snapshot commits with hook/signing suppression, resets, Git clean, branch return,
+  and diagnostic-branch deletion. These operations serve snapshot/restoration only;
+  delivery commits, publishing, and manual reset/clean alternatives remain outside
+  this exception. Normal implementation and delivery retain hooks and checks.
+- Keep diagnosis exclusive to this recorded checkout. Before `leave`, verify the
+  original parent ref, snapshot ancestry, and current branch against the checkpoint.
+  Inspect full status/diffs and untracked paths: every change to be discarded must
+  be attributable to diagnosis. Unexpected edits, uncertain ownership, or inconsistent
+  state stop restoration; preserve the state and ask how to proceed.
+- Do not mutate ignored files, submodules, or nested repositories through this
+  protocol; the snapshot is not proof they can be restored. After `leave`, verify
+  original branch/HEAD, index, staged/unstaged/untracked contents, and diagnostic-branch
+  absence against the checkpoint.
+- On failure or interruption, reconcile ownership and state before continuing;
+  never replay uncertain operations or broaden cleanup. Permission denials remain
+  binding. This is an instruction-based exception, not a crash-safe restore service.
+
 ## Diagnose on temporary branch
 
 1. Read relevant instructions, configuration, code, and tests. An `explore` call
    may investigate a bounded discovery question; read
    [exploration](../plan/references/exploration.md) when delegating substantial discovery.
-2. Read and run `sh <skill-base>/../git-isolation/scripts/preflight.sh` in the
-   current checkout. Then read and run
+2. Satisfy the [diagnostic exception](#diagnostic-exception), then read and run
+   `sh <skill-base>/../git-isolation/scripts/preflight.sh` in the current checkout.
+   Then read and run
    `sh <skill-base>/scripts/diag-branch.sh enter <slug>` to switch to a temporary
    diagnostic branch `fix/diag-<slug>` that carries and snapshots all uncommitted
    staged, unstaged, and untracked changes deterministically via Git.
@@ -62,11 +91,10 @@ Use `## Plan: <stable title>` and a revision starting at 1. Include:
 
 ## Approval and handoff
 
-Read [approval/handoff](../shared/approval-handoff.md) before requesting approval.
-Use its exact question for the selected isolation. Revisions require renewed
-approval; partial approval authorizes only named Todos/phases. On direct approval,
-dispatch `implement` according to the selected `single-worker` or `per-todo-worker`
-mode unless the user explicitly selects direct execution. In `per-todo-worker` mode
+Read and follow [approval/handoff](../shared/approval-handoff.md) for final-plan
+approval and execution handoff, using the selected isolation and actual revision.
+The selected `single-worker` or `per-todo-worker` mode governs dispatch unless
+the user explicitly selects direct execution. In `per-todo-worker` mode
 with `branch` or `worktree` isolation, `T1` prepares `fix/<task-slug>` and `T2..Tn`
 reuse that verified isolated checkout. `/build` is the manual current-checkout
 alternative, not approval itself.

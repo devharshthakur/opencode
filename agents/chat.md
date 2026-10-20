@@ -7,6 +7,7 @@ permissions:
   - { action: websearch, resource: '*', effect: allow }
   - { action: skill, resource: '*', effect: allow }
   - { action: question, resource: '*', effect: allow }
+  - { action: todowrite, resource: '*', effect: allow }
   - { action: execute, resource: '*', effect: allow }
   - { action: 'context7_*', resource: '*', effect: allow }
 color: '#06b6d4'

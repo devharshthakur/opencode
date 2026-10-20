@@ -41,6 +41,7 @@
     { "action": "read", "resource": "*.aws/credentials*", "effect": "ask" }
   ],
   "compaction": { "auto": false, "keep": { "tokens": 30000 } },
+  "experimental": { "todo": true },
   "mcp": {
     "servers": {
       "context7": {

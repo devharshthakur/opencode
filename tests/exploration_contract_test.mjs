@@ -68,8 +68,10 @@ test('native audit is standalone, explicit-only, and reuses staged plan approval
   assert.match(skill, /- `plan`: after finding selection/);
   assert.match(skill, /- `build`: execution only, after direct approval/);
   assert.ok(skill.replace(/\s+/g, ' ').includes(
-    'Approve and implement this plan locally, without isolation, commits, or publishing?',
+    "The loaded `plan` skill's shared approval/handoff procedure governs final-plan approval and execution.",
   ));
+  assert.doesNotMatch(skill, /Approve and implement this plan|Ready to implement revision/);
+  assert.ok(read('skills/shared/approval-handoff.md').includes('selected `/improve*` work'));
   for (const phrase of ['## Dependencies', 'Selection is not implementation approval',
     'plan/references/exploration.md', 'under `plan`\'s shell boundary',
     'one `implement` worker', 'no plan files', 'specific missing evidence']) {

@@ -39,6 +39,10 @@ remains available; report incomplete cleanup rather than claiming a clean finish
    resolved paths and symlinks to avoid deleting outside the owned boundary. Verify
    absence. Never sweep a shared temp directory or delete by a broad filename glob.
 
+The sole workflow-specific exception to preservation and cleanup methods in this
+section is [fix diagnostic restoration](../fix/SKILL.md#diagnostic-exception), within
+that protocol's recorded scope. All other cleanup follows these rules.
+
 Preserve intended deliverables, source changes, caches, persistent volumes/data,
 backups, branches, and worktrees unless separately authorized. Starting a resource
 does not authorize deletion of its persistent data. No broad Docker prune, Git

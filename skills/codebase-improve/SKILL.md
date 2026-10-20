@@ -119,11 +119,9 @@ results, uncertainties, and STOP conditions into a self-contained plan. Reuse
 verified evidence; refresh it only for drift or a specific unresolved question.
 
 Default execution intent: current checkout, current local HEAD, local uncommitted
-delivery. Ask exactly: "Approve and implement this plan locally, without isolation,
-commits, or publishing?" Only direct approval of that revision permits dispatch of
-one `implement` worker, with no model override, through the shared handoff. Never
-replay running, uncertain, or completed work. Explicitly selected direct `/build`
-is the alternative; invoking it alone is not approval. Other isolation requires a
+delivery. The loaded `plan` skill's shared approval/handoff procedure governs
+final-plan approval and execution. Use one `implement` worker without a model
+override, or explicitly selected direct `/build`. Other isolation requires a
 revised approved plan, not an inference from audit options.
 
 ## Dependencies

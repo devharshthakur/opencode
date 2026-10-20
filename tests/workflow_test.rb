@@ -4,10 +4,15 @@ require 'json'
 
 ROOT = File.expand_path('..', __dir__)
 CHECKS = []
+FAILURES = []
 
 def check(label)
-  raise "FAIL: #{label}" unless yield
-  CHECKS << label
+  if yield
+    CHECKS << label
+  else
+    FAILURES << label
+    warn "FAIL: #{label}"
+  end
 end
 
 def text(path)
@@ -256,7 +261,14 @@ configs.each do |path|
   check("#{path}: standard summary-compaction tail") do
     config.dig('compaction', 'auto') == false && config.dig('compaction', 'keep', 'tokens') == 30000 && !config.key?('warming')
   end
-  check("#{path}: unsupported experiments removed") { !config.key?('experimental') }
+  check("#{path}: only the supported todo experiment enabled") do
+    config['experimental'] == { 'todo' => true }
+  end
+  agents.each do |id, profile|
+    check("#{path}: #{id} permits session-local todowrite") do
+      effect(profile, 'todowrite', '*', config['permissions']) == 'allow'
+    end
+  end
   %w[shell edit execute subagent unknown_mutating_tool].each do |action|
     check("#{path}: dev allows #{action}") { effect(agents['dev'], action, '*', config['permissions']) == 'allow' }
   end
@@ -335,20 +347,35 @@ end
   end
 end
 
-# Static approval contracts; live TUI behavior requires a fresh session.
-%w[plan plan:branch plan:worktree setup].each do |id|
+# Static approval routing and ownership; live behavior requires a fresh session.
+planning_routes = {
+  'plan' => 'plan', 'plan:branch' => 'plan', 'plan:worktree' => 'plan',
+  'setup' => 'plan', 'fix' => 'fix', 'fix:branch' => 'fix', 'fix:worktree' => 'fix',
+}
+commands.keys.grep(/\Aimprove(?::|\z)/).each { |id| planning_routes[id] = 'codebase-improve' }
+planning_routes.each do |id, workflow|
   content = body("commands/#{id}.md")
-  check("#{id}: inline approval keeps the plan visible") do
-    content.include?("End the plan with the shared handoff's plain-text approval statement") &&
-      content.include?('actual revision; never use the `question` tool for implementation approval') &&
-      !content.include?('Ask: "Approve and implement')
+  check("#{id}: approval routes through its workflow, not a local policy") do
+    content.include?("Load `#{workflow}` using the skill tool") &&
+      content.include?('approval/handoff')
   end
 end
-check('plan: skill uses the inline contract while retaining clarification') do
-  content = text('skills/plan/SKILL.md').gsub(/\s+/, ' ')
-  content.include?('End the conversational plan with its plain-text approval statement') &&
-    content.include?('never use the `question` tool for implementation approval') &&
-    content.include?('Clarification questions remain available')
+%w[plan fix].each do |workflow|
+  check("#{workflow}: skill reaches the canonical approval policy") do
+    content = text("skills/#{workflow}/SKILL.md").gsub(/\s+/, ' ')
+    content.include?('[approval/handoff](../shared/approval-handoff.md)') &&
+      content.include?('for final-plan approval and execution handoff') &&
+      content.include?('selected isolation and actual revision')
+  end
+end
+approval_callers = Dir.glob(File.join(ROOT, '{agents,commands,skills}/**/*.md'))
+  .map { |path| path.delete_prefix(ROOT + '/') } + ['AGENTS.md']
+approval_callers.delete('skills/shared/approval-handoff.md')
+check('approval: agent, command, and skill prompts do not copy final approval policy') do
+  approval_callers.all? do |path|
+    content = text(path).gsub(/\s+/, ' ')
+    !content.match?(/Ready to implement revision|Approve and implement this plan|`question`(?: tool)? for implementation approval/)
+  end
 end
 check('handoff: inline approval is revision-bound and awaits the user') do
   content = text('skills/shared/approval-handoff.md').gsub(/\s+/, ' ')
@@ -364,12 +391,19 @@ check('handoff: inline approval is revision-bound and awaits the user') do
       content.include?("Ready to implement revision <N> #{limits}")
     end
 end
-check('handoff: fix retains question approval and setup retains choice questions') do
+check('handoff: one final-plan policy covers every planning workflow') do
   content = text('skills/shared/approval-handoff.md').gsub(/\s+/, ' ')
-  content.include?('For `/fix*`, retain question-style approval. Use `question` when available:') &&
-    %w[fix fix:branch fix:worktree].all? do |id|
-      body("commands/#{id}.md").include?('Ask: "Approve and implement')
-    end &&
+  content.include?('## Final-plan approval') &&
+    ['`/plan*`', '`/setup`', '`/fix*`', '`/improve*`'].all? { |workflow| content.include?(workflow) } &&
+    content.include?('Commands and skills reference this policy') &&
+    content.scan('Ready to implement revision <N>').length == 3 &&
+    !content.include?('retain question-style approval') &&
+    !content.include?('Approve and implement this plan')
+end
+check('handoff: clarification and setup choices can use question without approving implementation') do
+  content = text('skills/shared/approval-handoff.md').gsub(/\s+/, ' ')
+  content.include?('Clarification and setup-choice questions may still use `question`') &&
+    content.include?('confirming a choice is not implementation approval') &&
     text('skills/plan/references/setup.md').include?('using `question` when')
 end
 
@@ -387,8 +421,8 @@ check('setup: bounded discovery and local approval retain shared protections') d
   ["under `plan`'s shell boundary", 'read-only `explore`',
    'no repository writes, Git mutations, or implementation dispatch before approval',
    'Follow shared cleanup before requesting approval',
-   "shared handoff's plain-text approval statement for the current checkout and actual revision",
-   'approval dispatches one `implement` worker through the shared handoff procedure',
+   "Follow `plan`'s shared approval/handoff procedure",
+   'approval dispatches one `implement` worker',
    'Never replay uncertain or completed work', '`/build` is the explicitly selected direct alternative'].all? do |phrase|
     setup_command.include?(phrase)
   end
@@ -421,11 +455,10 @@ check('setup: concise approval summary and complete single-executor checklist ha
    'observable acceptance per task', 'No repository plan or tracking file by default',
    'not only in hidden reasoning', 'choice answers, concrete edits, ordered commands',
    'summary must expose all material changes and risks',
-   'Choice confirmation is not implementation approval',
    '[approval/handoff](../../shared/approval-handoff.md)', 'command `setup`',
    'detailed setup record in `evidence`', 'without a model override',
    'Do not create one worker per task', 'without a worker',
-   'mark `- [x] Ti` only with acceptance evidence', 'Todo tool additionally if available',
+   'mark `- [x] Ti` only with acceptance evidence', 'Use `todowrite` for multi-step session progress',
    'Report static contract checks separately'].all? { |phrase| setup.include?(phrase) } &&
     File.file?(File.expand_path('../../shared/approval-handoff.md', File.join(ROOT, 'skills/plan/references')))
 end
@@ -494,7 +527,8 @@ end
   check("#{id}: uses Markdown Todo checklist and approval-bound implement worker") do
     content.include?('dependency manifest') && content.include?('Markdown Todo checklist') &&
       content.include?('`single-worker`') && content.include?('`per-todo-worker`') &&
-      content.include?('Approval dispatches `implement`')
+      content.include?("Follow `fix`'s shared approval/handoff procedure") &&
+      content.include?('approval dispatches `implement` in the selected mode')
   end
 end
 check('branch mode never creates worktrees') do
@@ -508,6 +542,35 @@ check('fix skill defines temp-branch diagnosis, Todo checklist, and adaptive wor
   ['diag-branch.sh enter', 'diag-branch.sh leave', 'diagnosing-bugs', 'Markdown',
    'single-worker', 'per-todo-worker', 'fix/<task-slug>'].all? { |phrase| fix_skill.include?(phrase) }
 end
+diagnostic_exception = text('skills/fix/SKILL.md').split('## Diagnostic exception', 2).last
+  .split('## Diagnose on temporary branch', 2).first.gsub(/\s+/, ' ')
+check('fix: global preservation and cleanup route to the one diagnostic exception') do
+  text('AGENTS.md').include?('[fix diagnostics](~/.config/opencode/skills/fix/SKILL.md#diagnostic-exception)') &&
+    text('skills/shared/cleanup.md').include?('[fix diagnostic restoration](../fix/SKILL.md#diagnostic-exception)') &&
+    text('skills/fix/SKILL.md').include?('Satisfy the [diagnostic exception](#diagnostic-exception)')
+end
+check('fix: diagnostic authority covers only the existing helper snapshot and restoration') do
+  ['Invoking `/fix*` authorizes only the existing `diag-branch.sh` diagnostic protocol',
+   'not implementation approval or a general Git-mutation grant',
+   'Only the unmodified helper', 'snapshot commits with hook/signing suppression',
+   'resets, Git clean', 'diagnostic-branch deletion',
+   'delivery commits, publishing, and manual reset/clean alternatives remain outside this exception',
+   'Normal implementation and delivery retain hooks and checks'].all? do |phrase|
+    diagnostic_exception.include?(phrase)
+  end
+end
+check('fix: diagnostic restoration requires recorded state, attribution, and final verification') do
+  ['Before `enter`, record the exact checkout, original branch/HEAD',
+   'original staged, unstaged, and untracked state', 'record the snapshot SHA and helper metadata',
+   'Keep diagnosis exclusive to this recorded checkout', 'Before `leave`, verify',
+   'original parent ref, snapshot ancestry, and current branch',
+   'every change to be discarded must be attributable to diagnosis',
+   'Unexpected edits, uncertain ownership, or inconsistent state stop restoration',
+   'Do not mutate ignored files, submodules, or nested repositories',
+   'After `leave`, verify original branch/HEAD, index, staged/unstaged/untracked contents',
+   'never replay uncertain operations or broaden cleanup',
+   'Permission denials remain binding'].all? { |phrase| diagnostic_exception.include?(phrase) }
+end
 check('commit confirmation policies differ') do
   text('commands/commit.md').include?('Confirmation policy: required') &&
     text('commands/commit:auto.md').include?('Confirmation policy: not-required')
@@ -519,6 +582,67 @@ check('commits preserve hooks and explicit-path staging') do
   text('skills/commit/SKILL.md').include?('never disable them') && text('skills/commit/SKILL.md').include?('Stage explicit paths only')
 end
 handoff = text('skills/shared/approval-handoff.md')
+# Written snapshot contracts and simulated permission ordering only. These do not
+# run child sessions or establish the experimental tool's runtime permission action.
+todo_protocol = handoff.split('## Session-local todo transfer', 2).last.split('## Optional delivery', 2).first.gsub(/\s+/, ' ')
+example = YAML.safe_load(handoff[/```yaml\n(.*?)\n```/m, 1], aliases: false)
+check('todo: handoff example has scoped unique IDs and native status values') do
+  entries = example.fetch('todos')
+  entries.any? && entries.map { |entry| entry.fetch('id') }.uniq.length == entries.length &&
+    entries.all? do |entry|
+      entry.keys.sort == %w[content id phase status] &&
+        example.dig('authorization', 'approved_phases').include?(entry['phase']) &&
+        %w[pending in_progress completed cancelled].include?(entry['status']) &&
+        !entry['content'].empty?
+    end
+end
+check('todo: shared guidance applies to main agents and workers without granting authority') do
+  guidance = text('AGENTS.md')
+  ['Track multi-step work with `todowrite`', 'skip trivial tasks', 'Send full lists on changes',
+   'stable IDs in content', 'Session-local progress grants no execution authority',
+   'unavailable/denied tools without bypassing restrictions'].all? { |phrase| guidance.include?(phrase) }
+end
+check('todo: deny-default roles receive only a narrow todo exception') do
+  %w[chat explore].all? do |id|
+    agents[id]['permissions'].select { |rule| rule['action'].include?('todo') } ==
+      [{ 'action' => 'todowrite', 'resource' => '*', 'effect' => 'allow' }]
+  end
+end
+check('todo: snapshot filters partial approval and per-todo assignments') do
+  ['only tasks assigned to this worker within approved phases', 'matching `approved_phases`',
+   'Keep parent research, orchestration, and unapproved tasks out',
+   'transfer only the assigned `Ti`', 'not as additional assignments',
+   'without adding scope', 'todos: []'].all? { |phrase| todo_protocol.include?(phrase) }
+end
+check('todo: worker imports a projection into its own session with valid statuses') do
+  ['worker uses `todowrite`', 'in its own session', 'handoff metadata, not tool arguments',
+   'complete session list on each change', '`pending`, `in_progress`, `completed`, or `cancelled`',
+   'only with acceptance evidence', 'not a fifth tool status'].all? { |phrase| todo_protocol.include?(phrase) }
+end
+check('todo: continuation reconciles progress rather than replaying it') do
+  ['never execute them', 'continued session', 'reconcile its existing list',
+   'ownership reconciliation, not automatic restart', 'Missing or conflicting execution state stops execution',
+   'cannot authorize replay'].all? { |phrase| todo_protocol.include?(phrase) }
+end
+check('todo: parent reconciliation and unavailable-tool fallback remain evidence-bound') do
+  ['parent assesses that evidence before updating its own', 'do not update the parent session automatically',
+   'unavailable or denied todo tool is reported', 'without bypassing permissions',
+   'never expands the approval record'].all? { |phrase| todo_protocol.include?(phrase) }
+end
+check('todo: build imports after authority checks and reports IDs for reconciliation') do
+  content = text('skills/build/SKILL.md').gsub(/\s+/, ' ')
+  ['validate `todos` against assigned approved phases', 'import them with `todowrite`',
+   'Reconcile an existing child-session list', 'Direct execution maintains its current session',
+   'final statuses by stable ID with evidence and blockers'].all? { |phrase| content.include?(phrase) }
+end
+check('todo: exploration and completion reporting cover session-local progress') do
+  exploration = text('skills/plan/references/exploration.md').gsub(/\s+/, ' ')
+  reporting = text('skills/shared/reporting.md').gsub(/\s+/, ' ')
+  ['scoped `todos` snapshot', 'recreates it with `todowrite` in its own session',
+   'do not apply to read-only briefs'].all? { |phrase| exploration.include?(phrase) } &&
+    reporting.include?('final todo statuses by stable ID') &&
+    reporting.include?('only after assessing evidence')
+end
 %w[planning awaiting-approval approved running completed blocked cancelled].each do |state|
   check("handoff state #{state}") { handoff.include?("`#{state}`") }
 end
@@ -553,4 +677,5 @@ Dir.glob(File.join(ROOT, 'skills/**/*.md')).each do |path|
   end
 end
 
+abort "FAIL: #{FAILURES.length} offline workflow contracts; #{CHECKS.length} passed" unless FAILURES.empty?
 puts "PASS: #{CHECKS.length} offline workflow contracts (live behavior still needs fresh-session validation)"

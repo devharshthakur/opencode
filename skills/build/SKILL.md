@@ -33,6 +33,12 @@ separate direct task authorization and has no approved-plan prerequisite.
    installs, instrumentation, or edits in a new isolated checkout.
 4. Before tests or other resource creation, read [cleanup](../shared/cleanup.md)
    and track task-owned resources from creation through verified teardown.
+5. For a worker, validate `todos` against assigned approved phases, then import them
+   with `todowrite` under the shared handoff's session-local todo transfer protocol.
+   Reconcile an existing child-session list before replacing it; never replay
+   completed or uncertain work. Direct execution maintains its current session's
+   scoped list instead of copying a worker snapshot. Report unavailable/denied todo
+   tools and retain conversational tracking within the same authority.
 
 ## Execute and verify
 
@@ -41,6 +47,8 @@ separate direct task authorization and has no approved-plan prerequisite.
   scratch or send unrelated history back to the parent.
 - Keep a compact checkpoint in conversation: approval/revision, phase/Todo, paths,
   actual check results, blocker, and next move. Write it to a file only if requested.
+- Update the session todo list as work starts and acceptance is proved; report final
+  statuses by stable ID with evidence and blockers for parent reconciliation.
 - Validate observable acceptance, focused regression proof, and repository-required
   checks. Distinguish baseline failures. Never weaken checks or bypass hooks.
 - Material scope/risk/authority changes stop for a revised plan and approval;

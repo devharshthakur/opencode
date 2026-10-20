@@ -5,6 +5,10 @@ on failures/blockers when execution remains available. Lead with result or exact
 blocker. Report:
 
 - What changed and which acceptance criteria are proved.
+- For tracked work, final todo statuses by stable ID, completion evidence, and
+  blockers/next steps; identify unavailable/denied todo tools. Workers return their
+  session-local snapshot; the parent reconciles its own list only after assessing
+  evidence under [approval/handoff](approval-handoff.md#session-local-todo-transfer).
 - Actual passing/failing/blocked/unrun checks, including baseline failures.
 - Relevant limitations and pending fresh-session proof for configuration changes.
 - Cleanup verification: resources stopped/removed, or none created; exact retained

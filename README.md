@@ -32,6 +32,37 @@ Selecting an agent and selecting a session model are separate in V2: switching t
 model. Use `/models` to pick a different one; commands run in the current session
 and never override that choice.
 
+### Session-local todos
+
+The sample enables `experimental.todo`; the local config already enables it.
+Both primary agents and both workers use `todowrite` for multi-step progress,
+skipping trivial requests. `chat` and `explore` have a narrow todo permission
+exception; their project-access restrictions remain unchanged. This changes
+session metadata, not repository files or execution authority.
+
+Implementation handoffs carry a scoped `todos` snapshot (stable ID, phase,
+content, status). After validating authority, the worker recreates it in its own
+session and updates it as acceptance is proved. Read-only exploration briefs can
+also carry scoped discovery todos. Workers return final statuses and evidence;
+the parent checks the evidence before reconciling its own list. Lists are not
+automatically synchronized between sessions. See the
+[todo transfer protocol](skills/shared/approval-handoff.md#session-local-todo-transfer).
+
+Todo status is not approval. Markdown approval checklists remain visible, and no
+tracker file is required. Unavailable/denied tools are reported with conversational
+tracking as fallback; continued sessions reconcile existing progress before import,
+never replaying completed or uncertain work.
+
+Config and instructions normally reload automatically; use fresh sessions to
+validate this experimental feature. Confirm `todowrite` is available to `dev`,
+`chat`, `explore`, and `implement`, while forbidden project tools remain blocked
+for restricted roles. On a separately approved small multi-step task, inspect the
+worker's initial list, status updates, final evidence, and parent reconciliation;
+also check partial assignment and continuation without replay. Offline contracts
+do not prove runtime permission checks or model obedience. Current V2 tools and
+permissions docs do not yet describe this experimental tool; no service restart
+or live proof is implied by a passing static check.
+
 ## Everyday commands
 
 | Command | Behavior |
