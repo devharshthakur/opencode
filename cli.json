@@ -17,8 +17,8 @@
     "scrollbar": false,
     "thinking": "hide",
     "grouping": "auto",
-    "image_preview": false,
-    "tps": false,
+    "image_preview": true,
+    "tps": true,
     "permissions": "autoaccept",
     "verbosity": "low"
   },
@@ -34,7 +34,8 @@
   },
   "attention": {
     "notifications": true,
-    "sound": true
+    "sound": true,
+    "volume": 0.5
   },
   "animations": true,
   "scroll": {
@@ -43,5 +44,11 @@
   },
   "debug": {
     "devtools": false
+  },
+  "terminal": {
+    "copy": "manual"
+  },
+  "leader": {
+    "timeout": 2750
   }
 }
