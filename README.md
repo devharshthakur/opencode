@@ -122,6 +122,7 @@ expose a newly added worker. Offline checks do not prove obedience or token savi
 | `/quick <task>` | Direct execution on the current model; planning bypass |
 | `/plan <task>` | Plan; approval executes directly on the current branch |
 | `/setup <docs, URL, or setup skill references>` | Discover setup choices, prepare a concise custom plan; approval implements locally |
+| `/create:skill <idea or context>` | Interview and design a project-local OpenCode skill; confirm before writing |
 | `/fix <issue>` | Root-cause diagnosis plus Todo repair plan; approval executes directly |
 | `/improve [scope]` | Evidence-first audit; select findings, then plan and separately approve implementation |
 | `/use:worker [task]` or `@worker` | Propose worker execution; one approval covers workers needed for that task |
@@ -261,6 +262,7 @@ permission denials remain binding even for `dev`.
 - Agents and permissions: [`agents/`](agents/)
 - Commands: [`commands/`](commands/)
 - Orchestration skills: [`skills/`](skills/) — `plan`, `fix`, `codebase-improve`, `worker`, `commit`, `git-isolation`, `pr`
+- Skill authoring: [`skills/create-skill/SKILL.md`](skills/create-skill/SKILL.md)
 - PR templates: [`skills/pr/references/templates.md`](skills/pr/references/templates.md)
 - Shared guidance: [`AGENTS.md`](AGENTS.md)
 - Markdown handoffs and templates: [`skills/shared/handoff.md`](skills/shared/handoff.md)
