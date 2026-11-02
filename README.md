@@ -303,8 +303,4 @@ Confirm `/improve*` still waits for selection/plan approval and retains worker
 authority through nested planning/fixing. These are instruction contracts, not
 runtime enforcement or live proof.
 
-`extensions/workflow-pilot/` remains an **inactive** historical offline experiment:
-it is not wired into active commands or dispatch. Its JSON envelope is not the
-active Markdown handoff format; migration of that experiment is out of scope.
-
 </details>
