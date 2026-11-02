@@ -7,17 +7,21 @@ metadata:
 
 # Commit
 
-The caller supplies task scope and confirmation policy; this skill grants no
-authority. Loading it or asking about commit messages does not approve staging.
+The caller supplies task scope or a default-scope policy, and confirmation policy;
+this skill grants no authority. Loading it or asking about commit messages does not
+approve staging.
 
 ## Inspect
 
 1. Read `../git-isolation/scripts/preflight.sh`, then run it in the checkout.
    Inspect full staged/unstaged diffs, untracked contents, and recent commit style.
-2. Attribute every included path/hunk to the requested task. Arguments may narrow
-   scope. Never assume all workspace changes belong to it. Stop for unclear scope,
-   secrets, unrelated staged changes, or mixed unrelated hunks in the same file.
-3. If nothing attributable remains, report "nothing to commit" and stop.
+2. Attribute every included path/hunk to the requested scope. Arguments may narrow
+   scope. When the caller gives no scope and defines the default as current changes,
+   the scope is every tracked change, staged or unstaged (modification or deletion),
+   plus every untracked file, enumerated individually. Stop for unclear ownership,
+   secrets, staged changes outside a supplied narrower scope, or mixed unrelated
+   hunks under that narrower scope.
+3. If no in-scope changes remain, report "nothing to commit" and stop.
 
 ## Propose
 
