@@ -263,6 +263,7 @@ permission denials remain binding even for `dev`.
 - Commands: [`commands/`](commands/)
 - Orchestration skills: [`skills/`](skills/) — `plan`, `fix`, `codebase-improve`, `worker`, `commit`, `git-isolation`, `pr`
 - Skill authoring: [`skills/create-skill/SKILL.md`](skills/create-skill/SKILL.md)
+- Direct/worker execution policy and procedure: [`skills/shared/execution.md`](skills/shared/execution.md)
 - PR templates: [`skills/pr/references/templates.md`](skills/pr/references/templates.md)
 - Shared guidance: [`AGENTS.md`](AGENTS.md)
 - Markdown handoffs and templates: [`skills/shared/handoff.md`](skills/shared/handoff.md)
