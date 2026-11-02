@@ -50,7 +50,7 @@ This is not implementation approval or a general Git-mutation grant.
    `sh <skill-base>/scripts/diag-branch.sh enter <slug>` to switch to a temporary
    diagnostic branch `fix/diag-<slug>` that carries and snapshots all uncommitted
    staged, unstaged, and untracked changes deterministically via Git.
-3. Load `diagnosing-bugs` and run its diagnosis loop (Phases 1–4) on `fix/diag-<slug>`:
+3. Load `diagnosing-bugs` using the skill tool and run its diagnosis loop (Phases 1–4) on `fix/diag-<slug>`:
    build a tight red-capable reproduction command, reproduce and minimize the failure
    (including uncommitted changes when they contribute to the bug), test ranked
    falsifiable hypotheses, and use tagged `[DEBUG-...]` instrumentation to confirm

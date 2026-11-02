@@ -14,8 +14,8 @@ This skill is standalone; it does not load an external audit skill.
 
 ## Scope and authority
 
-Audit and plan under `plan`'s shell boundary: read
-[Plan](../plan/SKILL.md) before shell discovery and follow its planning boundary.
+Audit and plan under `plan`'s shell boundary: load `plan` using the skill tool
+before shell discovery and follow its planning boundary.
 No repository writes, Git mutations, installs, implementation dispatch, or external
 mutations before explicit implementation approval. Inspect unfamiliar commands for
 side effects; check-mode names do not prove a command is read-only. Follow shared
@@ -112,7 +112,8 @@ files, implementation, or publication. If there are no supported findings, say s
 
 ## 4. Plan selected work, then wait for approval
 
-After selection, load `plan` and use its full required plan format, revisioning,
+After selection, ensure `plan` is loaded using the skill tool and use its full
+required plan format, revisioning,
 cleanup gate, and [approval/handoff](../shared/approval-handoff.md) procedure.
 Carry selected IDs, evidence/excerpts, scope, dependencies, checks and expected
 results, uncertainties, and STOP conditions into a self-contained plan. Reuse
