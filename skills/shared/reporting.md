@@ -17,20 +17,29 @@ blocker. Report:
 - Repository/branch/path, retained isolation or backup resources, staged status,
   and preserved pre-existing work. Say explicitly when work is uncommitted/local.
 
-Do not invent results, hashes, links, or savings. Keep worker output concise but
-preserve identifiers, uncertainty, authority limits, and evidence. Review is
+Do not invent results, hashes, links, or savings. Keep user-facing output concise;
+worker reports preserve identifiers, uncertainty, authority limits, and decisive
+evidence without redundant narration. Review is
 against both requirements and repository rules; do not force parallel reviews
 or extra skills for every task. No automatic next-phase execution or publishing.
 
-## Worker receipts and requested reports
+## Worker reports and user summaries
 
-Workers use the [JSON handoff contract](handoff.md). Default output is a compact
-receipt (exploration retains its decisive evidence packet), with identifiers,
-acceptance/check/cleanup proof, uncertainty, and blockers. No default narrative
-`detailed_report`. The parent may request it initially or later in the same
-attributable worker session. A report-only continuation expands existing evidence
-without new edits, commands/checks, resources, or dispatch. The parent validates
-identity/structure and assesses proof; successful tool return is not acceptance.
+Workers use the [Markdown handoff contract](handoff.md) and role-specific result
+templates. Return detailed, self-contained reports for the parent: outcome,
+criterion-linked evidence, actual checks, relevant decisions, limitations, blockers,
+Todo state, cleanup, and continuation. Exploration supplies decision-relevant
+evidence; verification retains contradicted/unverified criteria. Avoid activity
+diaries and redundant source dumps. The parent makes risk-based targeted reads
+instead of routinely repeating sufficient investigation, and gives the user a
+concise summary rather than reproducing the worker report. No token savings are
+assumed without measurement.
+
+The parent may request clarification in the same attributable worker session.
+A report-only follow-up expands existing evidence without new edits,
+commands/checks, resources, or dispatch. Preserve prior outcomes and unknowns.
+The parent checks identity/structure and assesses proof; successful tool return
+is not acceptance.
 
 At completed development/repair/commit tasks, the parent follows
 [optional PR delivery](pr-offer.md) for the single plain-text GitHub PR offer and

@@ -63,14 +63,20 @@ This is not implementation approval or a general Git-mutation grant.
 
 ## Required plan and Todo checklist
 
-Use `## Plan: <stable title>` and a revision starting at 1. Include:
+Use `## Plan: <stable title>` and a revision starting at 1. Follow the
+[human-readable plan](../plan/SKILL.md#human-readable-approval-plan) presentation
+policy: explain the repair and consequential choices concisely; reserve source
+excerpts, exact commands, and edit instructions for the detailed worker handoff.
+Include:
 
-- **Goal/Scope:** confirmed symptom, root cause with `path:line` evidence, red-capable
-  reproduction command, exclusions, assumptions, and open questions.
+- **Goal/Scope:** confirmed symptom, root cause in plain language, exclusions,
+  assumptions, and open questions. Surface decisive technical evidence when needed
+  for a user decision; keep full provenance/reproduction detail in the handoff.
 - **Approach:** repair design, regression-test seam (or documented absence of a seam),
   alternatives, and relevant interfaces.
-- **Changes:** inspected paths and ordered edits; mark paths/evidence as current,
-  not immutable. Small-model workers should not have to reconstruct the discussion.
+- **Changes:** user-understandable behavior and affected areas, not an edit inventory.
+  The handoff retains inspected paths and ordered edits, with evidence marked as
+  current rather than immutable; workers should not reconstruct the discussion.
 - **Todo Checklist & Dispatch Mode:** break the fix into small, checkable Markdown
   Todo items (`- [ ] T1: ...`, `- [ ] T2: ...`) with stable IDs, prerequisites, and
   observable acceptance. Select one execution mode:
@@ -81,8 +87,9 @@ Use `## Plan: <stable title>` and a revision starting at 1. Include:
     time, validate its returned test proof and `git diff`, mark `- [x] Ti` in the
     Markdown Todo checklist, and then dispatch `Ti+1`. Stop immediately if any Todo
     fails validation or diverges.
-- **Validation:** exact reproduction command that must go red-to-green, repository
-  checks, expected outcomes, required regression proof, and baseline limitations.
+- **Validation:** how the failure will be reproduced and proved fixed, regression
+  coverage, and baseline limitations. Put exact reproduction/check commands and
+  expected red-to-green results in the detailed handoff.
 - **Execution:** `current`, `branch`, or `worktree` (`fix/<task-slug>` when isolated),
   intended local base (`HEAD` by default; no fetch), preservation decision, and
   authorized operations/skills. No staging, commits, or publishing.

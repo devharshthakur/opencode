@@ -65,28 +65,36 @@ do not prove runtime permission checks or model obedience. Current V2 tools and
 permissions docs do not yet describe this experimental tool; no service restart
 or live proof is implied by a passing static check.
 
-## JSON worker handoffs
+## Markdown worker handoffs
 
 The [handoff contract](skills/shared/handoff.md) standardizes `explore`,
-`implement`, and `verify` requests/results as versioned JSON. Structured fields
-carry identity, scope, authority, assignments, and acceptance; a Markdown `body`
-carries task-specific reasoning. The parent validates records with the local Ajv
-utility before dispatch/reconciliation. Native `subagent` still receives a prompt
-string: this is **not** enforced dispatch or authenticated approval.
+`implement`, and `verify` requests/results as controlled Markdown. Named sections
+carry identity, scope, authority, assignments, acceptance, and relevant context.
+The parent uses checklist preflight before dispatch and assesses returned evidence
+against the exact assignment. Native `subagent` receives the Markdown prompt
+directly: this is **not** enforced dispatch or authenticated approval.
+
+Templates may be adapted to the task: headings and grouping are flexible, required
+information and safeguards are not. User-facing approval plans explain outcomes,
+scope, consequential choices, risks, and success checks concisely. Subagents receive
+a separate detailed execution brief with the approved assignment, relevant source
+evidence, implementation guidance, and exact checks. Supporting detail cannot
+expand the approved scope or change agreed decisions.
 
 - **Explore:** decisive excerpts, provenance, guards/callers, counterevidence,
-  coverage, and decision sufficiency. `parent_reads: []` means none needed; gaps
+  coverage, and decision sufficiency. Parent reads may explicitly be none; gaps
   name the smallest lookup. No mandatory rereading of citations or hard read quota.
 - **Implement:** exact approved phase/Todo assignment, relevant evidence, edit
-  brief/invariants, observable acceptance, checks, and compact completion receipt.
+  brief/invariants, observable acceptance, checks, and detailed evidence report.
   Ordinary implementation choices stay with the worker.
 - **Verify:** independent assessment of actual before/after changes, not just the
   implementer summary. Selective for risk/conflict or explicit requests; shell,
   edits, tests, and delegation remain denied. The parent retains acceptance.
 
-Compact output is the default; detailed narrative reports require parent request,
-initially or by resuming the same attributable worker with a report-only JSON
-request. Report-only follow-ups perform no new work. Templates are examples, not
+Workers return self-contained, role-specific evidence reports for parent decisions,
+not activity diaries. Parent source reads are risk-based and targeted; user-facing
+summaries stay concise. Clarification can resume the attributable worker with a
+report-only Markdown request, which performs no new work. Templates are examples, not
 approval. Current dispatch defaults remain unchanged: plan approval normally uses
 `implement`, including sequential per-todo mode; explicit direct `/build` and
 `/quick` remain direct. No parallel implementers or automatic repair loop is added.
@@ -229,33 +237,28 @@ permission denials remain binding even for `dev`.
 - Orchestration skills: [`skills/`](skills/) — `plan`, `fix`, `codebase-improve`, `build`, `commit`, `git-isolation`, `pr`
 - PR templates: [`skills/pr/references/templates.md`](skills/pr/references/templates.md)
 - Shared guidance: [`AGENTS.md`](AGENTS.md)
-- JSON handoffs and templates: [`skills/shared/handoff.md`](skills/shared/handoff.md)
+- Markdown handoffs and templates: [`skills/shared/handoff.md`](skills/shared/handoff.md)
 - Independent verification and evidence collection: [`skills/shared/verification.md`](skills/shared/verification.md)
 
-Run the offline checks from the repository root:
+Run the Markdown handoff regression checks from the repository root:
 
 ```sh
-ruby tests/workflow_test.rb
-python3 tests/preflight_test.py
-python3 tests/diag_branch_test.py
-node --test tests/skill_policy_test.mjs
-node --test tests/exploration_contract_test.mjs
-node --test tests/workflow_pilot_test.mjs
+node --test tests/handoff_markdown_test.mjs
 git diff --check
 ```
 
-Preserve existing tests. Record baseline failures separately; old assertions that
-pin four profiles, the old model map, or YAML handoff text intentionally conflict
-with this update. Do not weaken them to manufacture green results. Validate new
-contracts with temporary external checks and remove those checks after execution;
-no permanent regression coverage is claimed for those disposable checks.
+These checks cover template structure, active references, authority/completion
+rules, report-only boundaries, and the retained evidence utility's input guards.
+They perform no worker dispatch and create no disposable resources. Preserve
+existing work and record baseline failures separately; do not weaken checks to
+manufacture green results. See the [templates](skills/shared/handoff/templates/)
+and [worked example](skills/shared/handoff/example.md) for the new format.
 
 <details>
 <summary>Maintenance notes</summary>
 
-Offline checks cover contracts, simulated permission ordering, references, pure
-skill-filter behavior, and unchanged-checkout preflight. They do not prove live
-model obedience, plugin effectiveness, model-request effort, or UI behavior.
+Offline handoff checks do not prove live model obedience, token savings, plugin
+effectiveness, model-request effort, or UI behavior.
 Commands, configuration, and CLI preferences normally reload automatically; use a
 fresh session to validate role, permission, or skill changes. Plugin helper changes
 outside watched directories can require an explicit reload or service restart, and
@@ -270,7 +273,7 @@ without forceful escalation. Also exercise a failed task and interruption/resume
 Use disposable local fixtures; Docker is optional, not required for offline checks.
 
 `extensions/workflow-pilot/` remains an **inactive** historical offline experiment:
-it is not imported by the active plugin or wired into commands, though its tests are
-retained.
+it is not wired into active commands or dispatch. Its JSON envelope is not the
+active Markdown handoff format; migration of that experiment is out of scope.
 
 </details>

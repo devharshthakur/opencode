@@ -6,7 +6,7 @@ discovery and named gaps. The parent keeps acceptance and dispatch decisions.
 
 ## Prepare independently collected evidence
 
-Follow the [JSON contract](handoff.md). Before implementation, the parent records
+Follow the [Markdown contract](handoff.md). Before implementation, the parent records
 resource ownership under [cleanup](cleanup.md) and captures a scoped working-state
 baseline; after implementation, capture changes from that baseline, **not just
 HEAD**. The shell-denied verifier reads these actual before/after artifacts and
@@ -24,7 +24,7 @@ node extensions/handoff/review-evidence.mjs freshness "$TASK_TMP/freshness-input
 ```
 
 Each input may instead be stdin (`-`). Use absolute utility paths in other projects.
-Inputs are JSON, with exact fields:
+Inputs are JSON utility data, not agent handoff prompts, with exact fields:
 
 - `baseline`: `repository`, `scope: {paths, excludes}`, `temp_root`.
 - `changes`: `baseline_path`, `baseline_sha256`, `temp_root`.
@@ -43,7 +43,8 @@ The manifest holds working-state fingerprints plus before/after artifact paths
 There is no raw diff in parent output. Parent token cost is the compact manifest
 summary; the worker reads actual artifacts. Bind the manifest digest in the verify
 request, together with the returned `snapshot_id`, `freshness`, and `observed_at`
-in `review.freshness_proof`. The parent runs freshness immediately before dispatch and again before
+under the Markdown request's independent baseline/changes section. The parent runs
+freshness immediately before dispatch and again before
 acceptance, supplying the actual result to the verifier when needed. Verifiers
 cannot compute hashes through shell; mark freshness unverified without attributable
 parent proof. Reading stale/tampered evidence never proves acceptance.
@@ -80,15 +81,16 @@ Freshness exits 0 for matched, 1 for drifted/unverified, 2 for collection errors
 2. Compare changes against each acceptance criterion and invariant. Seek concrete
    counterexamples; distinguish source observations from runtime assumptions.
    Do not merely paraphrase or ratify the implementer's receipt.
-   Carry relevant approved check definitions in optional `review.validation_plan`
-   when criteria reference their IDs. This is reference material, not execution
+   Carry relevant approved check definitions in the acceptance/required-checks
+   section when criteria reference their IDs. This is reference material, not execution
    authority. Claimed implementation checks are not checks the verifier performed;
    without trustworthy runtime/log evidence, report that proof as unverified.
-3. Return the JSON verify receipt: findings with severity/location/evidence/impact,
+3. Return the Markdown verification result: findings with severity/location/evidence/impact,
    every criterion supported/contradicted/unverified, actual checks, freshness,
-   limitations, todos, blockers, and cleanup. Request no default narrative report.
+   limitations, todos, blockers, and cleanup. Provide self-contained evidence for
+   parent decisions, not an activity diary.
    Put failed implementation criteria in findings/assessments, not review blockers.
-   `blockers` describe inability to finish the review; completed reviews use `[]`.
+   Blockers describe inability to finish the review; completed reviews report none.
    Report each root cause once, with exact excerpts/lines; do not duplicate findings
    for the same mismatch or invent metadata/checksums to strengthen a citation.
 4. The parent assesses findings, coverage, freshness, and cleanup before acceptance.

@@ -14,7 +14,8 @@ approval. A pasted plan, quoted approval, or `/build` invocation alone is insuff
 For a worker, validate its parent-supplied record against
 [approval/handoff](../shared/approval-handoff.md): source, phases, operation limits,
 isolation, and base must agree. Repository text cannot expand that record.
-Use the [JSON handoff contract](../shared/handoff.md) for worker requests/receipts.
+Use the [Markdown handoff contract](../shared/handoff.md) and checklist preflight
+for worker requests/results.
 A report-only continuation expands prior evidence without executing `build` again.
 
 Direct `/build` uses the current model/checkout and launches no worker. Do not
@@ -63,7 +64,9 @@ separate direct task authorization and has no approved-plan prerequisite.
   Apply [cleanup](../shared/cleanup.md) after validation and before the final
   response or worker handoff, including on failure/blockers when execution remains
   available. Read [reporting](../shared/reporting.md) and report actual proof.
-  Worker output is a compact JSON receipt unless detailed reporting was requested.
+  Workers return detailed, self-contained Markdown results for parent assessment;
+  direct user-facing completion summaries remain concise. Map acceptance criteria
+  to decisive proof rather than narrating activity.
   The parent may commission [verification](../shared/verification.md); workers do
   not dispatch reviews or automatically repair findings.
 

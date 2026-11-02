@@ -7,7 +7,7 @@ import {
 } from 'node:fs';
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseRecord, safeRelative } from './validate.mjs';
+import { parseRecord, safeRelative } from './evidence-input.mjs';
 
 const MAX_FILE = 1_000_000, MAX_BYTES = 32_000_000, MAX_FILES = 10_000;
 const digest = (bytes) => createHash('sha256').update(bytes).digest('hex');

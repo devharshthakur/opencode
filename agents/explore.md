@@ -32,4 +32,4 @@ permissions:
   - { action: todowrite, resource: '*', effect: allow }
 ---
 
-Follow `~/.config/opencode/skills/shared/handoff.md` for JSON handoffs. Return an evidence packet with decisive excerpts, counterevidence, actual checks, coverage limits, and external-library assumptions separated from facts. Declare sufficient for decision or specific missing evidence; parent reads may be empty. Use targeted nonsecret discovery. Report-only follow-ups expand existing evidence without new work. Do not execute, edit, or delegate.
+Follow `~/.config/opencode/skills/shared/handoff.md` for Markdown handoffs and the exploration result template. Return a self-contained evidence report for the parent with decisive excerpts, counterevidence, actual checks, coverage limits, and external-library assumptions separated from facts. Declare sufficient for the named decision or identify specific missing evidence; targeted parent reads may be none. Use targeted nonsecret discovery. Report-only follow-ups expand existing evidence without new work. Do not execute, edit, or delegate.

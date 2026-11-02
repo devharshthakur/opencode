@@ -1,6 +1,6 @@
 ---
 name: plan
-description: Create a detailed implementation plan and an explicit approval-bound handoff
+description: Create a human-readable plan and a detailed approval-bound agent handoff
 metadata:
   opencode/autoinvoke: false
 ---
@@ -48,25 +48,47 @@ Clean up and verify planning-owned resources before presenting the approval-read
 plan or reporting a blocker; disclose any incomplete cleanup. Reconcile interrupted
 resources rather than replaying startup. This is instruction-based, not a sandbox.
 
-## Required plan
+## Human-readable approval plan
 
-Use `## Plan: <stable title>` and a revision starting at 1. Include:
+Write the user-facing plan for a human deciding whether to approve or change it,
+not for a worker executing edits. Use `## Plan: <stable title>` and a revision
+starting at 1. Adapt headings, grouping, and length to the task. Include:
 
-- **Goal/Scope:** current and desired behavior, exclusions, assumptions, open questions.
-- **Approach:** decisions, alternatives, relevant interfaces and existing patterns.
-- **Changes:** inspected paths and ordered edits; mark paths/evidence as current,
-  not immutable. Small-model workers should not have to reconstruct the discussion.
-  Include current/desired behavior, invariants, and implementation discretion; reuse
-  evidence for the [JSON handoff](../shared/handoff.md) rather than rewriting it.
-- **Phases:** stable IDs, real prerequisites, concrete steps, observable acceptance.
-  Prefer complete vertical slices where useful; avoid a task graph for trivial work.
-  Wide compatibility changes may need expand/migrate/contract rather than fake green slices.
-- **Validation:** exact repository checks, expected outcomes, required regression proof,
-  known baseline limitations; distinguish planned checks from observed results.
-- **Execution:** current/branch/worktree, intended local base, preservation decision,
-  authorized operations and skill dependencies. No staging, commits, or publishing.
-- **Risks/Tradeoffs** and **Rollback** when relevant. For OpenCode changes, specify
-  feature-specific reload behavior and fresh-session validation.
+- **Goal and boundaries:** what changes, why it matters, what stays unchanged,
+  and meaningful exclusions.
+- **Approach and phases:** plain-language outcomes in execution order, with stable
+  phase/Todo IDs. Explain consequential choices and dependencies, not each code edit.
+- **Success and validation:** observable acceptance criteria and how they will be
+  checked; disclose known validation limits. Summarize checks in human terms.
+- **Decisions and risks:** tradeoffs, assumptions needing agreement, open questions,
+  and rollback when relevant. Resolve essential ambiguity before approval.
+- **Execution boundaries:** checkout/isolation, local base intent, preservation of
+  existing work, and operation limits. No staging, commits, or publishing.
+
+Default to the shortest plan that lets the user understand the whole proposal and
+suggest changes. Omit code snippets, line-by-line edits, exhaustive file lists,
+raw evidence, and command inventories unless they affect the user's decision or
+the user requests them. Keep material risks and scope visible; brevity must not
+hide a consequential choice. Add technical depth on request, not automatically.
+
+## Detailed agent handoff
+
+The user-facing plan and subagent handoff serve different audiences; do not show
+the execution brief merely to obtain approval. Prepare the detailed
+[Markdown handoff](../shared/handoff.md) from the approved human plan and relevant
+evidence. Preserve its revision, assigned phases, outcomes, fixed decisions,
+acceptance, and limits; label execution detail separately from the approved plan.
+
+Include current/desired behavior, inspected paths/symbols, ordered implementation
+steps, invariants, dependencies, exact validation commands/expected results,
+baseline limitations, skill triggers, and worker discretion where relevant.
+Mark source evidence as current, not immutable. The worker should not have to
+reconstruct the conversation or repeat sufficient research. Reuse decisive evidence
+with provenance rather than copying the transcript. Local implementation detail
+may elaborate approved work; new scope or material decisions require renewed
+approval. For OpenCode changes, include feature-specific reload behavior and
+fresh-session validation in the execution brief; surface user-relevant effects in
+the human plan.
 
 For isolated plans, use local `HEAD` unless the user selects another local base.
 The worker verifies its SHA after approval; no fetch. Resolve reliance on dirty

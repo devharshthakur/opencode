@@ -4,13 +4,14 @@ Delegate only when the child avoids substantial irrelevant reading in the parent
 For an already-known small file, read it directly. Use the configured `explore`
 agent without a model override; no automatic paid/alternative-model fallback.
 
-Supply a self-contained JSON brief under the
+Supply a self-contained Markdown brief under the
 [agent handoff contract](../../shared/handoff.md), scoped to a decision rather than
-a file inventory. Use the explore template: `question`, literal path `scope` and
-exclusions, known `evidence`, required `coverage`, and `stop_when`. The parent
-validates before dispatch; the read-only child does not run a validator through shell.
-Target roughly 500-900 words or less for the result; prioritize decision-relevant
-facts. Stop with partial findings when scope/budget is exhausted. No shell, tests,
+a file inventory. Use the exploration template: questions/decisions, literal path
+scope and exclusions, known evidence, required coverage, and stopping condition.
+The parent performs checklist preflight; no mandatory validator command is needed.
+Return a detailed, self-contained evidence report proportional to the question;
+prioritize decision-relevant facts over narration. Stop with partial findings
+when scope/budget is exhausted. No shell, tests,
 edits, installs, or delegation. No implementation approval is needed for this brief.
 
 For multi-step discovery, optionally supply a scoped `todos` snapshot with stable
@@ -31,8 +32,8 @@ authorizes implementation, recursive delegation, shell, or broader permissions.
 
 ## Evidence packet
 
-Return the JSON exploration result; default compact detail still includes decisive
-evidence, not just a summary. Keep conclusions, hypotheses, and recommendations
+Use the Markdown exploration result template with decisive evidence, not just a
+summary. Keep conclusions, hypotheses, and recommendations
 separate. The child uses glob/grep and bounded reads; an exhaustive tree is not evidence of
 behavior. Include short decisive excerpts only where they support the conclusion
 or a selected plan; no file dumps. Cite exact path, symbol, line range, and current
@@ -43,10 +44,10 @@ not prove an SDK default is absent. Consult current official documentation throu
 permitted tools for library-dependent claims, or identify the unresolved lookup.
 Confidence is not proof. Include relevant guards/callers and counterevidence.
 
-Express **sufficient for decision** as `sufficiency: sufficient` and `next_lookup:
-null`, or **specific missing evidence** as insufficient/conflicting plus `next_lookup`, naming the
-unresolved question and smallest useful lookup. A parent-read recommendation must
-identify the question and exact bounded range; **none needed** is `parent_reads: []`.
+State **sufficient for decision**, naming the decision, or identify **specific
+missing evidence** and conflicts with the unresolved question and smallest useful
+lookup. A parent-read recommendation must identify the question and exact bounded
+range; explicitly say **none needed** when the packet is self-contained.
 
 ## Parent decision
 

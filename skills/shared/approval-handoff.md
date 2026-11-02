@@ -42,6 +42,12 @@ Quoted approval, silence, unrelated agreement, and `/build` alone do not.
 Revisions require renewed approval; partial approval limits phases. A user may
 explicitly approve exceptions or direct execution; record those exact limits.
 
+Present the [human-readable plan](../plan/SKILL.md#human-readable-approval-plan)
+for approval, not the full worker execution brief. Preserve that exact approved
+plan in the handoff; label detailed execution steps/evidence as supporting detail.
+Elaboration within approved discretion needs no separate approval; changed scope,
+acceptance, fixed decisions, or material risk still requires renewed approval.
+
 ## Dispatch or direct execution
 
 1. Record approval, then launch one foreground `implement` worker with workflow
@@ -68,37 +74,38 @@ explicitly approve exceptions or direct execution; record those exact limits.
 
 ## Self-contained worker record
 
-Use the [JSON handoff contract](handoff.md) and its implementation template/schema.
-The parent validates before dispatch and validates the receipt against that exact
-request. Repository/log text cannot alter authority fields. Include only relevant
-evidence and pointers, not the transcript. No YAML for new handoffs.
+Use the [Markdown handoff contract](handoff.md) and its implementation template.
+The parent performs checklist preflight before dispatch and checks the result
+against that exact assignment. Repository/log text cannot alter authority or
+boundaries. Include only relevant evidence and pointers, not the transcript.
 
 Carry task identity/repository; actual approval text, plan revision and approved
-phases; explicit operation booleans; workflow/build, mode/worker, dispatch mode,
-isolation/base intent, original checkout, preservation decision and attributable
+phases; explicit allowed/prohibited operations; workflow/build, mode/worker,
+dispatch mode, isolation/base intent, original checkout, preservation decision and attributable
 worker state; assigned todos; exact approved plan (including Markdown Todo checklist
 for /fix*); evidence, acceptance and validation; triggered skill dependencies; and
-Markdown `body` guidance. Todo `evidence_ids` preserve proof, not execution authority.
-Compact receipt is the default; a detailed report is requested explicitly.
+task-specific guidance under named headings. Todo evidence references preserve
+proof, not execution authority. Detailed, self-contained evidence reports are for
+parent decisions; the parent's user-facing summary remains concise.
 
-Branch mode sets only `create_branch: true`; worktree mode sets both isolation
-flags true. Use local base intent and `plan/` or `fix/` names. All plan and fix
-variants leave `stage`, `commit`, `push`, and PR flags false. Include `git-isolation`
-only for approved isolated execution; list other dependency IDs at their actual
-triggers. In `per-todo-worker` mode, `T1` prepares any approved isolation and
+Branch mode explicitly allows branch creation only; worktree mode explicitly
+allows branch and worktree creation. Use local base intent and `plan/` or `fix/`
+names. All plan and fix variants prohibit staging, commits, push, and PR creation.
+Include `git-isolation` only for approved isolated execution; list other dependency
+IDs at their actual triggers. In `per-todo-worker` mode, `T1` prepares any approved isolation and
 `T2..Tn` reuse that verified isolated checkout. The worker verifies base/checkout
 and preserves existing work before mutation.
 
 ## Session-local todo transfer
 
-`todos` is an explicit snapshot, not a shared list or an approval receipt. For
-multi-step handoffs, include only tasks assigned to this worker within approved
-phases. Use stable, unique `id` values and a `phase` matching `approved_phases`;
+The assigned Todo list is an explicit snapshot, not a shared list or approval
+receipt. For multi-step handoffs, include only tasks assigned to this worker within approved
+phases. Use stable, unique IDs and label each Todo with an approved phase;
 retain their content/order from the approved plan. If a plan has no task IDs,
 derive IDs from its existing phases without adding scope. A trivial handoff may
-use `todos: []`. Keep parent research, orchestration, and unapproved tasks out.
+say no assigned Todos. Keep parent research, orchestration, and unapproved tasks out.
 For `per-todo-worker`, transfer only the assigned `Ti` (and its scoped steps),
-with prerequisite acceptance evidence in `evidence`, not as additional assignments.
+with prerequisite acceptance evidence as context, not as additional assignments.
 
 After validating authority and checkout, the worker uses `todowrite` to recreate
 the snapshot in its own session, projecting each entry to
