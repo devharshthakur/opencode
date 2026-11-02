@@ -13,6 +13,12 @@ Use dedicated task-temporary directories in the environment's approved temp root
 Track test artifacts and attributable child processes too. Preserve enough evidence
 across interruption/compaction to reconcile resources rather than recreate them.
 
+Task-created validation tests, fixtures, snapshots, and temporary test configuration
+are disposable task-owned artifacts. Record their exact paths when created, capture
+the actual command/result before removal, and delete them after acceptance evidence
+is recorded. Preserve pre-existing tests and explicitly requested test deliverables;
+preserve failing tests or evidence when needed to report a blocker.
+
 Pre-existing resources, including user-started services and containers, stay
 untouched. Age, naming, a busy port, or an untracked file alone does not prove
 ownership. If ownership is unclear, preserve the resource and report the uncertainty.

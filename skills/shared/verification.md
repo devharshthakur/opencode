@@ -15,6 +15,11 @@ If review is selected only afterward and no attributable baseline exists, report
 that gap. A targeted current-source `explore` assessment may still be useful, but
 must not masquerade as a complete before/after review or invent a snapshot.
 
+Task-scoped tests may already be deleted under the [execution
+policy](execution.md#task-scoped-validation-tests). Without test artifacts the
+verifier cannot rerun them; recorded command output remains a claim, so report
+runtime/test proof as unverified unless an attributable run is evidenced.
+
 Parent-run utility (not a plugin; no source writes or automatic cleanup):
 
 ```sh

@@ -257,7 +257,7 @@ deny shell, edits, Code Mode, delegation, and known secret-bearing reads; `chat`
 denies project tools; `implement` cannot recursively delegate. Managed policies and
 permission denials remain binding even for `dev`.
 
-## Further reading and checks
+## Further reading
 
 - Agents and permissions: [`agents/`](agents/)
 - Commands: [`commands/`](commands/)
@@ -268,24 +268,18 @@ permission denials remain binding even for `dev`.
 - Markdown handoffs and templates: [`skills/shared/handoff.md`](skills/shared/handoff.md)
 - Independent verification and evidence collection: [`skills/shared/verification.md`](skills/shared/verification.md)
 
-Run the Markdown handoff regression checks from the repository root:
-
-```sh
-node --test tests/handoff_markdown_test.mjs
-git diff --check
-```
-
-These checks cover template structure, active references, authority/completion
-rules, report-only boundaries, and the retained evidence utility's input guards.
-They perform no worker dispatch and create no disposable resources. Preserve
-existing work and record baseline failures separately; do not weaken checks to
-manufacture green results. See the [templates](skills/shared/handoff/templates/)
-and [worked example](skills/shared/handoff/example.md) for the new format.
+Task-scoped validation tests are the default: agents create only what the current
+task needs, record actual results, and remove the test files before completion.
+Pre-existing tests and explicitly requested test deliverables remain. Run
+`git diff --check` before completion to catch whitespace errors and conflict
+markers. This repository keeps no permanent test suite; see the
+[templates](skills/shared/handoff/templates/) and
+[worked example](skills/shared/handoff/example.md) for the handoff format.
 
 <details>
 <summary>Maintenance notes</summary>
 
-Offline handoff checks do not prove live model obedience, token savings, plugin
+Static review does not prove live model obedience, token savings, plugin
 effectiveness, model-request effort, or UI behavior.
 Commands, configuration, and CLI preferences normally reload automatically; use a
 fresh session to validate role, permission, or skill changes. Plugin helper changes
