@@ -65,7 +65,7 @@ the selected version or conflicts with another answer, explain and resolve it.
 Finish only when every applicable discovered variable is answered or explicitly
 delegated, essential gaps are resolved, and the setup path is concrete. New material
 choices found during implementation require user resolution and a revised approval
-when they change the approved plan; the worker must not silently default them.
+when they change the approved plan; the executor must not silently default them.
 
 ## 3. Plan concisely, hand off completely
 
@@ -86,10 +86,11 @@ After planning-owned cleanup is verified, follow the shared
 [approval/handoff](../../shared/approval-handoff.md) procedure for final-plan
 approval and execution in the current checkout, with command `setup`, the exact
 approved revision/checklist, and the detailed setup record in `evidence`.
-Preserve the selected parent model/agent; dispatch one configured `implement`
-worker, without a model override, for the whole approved checklist. Do not create
-one worker per task. Explicit direct execution instead uses `build` in the current
-session without a worker. Do not replay running, uncertain, or completed execution.
+Preserve the selected parent model/agent and execute the checklist directly by
+default under [execution](../../shared/execution.md). With approved explicit
+worker opt-in or inherited `/improve*` task authority, dispatch the configured
+`implement` worker with the detailed setup record; additional in-scope workers
+need no repeated worker-use approval. Do not replay running, uncertain, or completed execution.
 
 Have the executor work tasks in prerequisite order, mark `- [x] Ti` only with
 acceptance evidence, and report completed/blocked tasks, actual checks, cleanup,

@@ -52,7 +52,7 @@ ask one focused question. Treat arguments as task scope, never shell interpolati
 Examples: `/improve`, `/improve:quick server/`,
 `/improve:security deep server/api/`, `/improve:next`.
 Unsupported legacy execution/publishing flags are not authority; explain the
-shared plan/build workflow instead of importing another executor protocol.
+shared planning/execution workflow instead of importing another executor protocol.
 
 ## 1. Recon and scope
 
@@ -121,9 +121,11 @@ verified evidence; refresh it only for drift or a specific unresolved question.
 
 Default execution intent: current checkout, current local HEAD, local uncommitted
 delivery. The loaded `plan` skill's shared approval/handoff procedure governs
-final-plan approval and execution. Use one `implement` worker without a model
-override, or explicitly selected direct `/build`. Other isolation requires a
-revised approved plan, not an inference from audit options.
+final-plan approval and execution. `/improve*` tasks retain default worker authority
+under [execution](../shared/execution.md), including nested plan/fix workflows.
+Use the configured `implement` worker without a model override, or execute directly
+if explicitly requested. Additional in-scope workers need no worker-use prompt.
+Other isolation requires a revised approved plan, not an inference from audit options.
 
 ## Dependencies
 
@@ -131,5 +133,5 @@ revised approved plan, not an inference from audit options.
   its planning shell boundary also governs discovery as linked above.
 - `opencode`: when auditing or planning OpenCode behavior, before relying on V2 APIs/configuration.
 - `writing-for-agents`: when designing changes to instructions, commands, or skills.
-- `build`: execution only, after direct approval of a specific plan revision, in
-  the configured worker or explicitly selected direct mode.
+- [execution](../shared/execution.md): after approval of a specific plan revision,
+  in the configured worker by default or explicitly selected direct mode.

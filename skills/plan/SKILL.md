@@ -1,6 +1,6 @@
 ---
 name: plan
-description: Create a human-readable plan and a detailed approval-bound agent handoff
+description: Plan direct execution, with a detailed handoff when workers are authorized
 metadata:
   opencode/autoinvoke: false
 ---
@@ -16,7 +16,9 @@ without silently switching the model or broadening chat's permissions.
 1. Read relevant instructions, configuration, code, and tests. Use native reads,
    search, documentation, and bounded shell discovery under the rules below.
    An `explore` call stays read-only; parent `dev` performs shell operations.
-   No implementation worker may run before approval. Read
+   Keep implementation in the current session by default under
+   [execution](../shared/execution.md); bounded helpers do not transfer task ownership.
+   No implementation may run before approval. Read
    [exploration](references/exploration.md) when delegating substantial discovery.
    Reuse sufficient worker evidence rather than reopening citations routinely.
 2. Compare viable approaches. Challenge material assumptions with evidence and
@@ -71,13 +73,15 @@ raw evidence, and command inventories unless they affect the user's decision or
 the user requests them. Keep material risks and scope visible; brevity must not
 hide a consequential choice. Add technical depth on request, not automatically.
 
-## Detailed agent handoff
+## Execution detail and optional agent handoff
 
-The user-facing plan and subagent handoff serve different audiences; do not show
-the execution brief merely to obtain approval. Prepare the detailed
+Keep sufficient execution detail in conversation for direct execution. Only when
+worker dispatch is authorized under [execution](../shared/execution.md), prepare the detailed
 [Markdown handoff](../shared/handoff.md) from the approved human plan and relevant
 evidence. Preserve its revision, assigned phases, outcomes, fixed decisions,
 acceptance, and limits; label execution detail separately from the approved plan.
+The user-facing plan and subagent handoff serve different audiences; do not show
+the execution brief merely to obtain approval.
 
 Include current/desired behavior, inspected paths/symbols, ordered implementation
 steps, invariants, dependencies, exact validation commands/expected results,
@@ -91,7 +95,7 @@ fresh-session validation in the execution brief; surface user-relevant effects i
 the human plan.
 
 For isolated plans, use local `HEAD` unless the user selects another local base.
-The worker verifies its SHA after approval; no fetch. Resolve reliance on dirty
+The executor verifies its SHA after approval; no fetch. Resolve reliance on dirty
 original-checkout work before approval; never assume it follows isolation.
 
 ## Approval and handoff
@@ -107,4 +111,5 @@ verification or explicit blockers. Skill loading never approves execution.
 
 - `opencode`: OpenCode tasks, before relying on current V2 behavior.
 - `writing-for-agents`: when designing changes to agent instructions, commands, or skills.
-- `build`: execution only, after explicit approval, in the worker or explicitly selected direct mode.
+- [execution](../shared/execution.md): after explicit approval, directly by default;
+  preserve task-scoped worker authority from explicit opt-in or `/improve*` origin.

@@ -15,10 +15,11 @@ Worker session/checkpoint: <not started, or verified attributable session/state>
 
 ## Authority and boundaries
 Approval: <actual approval text and the revision/phases it covers>
+Worker-use authority: <approved explicit opt-in and task boundary, or /improve* task origin>
 Scope: <literal paths and exclusions>
 Preserve: <existing changes and invariants>
 Operation limits: <explicit editing, branch/worktree, stage/commit/push/PR limits>
-Execution setup: <workflow build; single-worker or sequential per-todo-worker;
+Execution setup: <shared execution reference; single-worker or sequential per-todo-worker;
 original checkout; isolation/base intent;
 verified existing isolation if reused; no worker replay>
 Authorized skills: <IDs with their actual written triggers; listing is not invocation>

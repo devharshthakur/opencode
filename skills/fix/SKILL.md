@@ -79,7 +79,9 @@ Include:
   current rather than immutable; workers should not reconstruct the discussion.
 - **Todo Checklist & Dispatch Mode:** break the fix into small, checkable Markdown
   Todo items (`- [ ] T1: ...`, `- [ ] T2: ...`) with stable IDs, prerequisites, and
-  observable acceptance. Select one execution mode:
+  observable acceptance. Use `direct` by default: the current session executes the
+  checklist in order. Bounded discovery/read-only review helpers remain allowed.
+  Only when [worker execution is authorized](../shared/execution.md), select:
   - `single-worker` (small cohesive fixes, 1–2 files / one tight red-to-green loop):
     one `implement` worker executes the full Todo checklist in order.
   - `per-todo-worker` (large multi-step/multi-component fixes): one upfront approval
@@ -100,11 +102,12 @@ Include:
 
 Read and follow [approval/handoff](../shared/approval-handoff.md) for final-plan
 approval and execution handoff, using the selected isolation and actual revision.
-The selected `single-worker` or `per-todo-worker` mode governs dispatch unless
-the user explicitly selects direct execution. In `per-todo-worker` mode
+Execute directly by default; plan approval alone does not authorize dispatch.
+Explicit approved worker opt-in or inherited `/improve*` task authority enables
+`single-worker` or `per-todo-worker` without per-worker approval. In `per-todo-worker` mode
 with `branch` or `worktree` isolation, `T1` prepares `fix/<task-slug>` and `T2..Tn`
-reuse that verified isolated checkout. `/build` is the manual current-checkout
-alternative, not approval itself.
+reuse that verified isolated checkout. Direct execution prepares the same approved
+isolation itself; no additional direct-execution command is needed.
 
 **Done when:** the temporary diagnostic branch is cleaned up, original uncommitted
 work is restored on the parent branch, and a complete revision with its Markdown
@@ -115,4 +118,5 @@ Todo checklist is awaiting approval (or an exact blocker is reported).
 - `diagnosing-bugs`: root-cause reproduction and verification on `fix/diag-<slug>` and during approved execution.
 - `opencode`: OpenCode tasks, before relying on current V2 behavior.
 - `writing-for-agents`: when designing changes to agent instructions, commands, or skills.
-- `build`: execution only, after explicit approval, in the worker or explicitly selected direct mode.
+- [execution](../shared/execution.md): after explicit approval, directly by default;
+  retain explicit worker opt-in or inherited `/improve*` authority where applicable.

@@ -25,7 +25,7 @@ filesystem tools with extra MCP schemas.
 | `dev` | Primary; default | DeepSeek V4.1 Flash low; ordinary questions or direct edits |
 | `chat` | Primary | DeepSeek V4.1 Flash high; external conversation/research, no project tools |
 | `explore` | Subagent only | Muse Spark 1.3 Contributor medium; bounded cited discovery |
-| `implement` | Subagent only | DeepSeek V4.1 Flash high; approved-plan execution |
+| `implement` | Subagent only | DeepSeek V4.1 Flash high; authorized worker execution of approved plans |
 | `verify` | Subagent only | DeepSeek V4.1 Flash high; independent read-only change review |
 
 Shift+Tab cycles only `dev` and `chat`; all three workers remain discoverable subagents.
@@ -95,9 +95,12 @@ Workers return self-contained, role-specific evidence reports for parent decisio
 not activity diaries. Parent source reads are risk-based and targeted; user-facing
 summaries stay concise. Clarification can resume the attributable worker with a
 report-only Markdown request, which performs no new work. Templates are examples, not
-approval. Current dispatch defaults remain unchanged: plan approval normally uses
-`implement`, including sequential per-todo mode; explicit direct `/build` and
-`/quick` remain direct. No parallel implementers or automatic repair loop is added.
+approval. Ordinary tasks execute in the current session with its selected model;
+bounded `explore` discovery and read-only `verify` assistance remain allowed.
+Implementation dispatch needs approved explicit `@worker` or `/use:worker` opt-in,
+except `/improve*` tasks retain default worker authority through nested workflows.
+No parallel implementers or automatic repair loop is added. See
+[task execution](skills/shared/execution.md).
 
 The [review-evidence utility](skills/shared/verification.md) lets the parent collect
 scoped baseline/after artifacts in task-owned temporary storage, returning compact
@@ -117,11 +120,11 @@ expose a newly added worker. Offline checks do not prove obedience or token savi
 | --- | --- |
 | `/ask <question>` | Read-only answer; no shell, edits, or unsolicited plan |
 | `/quick <task>` | Direct execution on the current model; planning bypass |
-| `/plan <task>` | Plan; approval dispatches `implement` on the current branch |
+| `/plan <task>` | Plan; approval executes directly on the current branch |
 | `/setup <docs, URL, or setup skill references>` | Discover setup choices, prepare a concise custom plan; approval implements locally |
-| `/fix <issue>` | Root-cause diagnosis plus Todo repair plan; approval implements |
+| `/fix <issue>` | Root-cause diagnosis plus Todo repair plan; approval executes directly |
 | `/improve [scope]` | Evidence-first audit; select findings, then plan and separately approve implementation |
-| `/build [plan/phases]` | Execute an already approved plan directly |
+| `/use:worker [task]` or `@worker` | Propose worker execution; one approval covers workers needed for that task |
 | `/commit [scope]` | Approve exact files and messages before local commit |
 | `/commit:auto [scope]` | Authorize scoped local commits without routine confirmation |
 | `/pr [:<base>] [draft]` | Task-scoped commits/push and create or update a GitHub PR |
@@ -132,6 +135,26 @@ temporary `fix/diag-<slug>` branch, deletes it before asking for approval, and
 proposes a Markdown Todo checklist. Nothing here publishes, amends, merges,
 deploys, or performs destructive cleanup automatically. Full behavior lives in
 [`commands/`](commands/).
+
+### Explicit worker opt-in
+
+Use `@worker` or `/use:worker` with a task, or omit arguments to use the current
+task. Both prepare a concise approval proposal and detailed execution handoff;
+invocation alone does not dispatch. If a plan also needs approval, the proposal
+combines plan approval and worker-use approval into one reply. If the exact plan
+is already approved, only worker use needs approval.
+
+One approval authorizes worker use for the task, not a particular count. The parent
+may dispatch additional in-scope workers without asking again. Scope changes and
+new operations retain their existing approval gates. Task completion/cancellation
+ends that authority; unrelated tasks default to direct execution. `/improve*`
+does not need a separate worker-use opt-in, but still needs its normal selection
+and implementation-plan approvals. The manual-only
+[`worker` skill](skills/worker/SKILL.md) owns this opt-in workflow.
+
+The custom `/build` command and `build` skill are retired: approved plans now
+execute directly by default, using the shared execution reference. No agent model
+or tool permission configuration is changed by worker opt-in.
 
 ### Codebase improvement audits
 
@@ -163,8 +186,10 @@ reads remain available for named gaps and necessary decision/edit/review context
 Audits are read-only under the shared planning boundary. Findings appear in
 conversation; selecting IDs leads to a plan, **not implementation approval**.
 Plans/files, commits, or publication are never created implicitly. A separately
-approved plan uses the existing local `implement` handoff or explicitly selected
-direct `/build`. Current session agent/model choices are preserved. Use `dev`;
+approved plan uses the existing local `implement` handoff by default, or direct
+execution if explicitly requested. Its worker authority survives nested plan/fix
+workflows without a separate worker-use prompt. Current session agent/model choices
+are preserved. Use `dev`;
 `chat` must ask you to switch rather than silently changing profiles.
 
 Commands normally reload automatically. In a fresh `dev` session, confirm the
@@ -187,10 +212,11 @@ are not silently selected. Explicit instructions already supplied count as answe
 Missing essential sources or incompatible instructions are surfaced before approval.
 
 You receive a concise plan with confirmed choices and a Markdown Todo checklist.
-Choice confirmation is not implementation approval. Approval sends one `implement`
-worker the detailed source-backed plan for all tasks; you can explicitly request
-direct execution instead. No plan file, new agent, installs, or project edits are
-created during planning. The workflow preserves the selected model/agent and runs
+Choice confirmation is not implementation approval. Approval executes the detailed
+source-backed plan directly in the current session by default. Explicit approved
+worker opt-in or inherited `/improve*` authority enables worker execution instead.
+No plan file, new agent, installs, or project edits are created during planning.
+The workflow preserves the selected model/agent and runs
 in `dev`; cloud provisioning, destructive overwrites, production changes, commits,
 and publishing are outside the default local scope. Full setup procedure:
 [`skills/plan/references/setup.md`](skills/plan/references/setup.md).
@@ -234,7 +260,7 @@ permission denials remain binding even for `dev`.
 
 - Agents and permissions: [`agents/`](agents/)
 - Commands: [`commands/`](commands/)
-- Orchestration skills: [`skills/`](skills/) — `plan`, `fix`, `codebase-improve`, `build`, `commit`, `git-isolation`, `pr`
+- Orchestration skills: [`skills/`](skills/) — `plan`, `fix`, `codebase-improve`, `worker`, `commit`, `git-isolation`, `pr`
 - PR templates: [`skills/pr/references/templates.md`](skills/pr/references/templates.md)
 - Shared guidance: [`AGENTS.md`](AGENTS.md)
 - Markdown handoffs and templates: [`skills/shared/handoff.md`](skills/shared/handoff.md)
@@ -267,10 +293,19 @@ Git to simplify it.
 
 Fresh-session cleanup proof remains manual: exercise `/plan*` discovery with an
 owned temporary service/file and verify teardown before approval; repeat with
-implementation through `/quick` and `/build`/worker handoff. Verify a pre-existing
-service/file remains untouched, and a failed or uncertain cleanup is reported
+implementation through `/quick`, approved direct plans, and explicit worker handoff.
+Verify a pre-existing service/file remains untouched, and a failed or uncertain cleanup is reported
 without forceful escalation. Also exercise a failed task and interruption/resume.
 Use disposable local fixtures; Docker is optional, not required for offline checks.
+
+Fresh-session routing proof remains manual: approve a small `/plan` or `/fix`
+task and confirm the current model implements it (bounded `explore` is allowed).
+Check branch/worktree variants preserve their approved isolation. Invoke `@worker`
+or `/use:worker` and confirm no dispatch before approval, a detailed approved
+handoff afterward, and no repeated worker-use prompt for additional in-scope workers.
+Confirm `/improve*` still waits for selection/plan approval and retains worker
+authority through nested planning/fixing. These are instruction contracts, not
+runtime enforcement or live proof.
 
 `extensions/workflow-pilot/` remains an **inactive** historical offline experiment:
 it is not wired into active commands or dispatch. Its JSON envelope is not the

@@ -1,7 +1,7 @@
 # Task-owned resource lifecycle
 
 Read before creating disposable resources during planning or implementation,
-including direct tasks, `/quick`, `/build`, and worker execution. This protocol
+including direct tasks, `/quick`, and worker execution. This protocol
 governs cleanup, not permission to create resources or expand task scope.
 
 ## Record

@@ -13,8 +13,9 @@ Worker session: <verified attributable session ID>
 Missing or conflicting state blocks execution; never replay uncertain work.>
 
 ## Authority and boundaries
-<Actual applicable approval, plan revision/phases for implementation, scope,
-preservation, explicit operation limits, and authorized skill triggers.
+<Actual applicable approval, plan revision/phases and task-scoped worker-use
+authority for implementation, scope, preservation, explicit operation limits,
+and authorized skill triggers.
 Read-only roles retain their original restrictions.>
 
 ## Assigned remaining work

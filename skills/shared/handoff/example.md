@@ -21,6 +21,8 @@ Success: Both blank cases return the existing validation error and leave stored
 preferences untouched; valid saves and the relevant tests continue to pass.
 
 Execution: Current checkout, local HEAD, preserving unrelated changes.
+Worker mode: User requested @worker; this plan proposes worker use for this task,
+including additional in-scope workers without repeated worker-use approval.
 No isolation, staging, commits, or publishing.
 
 Ready to implement revision 2 locally, without isolation, commits, or publishing.
@@ -51,12 +53,14 @@ trimming, preserving valid saves and stored preferences on rejection.
 
 ## Authority and boundaries
 Approval: User replied "approve r2" for P1 in the current checkout.
+Worker-use authority: Explicit @worker request, approved with revision 2 for this task.
 Scope: src/preferences/service.ts and src/preferences/service.test.ts
 Preserve: All unrelated existing changes and valid-name behavior.
 Operation limits: Assigned edits/tests only; no isolation, staging, commits,
 push, PR, or production-data changes.
-Execution setup: build, current checkout, local HEAD; verify base and ownership.
-Authorized skills: build; other dependencies only at their written triggers.
+Execution setup: shared execution reference, current checkout, local HEAD;
+verify base and ownership.
+Authorized skills: Dependencies only at their written triggers.
 
 ## Relevant context
 E1: Prior inspection identified the service as owner of validation/persistence

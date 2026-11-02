@@ -36,7 +36,8 @@ Before dispatch, check:
 
 - Identity, destination, role, request/task IDs, and new-work/continuation mode agree.
 - Scope, exclusions, preservation, operation limits, and actual approval where
-  needed are explicit. Verify ownership/state; a label alone is not proof.
+  needed are explicit. Implementation also carries task-scoped worker-use
+  authority. Verify ownership/state; a label alone is not proof.
 - The assignment has bounded questions or acceptance criteria, required coverage
   or checks, and stop conditions. For implementation, the plan/Todos are the exact
   approved portion, with fixed decisions and permitted worker discretion.
@@ -64,7 +65,8 @@ task without losing their role-specific obligations.
 - [Implementation request](handoff/templates/implement.md) and
   [result](handoff/templates/implement-result.md): exact approved assigned plan,
   authority/execution boundaries, Todo snapshot, acceptance, validation, and relevant
-  evidence. Load `build` at its trigger. Preserve sequential per-todo execution;
+  evidence. Follow [execution](execution.md) with recorded task-scoped worker
+  authority. Preserve sequential per-todo execution;
   no parallel implementers, recursive delegation, or automatic repair loops.
 - [Exploration request](handoff/templates/explore.md) and
   [result](handoff/templates/explore-result.md): bounded questions, coverage,
