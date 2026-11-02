@@ -126,8 +126,8 @@ expose a newly added worker. Offline checks do not prove obedience or token savi
 | `/fix <issue>` | Root-cause diagnosis plus Todo repair plan; approval executes directly |
 | `/improve [scope]` | Evidence-first audit; select findings, then plan and separately approve implementation |
 | `/use:worker [task]` or `@worker` | Propose worker execution; one approval covers workers needed for that task |
-| `/commit [scope]` | Defaults to all current changes; approve exact files and messages before local commit |
-| `/commit:auto [scope]` | Defaults to all current changes; authorize scoped local commits without routine confirmation |
+| `/commit [scope]` | Defaults to all current changes; approve small coherent local commits as an ordered series |
+| `/commit:auto [scope]` | Defaults to all current changes; create small coherent local commits without routine confirmation |
 | `/pr [:<base>] [draft]` | Task-scoped commits/push and create or update a GitHub PR |
 
 Planning variants add explicitly approved isolation: `/plan:branch`,
