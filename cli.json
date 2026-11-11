@@ -7,7 +7,7 @@
 
   "diffs": {
     "wrap": "none",
-    "tree": false,
+    "tree": true,
     "view": "unified",
     "single": true
   },
@@ -37,7 +37,7 @@
     "sound": true,
     "volume": 0.5
   },
-  "animations": true,
+  "animations": false,
   "scroll": {
     "speed": 3,
     "acceleration": true
@@ -46,7 +46,8 @@
     "devtools": false
   },
   "terminal": {
-    "copy": "manual"
+    "copy": "select",
+    "title": true
   },
   "leader": {
     "timeout": 2750
