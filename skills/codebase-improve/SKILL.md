@@ -104,6 +104,10 @@ verification/confidence, and evidence. Rank by impact versus effort, discounted 
 uncertainty and fix risk; prerequisites precede dependent changes. State actual
 checks and coverage limits. Separate direction proposals from defect findings
 (normally 2–4 options), each grounded in repository intent or a concrete asymmetry.
+Before recommending a change to agent-facing prompts or instructions, read the
+[cross-model prompt consistency evaluation](references/cross-model-prompt-evaluation.md)
+to define observable decision criteria and a baseline; it is human-run and measures
+behavioral consistency, not identical prose.
 
 Recommend a small selection, then wait for the user to choose IDs, a subset, or
 request further investigation. Selection is not implementation approval. A bare
