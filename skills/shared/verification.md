@@ -90,14 +90,14 @@ Freshness exits 0 for matched, 1 for drifted/unverified, 2 for collection errors
    section when criteria reference their IDs. This is reference material, not execution
    authority. Claimed implementation checks are not checks the verifier performed;
    without trustworthy runtime/log evidence, report that proof as unverified.
-3. Return the Markdown verification result: findings with severity/location/evidence/impact,
+3. Return the Markdown verification result under the shared
+   [evidence and reporting requirements](handoff.md#evidence-and-parent-reports).
+   Verification-specific content: findings with severity/location/evidence/impact,
    every criterion supported/contradicted/unverified, actual checks, freshness,
-   limitations, todos, blockers, and cleanup. Provide self-contained evidence for
-   parent decisions, not an activity diary.
-   Put failed implementation criteria in findings/assessments, not review blockers.
-   Blockers describe inability to finish the review; completed reviews report none.
-   Report each root cause once, with exact excerpts/lines; do not duplicate findings
-   for the same mismatch or invent metadata/checksums to strengthen a citation.
+   limitations, todos, blockers, and cleanup. Put failed implementation criteria in
+   findings/assessments, not review blockers; blockers describe inability to finish
+   the review, and completed reviews report none. Report each root cause once and do
+   not duplicate findings for the same mismatch.
 4. The parent assesses findings, coverage, freshness, and cleanup before acceptance.
    It may return in-scope corrections to the attributable implementer under current
    approval; material changes require a revised plan/approval. A new review request

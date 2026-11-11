@@ -32,29 +32,42 @@ exclusions; no globs. External evidence still requires applicable permissions.
 
 ## Parent preflight
 
-Before dispatch, check:
+Before dispatch, check each entry:
 
-- Identity, destination, role, request/task IDs, and new-work/continuation mode agree.
-- Scope, exclusions, preservation, operation limits, and actual approval where
-  needed are explicit. Implementation also carries task-scoped worker-use
-  authority. Verify ownership/state; a label alone is not proof.
-- The assignment has bounded questions or acceptance criteria, required coverage
-  or checks, and stop conditions. For implementation, the plan/Todos are the exact
-  approved portion, with fixed decisions and permitted worker discretion.
-- Context contains relevant evidence and decisions, not the discussion transcript
-  or unnecessary source dumps. No secrets are included.
-- Clarification/stop conditions and the matching return template are supplied.
-- The configured worker/model is preserved; no override or automatic fallback.
+- Preflight identity: request ID, task ID, role, working directory, destination, and
+  new-work/continuation mode agree.
+- Preflight boundaries: literal scope, exclusions, preservation decision, operation
+  limits, and actual approval where needed are explicit.
+- Preflight assignment: bounded questions or acceptance criteria, required coverage
+  or checks, and stop conditions are present. For implementation, the plan/Todos are
+  the exact approved portion, with fixed decisions and permitted worker discretion.
+- Preflight authority: implementation carries task-scoped worker-use authority from
+  explicit opt-in or `/improve*` origin. Verify ownership and checkout state; a
+  label alone is not proof.
+- Preflight context: relevant evidence and decisions are present without the
+  discussion transcript or unnecessary source dumps. No secrets are included.
+- Preflight return: clarification/stop conditions and the matching return template are
+  supplied.
+- Preflight model: the configured worker/model is preserved; no override or automatic
+  fallback.
 
 This is a checklist preflight, not a mandatory validator command. Dispatch through
 the native tool and record the returned session ID/state. Resume an attributable
 session for gaps or authorized continuation; use a fresh session for independent
 verification. Never replay uncertain work.
 
-Before acceptance, check returned identity, required information, assigned scope,
-criterion/check evidence, Todo state, limitations, and cleanup. A successful tool
-return is not proof. Ask the attributable worker to correct missing evidence or
-identity; request report-only clarification when no new work is authorized.
+Before acceptance, check each returned entry:
+
+- Acceptance identity: returned identity, request/task IDs, role, and session agree
+  with the dispatch.
+- Acceptance scope: work and changed paths stay within the assignment; deviations and
+  gaps are explicit.
+- Acceptance evidence: required information, each criterion, and each check have
+  self-contained evidence. A successful tool return is not proof.
+- Acceptance state: Todo state, limitations, cleanup, and continuation match the
+  evidence.
+- Acceptance remediation: ask the attributable worker to correct missing evidence or
+  identity; when no new work is authorized, request report-only clarification.
 
 ## Role templates
 
@@ -103,6 +116,9 @@ decision/authority is needed. Material scope, risk, or authority changes require
 reconciliation and renewed approval as applicable.
 
 ## Evidence and parent reports
+
+This section is the canonical wording for shared evidence and reporting. Role
+references add only their specific requirements.
 
 Resolve template references from this contract's directory, not the target
 project's working directory. Filled requests identify the return template by role;

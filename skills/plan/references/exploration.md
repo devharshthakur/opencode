@@ -9,9 +9,9 @@ Supply a self-contained Markdown brief under the
 a file inventory. Use the exploration template: questions/decisions, literal path
 scope and exclusions, known evidence, required coverage, and stopping condition.
 The parent performs checklist preflight; no mandatory validator command is needed.
-Return a detailed, self-contained evidence report proportional to the question;
-prioritize decision-relevant facts over narration. Stop with partial findings
-when scope/budget is exhausted. No shell, tests,
+Return evidence under the shared
+[reporting requirements](../../shared/handoff.md#evidence-and-parent-reports),
+proportional to the question. Stop with partial findings when scope/budget is exhausted. No shell, tests,
 edits, installs, or delegation. No implementation approval is needed for this brief.
 
 For multi-step discovery, optionally supply a scoped `todos` snapshot with stable
@@ -32,17 +32,19 @@ authorizes implementation, recursive delegation, shell, or broader permissions.
 
 ## Evidence packet
 
-Use the Markdown exploration result template with decisive evidence, not just a
-summary. Keep conclusions, hypotheses, and recommendations
-separate. The child uses glob/grep and bounded reads; an exhaustive tree is not evidence of
-behavior. Include short decisive excerpts only where they support the conclusion
-or a selected plan; no file dumps. Cite exact path, symbol, line range, and current
-revision when known. Reuse inspected evidence and report omitted/truncated areas.
-State checks actually performed and their results; separate source observations,
-external-library assumptions, and hypotheses. Missing explicit configuration does
-not prove an SDK default is absent. Consult current official documentation through
-permitted tools for library-dependent claims, or identify the unresolved lookup.
-Confidence is not proof. Include relevant guards/callers and counterevidence.
+Use the Markdown exploration result template and the shared
+[evidence and reporting requirements](../../shared/handoff.md#evidence-and-parent-reports)
+for self-contained evidence, citations, checks, excerpts, and non-duplication.
+Role-specific additions:
+
+- Keep conclusions, hypotheses, and recommendations separate.
+- The child uses glob/grep and bounded reads; an exhaustive tree is not evidence of
+  behavior.
+- Missing explicit configuration does not prove an SDK default is absent. Consult
+  current official documentation through permitted tools for library-dependent
+  claims, or identify the unresolved lookup. Confidence is not proof.
+- Include relevant guards/callers and counterevidence, and report omitted or
+  truncated areas.
 
 State **sufficient for decision**, naming the decision, or identify **specific
 missing evidence** and conflicts with the unresolved question and smallest useful

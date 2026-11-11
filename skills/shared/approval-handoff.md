@@ -5,12 +5,26 @@ exactly-once execution guarantee. Tool permissions do not approve task scope.
 
 ## Record and approval
 
-Keep a compact conversation record: title/revision, repository, exact plan/phases,
-acceptance/checks, evidence, preservation decision, isolation/base intent, limits,
-authorized skills, execution mode, task-scoped worker authority if any, and worker
-ID/state if dispatched. No tracking file unless requested. States: `planning`,
-`awaiting-approval`, `approved`,
-`running`, `completed`, `blocked`, `cancelled`.
+Keep a compact conversation record, not a tracking file unless requested. Record
+these fields explicitly so a later reader does not infer them from command lineage:
+
+- Stage: `planning`, `awaiting-approval`, `approved`, `running`, `completed`,
+  `blocked`, or `cancelled`.
+- Implementation approval: `not requested`, `pending`, or `approved` with the exact
+  revision/phases and quoted approval text.
+- Execution mode: `direct` in the current session/model, or `worker`, with the
+  checkout/isolation and base intent.
+- Worker authority: `none`, `proposed`, `active` with its source, or `ended`; the
+  source is explicit `@worker`/`/use:worker` opt-in or `/improve*` task origin.
+- Next permitted action: the single action currently authorized, such as present the
+  revision, await `approve r<N>`, dispatch, execute an assigned phase, report only,
+  or stop.
+
+Also record title/revision, repository, exact plan/phases, acceptance/checks,
+evidence, preservation decision, limits, authorized skills, and worker ID/state if
+dispatched. These fields record resolved state; they do not grant it. Establish
+approval, scope, and execution authority from the actual user reply and task origin,
+not from a command name or a field left unfilled.
 
 ## Final-plan approval
 
