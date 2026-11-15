@@ -1,7 +1,7 @@
 # Lean OpenCode workflow
 
 A personal [OpenCode V2](https://opencode.ai/v2/docs/) setup for everyday
-development: two primary agents, three specialist workers, and a command set that
+development: two primary agents, four specialist workers, and a command set that
 stays out of the way until you need it.
 
 **Work in the current session with the current model, plan when a change deserves
@@ -60,22 +60,28 @@ This repository is an OpenCode config directory. It is designed to live at
 | :--- | :--- | :--- | :--- |
 | **`dev`** | Primary · default | Everyday project work, direct edits, and command-led workflows. Owns the final call. | DeepSeek V4.1 Flash · low |
 | **`chat`** | Primary | Conversation and external research. No project tools. | DeepSeek V4.1 Flash · high |
-| **`explore`** | Worker | Bounded, cited discovery. Read-only. | Muse Spark 1.3 Contributor · medium |
-| **`implement`** | Worker | Executes an approved implementation brief. | DeepSeek V4.1 Flash · high |
-| **`verify`** | Worker | Independent review of actual changes. Read-only. | DeepSeek V4.1 Flash · high |
+| **`explore`** | Worker | Bounded, cited discovery. Read-only. | Muse Spark 1.3 Contributor · high |
+| **`implement`** | Worker | Executes an approved implementation brief. | DeepSeek V4.1 Flash · max |
+| **`ui`** | Worker | Builds components, pages, and styles in the repo's existing design language. | GPT-6 Luna · high |
+| **`verify`** | Worker | Independent review of actual changes. Read-only. | DeepSeek V4.1 Flash · max |
 
-Model policy mirrors `opencode.sample.jsonc`; change it in your local config.
+Model pins live in each agent's Markdown frontmatter under `agents/`, which wins
+over an `agents.<id>.model` entry in `opencode.jsonc`. `opencode.sample.jsonc`
+records the tracked defaults.
 
 **Choosing an agent.** <kbd>Shift</kbd> + <kbd>Tab</kbd> cycles only `dev` and
-`chat`. The three workers are subagents, not modes. Agent and model selection are
+`chat`. The four workers are subagents, not modes. Agent and model selection are
 independent: switching to `chat` does not change the model, and existing sessions
 keep theirs. Use `/models` to pick a model; commands run in the current session and
 never override that choice.
 
 **Access at a glance.** `chat` has no project tools. `explore` and `verify` can
 read, but cannot run shell commands, edit, use Code Mode, delegate, or open known
-secret-bearing files. `implement` cannot recursively delegate. Managed policies and
-permission denials remain binding even for `dev`.
+secret-bearing files. `implement` cannot recursively delegate. `ui` reads and
+edits code, runs shell commands, uses the web, loads skills, and generates images;
+it cannot delegate, and private keys, certificates, and credential stores stay
+closed. Unlike `explore` and `verify`, `ui` can read `.env` files. Managed policies
+and permission denials remain binding even for `dev`.
 
 ## Commands
 
@@ -91,6 +97,22 @@ Commands run in the current session and respect the selected model. Each file in
 | `/plan <task>` | Plans first; approval implements on the current branch. |
 | `/setup <sources...>` | Works from docs, a URL, attachments, or setup skill references. Interviews you, then prepares a source-backed plan. |
 | `/create:skill <idea or context>` | Designs a project-local OpenCode skill with you before writing it. |
+
+<details>
+<summary><strong>How <code>/plan</code> works</strong></summary>
+
+The agent inspects the relevant code and configuration, then asks every decision
+the plan depends on in one batch: scope and exclusions, capabilities, naming,
+model and effort, validation depth, delivery, documentation, and execution mode.
+Each item arrives recommended-first, so a defensible choice takes one keystroke to
+accept, and anything you already decided in conversation counts as settled.
+
+You receive one complete plan with no open questions. A decision that surfaces
+later comes back to you before the plan is revised. Approval executes it directly
+in the current session; worker opt-in or inherited `/improve*` authority uses
+workers instead. Full procedure: [`skills/plan/SKILL.md`](skills/plan/SKILL.md).
+
+</details>
 
 <details>
 <summary><strong>How <code>/setup</code> works</strong></summary>
@@ -157,9 +179,10 @@ high-risk or conflicting claims rather than rereading every citation. Source rea
 remain available when a gap or decision needs them.
 
 A separately approved plan uses `implement` by default, or direct execution if you
-ask for it. That worker authorization carries through nested plan/fix workflows
-without another opt-in. Current agent and model choices are preserved. Plan files,
-commits, and publication are never created implicitly.
+ask for it. UI-heavy work can go to `ui` under the same worker gate. That worker
+authorization carries through nested plan/fix workflows without another opt-in.
+Current agent and model choices are preserved. Plan files, commits, and publication
+are never created implicitly.
 
 </details>
 
@@ -256,7 +279,7 @@ enforcement. Configured permissions are enforced separately.
 <summary><strong>Markdown handoffs</strong> — controlled briefs in, evidence out</summary>
 
 The [handoff contract](skills/shared/handoff.md) standardizes `explore`,
-`implement`, and `verify` requests and results as controlled Markdown. Named
+`implement`, `ui`, and `verify` requests and results as controlled Markdown. Named
 sections carry identity, scope, authority, assignments, acceptance, and relevant
 context. The parent session — the one that dispatched the work — runs a checklist
 preflight before dispatch and assesses returned evidence against the exact
@@ -277,6 +300,9 @@ repair loop. See [task execution](skills/shared/execution.md).
 - **`implement`** — The exact approved phase and Todo assignment, relevant
   evidence, edit brief and invariants, observable acceptance, checks, and a
   detailed evidence report. Ordinary implementation choices stay with the worker.
+- **`ui`** — The approved UI assignment, the repo's framework, styling system, and
+  existing primitives, plus the craft bar and the checks it must run. Returns the
+  implementation result template with rendered output and its limits stated.
 - **`verify`** — An independent assessment of what actually changed, not just the
   implementer's summary. Used selectively for risk, conflict, or an explicit
   request. Shell, edits, tests, and delegation stay denied; the parent retains
