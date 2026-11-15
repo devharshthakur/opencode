@@ -368,13 +368,13 @@ disable it; they use the pinned `@opencode/plugin@2.3.0` SDK.
 <details>
 <summary><strong>Independent verification</strong> — a second look when it matters</summary>
 
-The [`verification` skill](skills/shared/verification/SKILL.md) documents the review-evidence utility that collects scoped
-before-and-after artifacts in task-owned temporary storage and returns compact
-paths and digests. It preserves a dirty baseline, flags unexpected changes and
-stale evidence, excludes protected files, and reports coverage limits. Artifacts
-are real source and remain subject to permissions and privacy rules; they are not a
-secret scanner or sandbox. Cleanup is mandatory after reconciliation. There is no
-persistent ledger or active plugin.
+The [`verification` skill](skills/shared/verification/SKILL.md) defines selective
+read-only review of actual changes. The parent records a scoped working-state
+baseline in task-owned temporary storage, captures changes from that baseline after
+implementation, and binds the artifact paths, digests, freshness proof, and observed
+time in the verify request. Artifacts are real source and remain subject to
+permissions and privacy rules; they are not a secret scanner or sandbox. Cleanup is
+mandatory after reconciliation. There is no persistent ledger or active plugin.
 
 </details>
 
@@ -389,7 +389,6 @@ persistent ledger or active plugin.
 │   ├── fix/                Diagnosis and repair workflow
 │   └── shared/             Shared policy skills
 │       └── agent-handoff/  Templates and a worked example
-├── extensions/handoff/     Review-evidence helpers
 ├── plugins/                Global V2 plugins
 ├── opencode.sample.jsonc   Tracked configuration template
 ├── AGENTS.md               Shared agent guidance

@@ -24,35 +24,23 @@ Task-scoped tests may already be deleted under the [`execution` skill's test pol
 verifier cannot rerun them; recorded command output remains a claim, so report
 runtime/test proof as unverified unless an attributable run is evidenced.
 
-Parent-run utility (not a plugin; no source writes or automatic cleanup):
-
-```sh
-node extensions/handoff/review-evidence.mjs baseline "$TASK_TMP/baseline-input.json"
-node extensions/handoff/review-evidence.mjs changes "$TASK_TMP/changes-input.json"
-node extensions/handoff/review-evidence.mjs freshness "$TASK_TMP/freshness-input.json"
-```
-
-Each input may instead be stdin (`-`). Use absolute utility paths in other projects.
-Inputs are JSON utility data, not agent handoff prompts, with exact fields:
-
-- `baseline`: `repository`, `scope: {paths, excludes}`, `temp_root`.
-- `changes`: `baseline_path`, `baseline_sha256`, `temp_root`.
-- `freshness`: `manifest_path`, `manifest_sha256`.
-
-`temp_root` must exist outside the repository and not be its ancestor. Each capture
-creates one private `handoff-evidence-*` directory, returning its exact ownership
-path, manifest path/digest, IDs, changed/unexpected paths, and limitations. Record
-that path immediately, including partial directories returned on failure. Preserve
-baseline and snapshot until review, freshness, and parent reconciliation finish;
-then remove those exact task-owned directories and verify removal. The utility
-never sweeps temporary roots. Retain failure evidence in conversation, not secrets.
+The parent collects the evidence itself; there is no project utility. Before
+implementation, copy the scoped working state into one private `handoff-evidence-*`
+directory under a `temp_root` that exists outside the repository and is not its
+ancestor; after implementation, capture the same scope again and compare. Record
+immediately, including partial results from a failed capture: repository, capture
+ID, scope paths and exclusions, `temp_root`, exact directory, manifest path and
+digest, observed time, changed/unexpected paths, and limitations. Preserve baseline
+and snapshot until review, freshness, and parent reconciliation finish; then remove
+those exact task-owned directories and verify removal. Capture never sweeps
+temporary roots. Retain failure evidence in conversation, not secrets.
 
 The manifest holds working-state fingerprints plus before/after artifact paths
-(before relative to `baseline_root`; after relative to the snapshot directory).
-There is no raw diff in parent output. Parent token cost is the compact manifest
-summary; the worker reads actual artifacts. Bind the manifest digest in the verify
-request, together with the returned `snapshot_id`, `freshness`, and `observed_at`
-under the Markdown request's independent baseline/changes section. The parent runs
+(before relative to the baseline directory; after relative to the snapshot
+directory). There is no raw diff in parent output. Parent token cost is the compact
+manifest summary; the worker reads actual artifacts. Bind the manifest digest in the
+verify request, together with the capture ID, `freshness`, and `observed_at`
+under the Markdown request's independent baseline/changes section. The parent reruns
 freshness immediately before dispatch and again before
 acceptance, supplying the actual result to the verifier when needed. Verifiers
 cannot compute hashes through shell; mark freshness unverified without attributable
@@ -61,9 +49,9 @@ parent proof. Reading stale/tampered evidence never proves acceptance.
 ## Collection boundaries
 
 Content artifacts are limited to assigned paths. To flag unexpected changes, the
-local helper fingerprints nonignored, nonexcluded, nonprotected repository files;
-this is local I/O, not additional parent-model source reading. It uses fixed Git
-argument arrays, no shell, optional locks, external diffs, textconv, or hooks.
+parent fingerprints nonignored, nonexcluded, nonprotected repository files by
+read-only inspection; this is local I/O, not additional parent-model source reading.
+Capture runs with optional locks disabled and no hooks, external diffs, or textconv.
 HEAD/index changes are flagged for reconciliation. New/deleted files and file
 modes are included; pre-existing dirty work is the baseline, not claimed as edits.
 
@@ -77,11 +65,11 @@ Use scope/exclusions and existing read permissions; never use snapshots to route
 around a denied read. Sensitive config needs parent-owned field-limited sanitized
 proof or an explicit unverified criterion, not copying credentials to a neutral name.
 
-The helper must run only under the parent's authorized inspection scope. Capture
-does create disposable evidence files; it does not grant edit/test/execution scope.
+Capture must run only under the parent's authorized inspection scope. Capture does
+create disposable evidence files; it does not grant edit/test/execution scope.
 Unexpected changes, drift, incomplete coverage, or unclear attribution return to
-the parent. Exported capture/freshness functions and the CLI have the same limits.
-Freshness exits 0 for matched, 1 for drifted/unverified, 2 for collection errors.
+the parent. Report freshness as matched, drifted, or unverified; collection errors
+are limitations, never a pass.
 
 ## Review and return
 
