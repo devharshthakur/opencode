@@ -2,7 +2,7 @@
 description: Execute an approved implementation handoff and return validation evidence
 mode: subagent
 hidden: false
-model: opencode-go/deepseek-v4.1-flash#high
+model: opencode-go/deepseek-v4.1-flash#max
 permissions:
   - { action: subagent, resource: '*', effect: deny }
   - { action: browser, resource: '*', effect: deny }
