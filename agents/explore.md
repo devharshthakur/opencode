@@ -4,6 +4,7 @@ mode: subagent
 hidden: false
 permissions:
   - { action: '*', resource: '*', effect: deny }
+  - { action: skill, resource: 'caveman', effect: allow }
   - { action: external_directory, resource: '*', effect: ask }
   - { action: read, resource: '*', effect: allow }
   - { action: read, resource: '*.env', effect: deny }
