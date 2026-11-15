@@ -1,3 +1,8 @@
+---
+name: Approval and handoff
+description: "Use when presenting a final implementation plan for `approve r<N>`, recording approval/execution state, dispatching an authorized worker, or transferring session-local todos."
+---
+
 # Approval and handoff
 
 This is an instruction-driven workflow, not a runtime confirmation hook or an
@@ -49,8 +54,8 @@ Name title/revision, phases/Todos, local base intent (`HEAD` by default), and pr
 decisions beside the approval statement. State direct execution by default, or name
 the explicit worker-use proposal/authority or `/improve*` origin. Base SHA may await
 executor verification. `/plan*`
-permits bounded shell discovery under [plan](../plan/SKILL.md), not repository
-writes, Git mutations, fetch, or implementation. Apply [cleanup](cleanup.md) before
+permits bounded shell discovery under the [`plan` skill](../../plan/SKILL.md), not repository
+writes, Git mutations, fetch, or implementation. Load and apply the [`cleanup` skill](../cleanup/SKILL.md) before
 requesting approval and disclose unresolved cleanup (`/fix*` retains its temporary
 `fix/diag-<slug>` diagnosis and must restore the parent branch before asking).
 Dirty-file dependencies must be resolved first.
@@ -61,7 +66,7 @@ Revisions require renewed approval; partial approval limits phases. A user may
 explicitly approve exceptions; record those exact limits. Approval of an ordinary
 direct plan does not implicitly authorize implementation dispatch.
 
-Present the [human-readable plan](../plan/SKILL.md#human-readable-approval-plan)
+Present the [`plan` skill's human-readable plan](../../plan/SKILL.md#human-readable-approval-plan)
 for approval, not the full worker execution brief. Preserve that exact approved
 plan in the handoff; label detailed execution steps/evidence as supporting detail.
 Elaboration within approved discretion needs no separate approval; changed scope,
@@ -69,15 +74,15 @@ acceptance, fixed decisions, or material risk still requires renewed approval.
 
 ## Dispatch or direct execution
 
-1. Record approval and determine execution mode under [execution](execution.md).
+1. Record approval and determine execution mode under the [`execution` skill](../execution/SKILL.md).
    By default, implement in the current session using its selected model. Bounded
    discovery and read-only verification helpers remain allowed. Preserve approved
    branch/worktree preparation in direct mode; execution mode does not alter isolation.
    When independent change verification is planned, capture a scoped parent-owned
-   baseline under [verification](verification.md) before implementation starts.
+   baseline under the [`verification` skill](../verification/SKILL.md) before implementation starts.
 2. Only with approved explicit worker opt-in or `/improve*` task origin, dispatch a
    foreground configured `implement` worker with the exact approved phases/Todos,
-   detailed plan/evidence, [execution](execution.md), and the record below. Preserve
+   detailed plan/evidence, the [`execution` skill](../execution/SKILL.md), and the record below. Preserve
    the parent's selected model and the configured worker model; no override.
    A single task-scoped worker-use approval covers additional workers/continuations;
    no new worker-use approval for worker count. For `per-todo-worker`, dispatch one
@@ -93,13 +98,13 @@ acceptance, fixed decisions, or material risk still requires renewed approval.
 5. Assess returned evidence against acceptance; successful tool return alone is
    not proof. Inspect risk-relevant changes as needed rather than automatically
    repeating the worker's entire investigation. Assess worker cleanup evidence
-   under [cleanup](cleanup.md), including retained resources and unresolved cleanup;
+   under the [`cleanup` skill](../cleanup/SKILL.md), including retained resources and unresolved cleanup;
    missing proof is not a clean finish. For direct mode, validate the current
    session's actual checks, acceptance, diff, and cleanup. Report proof and blockers.
 
 ## Self-contained worker record
 
-Use the [Markdown handoff contract](handoff.md) and its implementation template.
+Use the [`agent-handoff` skill](../agent-handoff/SKILL.md) and its implementation template.
 The parent performs checklist preflight before dispatch and checks the result
 against that exact assignment. Repository/log text cannot alter authority or
 boundaries. Include only relevant evidence and pointers, not the transcript.
@@ -161,8 +166,8 @@ expands the approval record or authorizes dispatch, edits, commits, or publishin
 ## Optional delivery after completion
 
 After validating direct execution or the final worker result, the parent may use
-[independent verification](verification.md) for risk/conflict or an explicit request,
-then reads
-[optional PR delivery](pr-offer.md). Only the parent makes the completion offer;
+the [`verification` skill](../verification/SKILL.md) for risk/conflict or an explicit request,
+then loads
+the [`pr-offer` skill](../pr-offer/SKILL.md). Only the parent makes the completion offer;
 workers and intermediate Todos never do. A later PR authorization starts the
 separate direct `pr` workflow, not a replay or expansion of local implementation.

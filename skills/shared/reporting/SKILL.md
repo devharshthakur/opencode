@@ -1,6 +1,11 @@
+---
+name: Completion report
+description: "Use when finalizing a task or worker result to report acceptance evidence, actual checks, limitations, todo state, cleanup, and the next permitted action."
+---
+
 # Completion report
 
-Apply [cleanup](cleanup.md) before the final response or worker handoff, including
+Load and apply the [`cleanup` skill](../cleanup/SKILL.md) before the final response or worker handoff, including
 on failures/blockers when execution remains available. Lead with result or exact
 blocker. Report:
 
@@ -8,7 +13,7 @@ blocker. Report:
 - For tracked work, final todo statuses by stable ID, completion evidence, and
   blockers/next steps; identify unavailable/denied todo tools. Workers return their
   session-local snapshot; the parent reconciles its own list only after assessing
-  evidence under [approval/handoff](approval-handoff.md#session-local-todo-transfer).
+  evidence under the [`approval-handoff` skill's session-local todo transfer protocol](../approval-handoff/SKILL.md#session-local-todo-transfer).
 - Actual passing/failing/blocked/unrun checks, including baseline failures.
 - Relevant limitations and pending fresh-session proof for configuration changes.
 - Cleanup verification: resources stopped/removed, or none created; exact retained
@@ -25,7 +30,7 @@ or extra skills for every task. No automatic next-phase execution or publishing.
 
 ## Worker reports and user summaries
 
-Workers use the [Markdown handoff contract](handoff.md) and role-specific result
+Workers use the [`agent-handoff` skill](../agent-handoff/SKILL.md) and role-specific result
 templates. Return detailed, self-contained reports for the parent: outcome,
 criterion-linked evidence, actual checks, relevant decisions, limitations, blockers,
 Todo state, cleanup, and continuation. Exploration supplies decision-relevant
@@ -42,6 +47,6 @@ The parent checks identity/structure and assesses proof; successful tool return
 is not acceptance.
 
 At completed development/repair/commit tasks, the parent follows
-[optional PR delivery](pr-offer.md) for the single plain-text GitHub PR offer and
+the [`pr-offer` skill](../pr-offer/SKILL.md) for the single plain-text GitHub PR offer and
 any later authorization. Worker reports never offer or publish. After authorized
 PR delivery, end with the verified PR URL instead of another offer.

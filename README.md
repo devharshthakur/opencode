@@ -217,7 +217,7 @@ selection and implementation-plan approvals. The manual-only
 
 Worker opt-in changes who executes; it does not change agent models or tool
 permissions. Without explicit opt-in, approved plans execute directly by default
-using the shared [execution policy](skills/shared/execution.md); `/improve*` plans
+using the [`execution` skill](skills/shared/execution/SKILL.md); `/improve*` plans
 use their inherited worker authority instead. The old `/build` command and `build`
 skill are retired.
 
@@ -248,7 +248,7 @@ Approval is narrow, visible, and tied to the action at hand.
   never expands scope.
 - Cleanup is a completion gate: clean up and verify task-owned resources, or report
   the exact failure. Pre-existing resources and intended deliverables stay
-  untouched. See the [resource lifecycle](skills/shared/cleanup.md).
+  untouched. See the [`cleanup` skill](skills/shared/cleanup/SKILL.md).
 
 ## Guardrails
 
@@ -278,7 +278,7 @@ enforcement. Configured permissions are enforced separately.
 <details>
 <summary><strong>Markdown handoffs</strong> — controlled briefs in, evidence out</summary>
 
-The [handoff contract](skills/shared/handoff.md) standardizes `explore`,
+The [`agent-handoff` skill](skills/shared/agent-handoff/SKILL.md) standardizes `explore`,
 `implement`, `ui`, and `verify` requests and results as controlled Markdown. Named
 sections carry identity, scope, authority, assignments, acceptance, and relevant
 context. The parent session — the one that dispatched the work — runs a checklist
@@ -291,7 +291,7 @@ safeguards cannot. Templates are examples, not approval. Workers return
 self-contained evidence reports, not activity diaries, while user-facing summaries
 stay concise. Clarification can resume the same worker with a report-only request
 that performs no new work. There are no parallel implementers and no automatic
-repair loop. See [task execution](skills/shared/execution.md).
+repair loop. See the [`execution` skill](skills/shared/execution/SKILL.md).
 
 - **`explore`** — Decisive excerpts with provenance, callers and guards,
   counterevidence, coverage, and whether the evidence is sufficient for the
@@ -330,7 +330,7 @@ approval checklists stay visible; no tracker file is required. If todo tools are
 unavailable or denied, conversational tracking is the fallback. Continued sessions
 reconcile existing progress before importing, never replaying completed or
 uncertain work. See the
-[todo transfer protocol](skills/shared/approval-handoff.md#session-local-todo-transfer).
+[todo transfer protocol](skills/shared/approval-handoff/SKILL.md#session-local-todo-transfer).
 
 Current V2 tools and permissions docs do not yet describe this experimental tool. In
 a fresh session, confirm that `todowrite` is available to all five roles while
@@ -368,7 +368,7 @@ disable it; they use the pinned `@opencode/plugin@2.3.0` SDK.
 <details>
 <summary><strong>Independent verification</strong> — a second look when it matters</summary>
 
-The [review-evidence utility](skills/shared/verification.md) collects scoped
+The [`verification` skill](skills/shared/verification/SKILL.md) documents the review-evidence utility that collects scoped
 before-and-after artifacts in task-owned temporary storage and returns compact
 paths and digests. It preserves a dirty baseline, flags unexpected changes and
 stale evidence, excludes protected files, and reports coverage limits. Artifacts
@@ -384,11 +384,11 @@ persistent ledger or active plugin.
 .
 ├── agents/                 Primary agents and worker personas
 ├── commands/               Slash commands
-├── skills/                 Workflow skills and shared contracts
+├── skills/                 Workflow skills and shared policy skills
 │   ├── plan/               Planning and setup workflows
 │   ├── fix/                Diagnosis and repair workflow
-│   └── shared/             Execution, handoff, verification, cleanup, and PR rules
-│       └── handoff/        Templates and a worked example
+│   └── shared/             Shared policy skills
+│       └── agent-handoff/  Templates and a worked example
 ├── extensions/handoff/     Review-evidence helpers
 ├── plugins/                Global V2 plugins
 ├── opencode.sample.jsonc   Tracked configuration template
@@ -407,12 +407,15 @@ Other workflow skills under `skills/` include `worker`, `commit`, `git-isolation
 | Commands | [`commands/`](commands/) |
 | Orchestration skills | [`skills/`](skills/) |
 | Shared guidance | [`AGENTS.md`](AGENTS.md) |
-| Execution policy | [`skills/shared/execution.md`](skills/shared/execution.md) |
-| Markdown handoffs | [`skills/shared/handoff.md`](skills/shared/handoff.md) |
-| Handoff templates | [`skills/shared/handoff/templates/`](skills/shared/handoff/templates/) |
-| Worked handoff example | [`skills/shared/handoff/example.md`](skills/shared/handoff/example.md) |
-| Verification and evidence | [`skills/shared/verification.md`](skills/shared/verification.md) |
-| Resource cleanup | [`skills/shared/cleanup.md`](skills/shared/cleanup.md) |
+| Task execution | [`skills/shared/execution/SKILL.md`](skills/shared/execution/SKILL.md) |
+| Approval and handoff | [`skills/shared/approval-handoff/SKILL.md`](skills/shared/approval-handoff/SKILL.md) |
+| Markdown handoffs | [`skills/shared/agent-handoff/SKILL.md`](skills/shared/agent-handoff/SKILL.md) |
+| Handoff templates | [`skills/shared/agent-handoff/templates/`](skills/shared/agent-handoff/templates/) |
+| Worked handoff example | [`skills/shared/agent-handoff/example.md`](skills/shared/agent-handoff/example.md) |
+| Verification and evidence | [`skills/shared/verification/SKILL.md`](skills/shared/verification/SKILL.md) |
+| Resource cleanup | [`skills/shared/cleanup/SKILL.md`](skills/shared/cleanup/SKILL.md) |
+| Optional PR delivery | [`skills/shared/pr-offer/SKILL.md`](skills/shared/pr-offer/SKILL.md) |
+| Completion report | [`skills/shared/reporting/SKILL.md`](skills/shared/reporting/SKILL.md) |
 | PR templates | [`skills/pr/references/templates.md`](skills/pr/references/templates.md) |
 | Skill authoring | [`skills/create-skill/SKILL.md`](skills/create-skill/SKILL.md) |
 | Setup procedure | [`skills/plan/references/setup.md`](skills/plan/references/setup.md) |

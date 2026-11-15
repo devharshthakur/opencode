@@ -63,7 +63,7 @@ about commit messages does not approve staging.
 3. Verify each hash, complete message, included files, the final remaining changes,
    and staged status. Report actual validation and leave commits local.
 
-At standalone completion, follow [optional PR delivery](../shared/pr-offer.md).
+At standalone completion, load and follow the [`pr-offer` skill](../shared/pr-offer/SKILL.md).
 When invoked inside `pr`, return local commit evidence to that workflow instead;
 do not emit an inner completion offer or independently publish.
 

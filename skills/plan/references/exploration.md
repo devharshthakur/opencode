@@ -5,12 +5,12 @@ For an already-known small file, read it directly. Use the configured `explore`
 agent without a model override; no automatic paid/alternative-model fallback.
 
 Supply a self-contained Markdown brief under the
-[agent handoff contract](../../shared/handoff.md), scoped to a decision rather than
+[`agent-handoff` skill](../../shared/agent-handoff/SKILL.md), scoped to a decision rather than
 a file inventory. Use the exploration template: questions/decisions, literal path
 scope and exclusions, known evidence, required coverage, and stopping condition.
 The parent performs checklist preflight; no mandatory validator command is needed.
-Return evidence under the shared
-[reporting requirements](../../shared/handoff.md#evidence-and-parent-reports),
+Return evidence under the
+[`agent-handoff` skill's evidence and reporting requirements](../../shared/agent-handoff/SKILL.md#evidence-and-parent-reports),
 proportional to the question. Stop with partial findings when scope/budget is exhausted. No shell, tests,
 edits, installs, or delegation. No implementation approval is needed for this brief.
 
@@ -20,7 +20,7 @@ session and returns final statuses with its evidence packet; otherwise it create
 its own scoped progress list. This is session metadata, not permission for edits
 or execution. Use the status/projection, continuation, fallback, and parent
 reconciliation rules in
-[session-local todo transfer](../../shared/approval-handoff.md#session-local-todo-transfer);
+the [`approval-handoff` skill's session-local todo transfer](../../shared/approval-handoff/SKILL.md#session-local-todo-transfer);
 implementation approval/phase requirements there do not apply to read-only briefs.
 
 Give independent children distinct questions/scopes; disclose unavoidable overlap.
@@ -32,8 +32,8 @@ authorizes implementation, recursive delegation, shell, or broader permissions.
 
 ## Evidence packet
 
-Use the Markdown exploration result template and the shared
-[evidence and reporting requirements](../../shared/handoff.md#evidence-and-parent-reports)
+Use the Markdown exploration result template and the
+[`agent-handoff` skill's evidence and reporting requirements](../../shared/agent-handoff/SKILL.md#evidence-and-parent-reports)
 for self-contained evidence, citations, checks, excerpts, and non-duplication.
 Role-specific additions:
 

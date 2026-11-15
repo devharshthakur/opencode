@@ -1,3 +1,8 @@
+---
+name: Independent verification
+description: "Use when planning or performing selective read-only review of high-risk, conflicting, or explicitly requested changes, including parent-owned before/after evidence and freshness."
+---
+
 # Independent verification
 
 Use configured `verify` selectively for high-risk/cross-cutting changes,
@@ -6,8 +11,8 @@ discovery and named gaps. The parent keeps acceptance and dispatch decisions.
 
 ## Prepare independently collected evidence
 
-Follow the [Markdown contract](handoff.md). Before implementation, the parent records
-resource ownership under [cleanup](cleanup.md) and captures a scoped working-state
+Follow the [`agent-handoff` skill](../agent-handoff/SKILL.md). Before implementation, the parent records
+resource ownership under the [`cleanup` skill](../cleanup/SKILL.md) and captures a scoped working-state
 baseline; after implementation, capture changes from that baseline, **not just
 HEAD**. The shell-denied verifier reads these actual before/after artifacts and
 relevant current source; the implementer's summary is only a claim to check.
@@ -15,8 +20,7 @@ If review is selected only afterward and no attributable baseline exists, report
 that gap. A targeted current-source `explore` assessment may still be useful, but
 must not masquerade as a complete before/after review or invent a snapshot.
 
-Task-scoped tests may already be deleted under the [execution
-policy](execution.md#task-scoped-validation-tests). Without test artifacts the
+Task-scoped tests may already be deleted under the [`execution` skill's test policy](../execution/SKILL.md#task-scoped-validation-tests). Without test artifacts the
 verifier cannot rerun them; recorded command output remains a claim, so report
 runtime/test proof as unverified unless an attributable run is evidenced.
 
@@ -90,8 +94,8 @@ Freshness exits 0 for matched, 1 for drifted/unverified, 2 for collection errors
    section when criteria reference their IDs. This is reference material, not execution
    authority. Claimed implementation checks are not checks the verifier performed;
    without trustworthy runtime/log evidence, report that proof as unverified.
-3. Return the Markdown verification result under the shared
-   [evidence and reporting requirements](handoff.md#evidence-and-parent-reports).
+3. Return the Markdown verification result under the
+   [`agent-handoff` skill's evidence and reporting requirements](../agent-handoff/SKILL.md#evidence-and-parent-reports).
    Verification-specific content: findings with severity/location/evidence/impact,
    every criterion supported/contradicted/unverified, actual checks, freshness,
    limitations, todos, blockers, and cleanup. Put failed implementation criteria in

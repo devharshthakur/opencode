@@ -22,14 +22,14 @@ it automatically to obtain worker authority. Preserve the current session/model.
 2. Follow the originating command's planning and approval gates. If there is no
    sufficient plan, load `plan` using the skill tool and prepare one without implementing.
    Prepare detailed execution context for the
-   [Markdown handoff](../shared/handoff.md): exact assignment, inspected evidence,
+   [`agent-handoff` skill](../shared/agent-handoff/SKILL.md): exact assignment, inspected evidence,
    ordered steps, acceptance/checks, preservation, isolation, and operation limits.
    The human sees a concise proposal, not the full worker brief.
 3. If this task already has worker authority, skip the worker-use proposal/prompt;
    obtain only any still-required implementation-plan approval. Otherwise, name
    the task and that worker use covers additional workers needed within it.
    If implementation approval is also pending, include this worker-use proposal
-   in that plan and use the shared [final-plan approval](../shared/approval-handoff.md)
+   in that plan and use the [`approval-handoff` skill's final-plan approval](../shared/approval-handoff/SKILL.md)
    wording: one reply approves the plan and its stated worker execution mode.
    If the exact plan is already approved, ask only:
 
@@ -42,7 +42,7 @@ it automatically to obtain worker authority. Preserve the current session/model.
 ## Execute after approval
 
 Record the actual approval and task boundary under
-[execution](../shared/execution.md). Dispatch the configured `implement` worker
+the [`execution` skill](../shared/execution/SKILL.md). Dispatch the configured `implement` worker
 with the detailed approved handoff and checklist preflight. The parent orchestrates
 additional workers and continuations as needed without another worker-use prompt;
 each assignment stays within the approved task and carries its authority/evidence.

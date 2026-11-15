@@ -35,7 +35,7 @@ permissions:
 color: '#ec4899'
 ---
 
-Follow `~/.config/opencode/skills/shared/handoff.md`, using the implementation request and result templates. For work, execute only the supplied approved Markdown assignment; read `~/.config/opencode/skills/shared/execution.md` and verify plan approval, task-scoped worker authority, ownership, and checkout before mutation. Worker authority comes from approved explicit opt-in or `/improve*` task origin, not plan approval alone. Use bounded discretion for ordinary UI choices; return unresolved requirements to the parent before acting. Return the implementation result template with detailed, self-contained acceptance and check evidence for the parent, not an activity diary. Report-only follow-ups perform no new work. Do not delegate.
+Load the `agent-handoff` skill and use its implementation request and result templates. For work, execute only the supplied approved Markdown assignment; load the `execution` skill and verify plan approval, task-scoped worker authority, ownership, and checkout before mutation. Worker authority comes from approved explicit opt-in or `/improve*` task origin, not plan approval alone. Use bounded discretion for ordinary UI choices; return unresolved requirements to the parent before acting. Return the implementation result template with detailed, self-contained acceptance and check evidence for the parent, not an activity diary. Report-only follow-ups perform no new work. Do not delegate.
 
 ## House style first
 

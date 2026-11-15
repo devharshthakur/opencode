@@ -1,13 +1,18 @@
+---
+name: Agent handoff contract
+description: "Use when preparing, consuming, or reconciling explore, implement, ui, or verify Markdown handoffs and continuations, including templates, checklist preflight, and evidence reports."
+---
+
 # Agent handoff contract
 
 Load when preparing, consuming, or reconciling an `explore`, `implement`, or
-`verify` assignment or follow-up. This contract governs communication, not
-[approval/dispatch](approval-handoff.md), command scope, or tool permissions.
+`verify` assignment or follow-up. This contract governs communication, not approval or dispatch in the
+[`approval-handoff` skill](../approval-handoff/SKILL.md), command scope, or tool permissions.
 
 ## Format and source of truth
 
 Send a self-contained Markdown brief as the native `subagent.prompt`, using the
-matching [template](handoff/templates/). Templates are adaptable starting points,
+matching [template](templates/). Templates are adaptable starting points,
 not rigid forms: rename, reorder, merge, or add sections to fit the task, and omit
 inapplicable optional sections. Preserve required information with clear labels:
 identity, authority/boundaries, assignment, relevant evidence, acceptance/coverage,
@@ -75,30 +80,30 @@ The default headings aid readability; preflight checks meaning and completeness,
 not exact heading names or order. Adapt request and result layouts to the current
 task without losing their role-specific obligations.
 
-- [Implementation request](handoff/templates/implement.md) and
-  [result](handoff/templates/implement-result.md): exact approved assigned plan,
+- [Implementation request](templates/implement.md) and
+  [result](templates/implement-result.md): exact approved assigned plan,
   authority/execution boundaries, Todo snapshot, acceptance, validation, and relevant
-  evidence. Follow [execution](execution.md) with recorded task-scoped worker
+  evidence. Follow the [`execution` skill](../execution/SKILL.md) with recorded task-scoped worker
   authority. Preserve sequential per-todo execution;
   no parallel implementers, recursive delegation, or automatic repair loops.
-- [Exploration request](handoff/templates/explore.md) and
-  [result](handoff/templates/explore-result.md): bounded questions, coverage,
+- [Exploration request](templates/explore.md) and
+  [result](templates/explore-result.md): bounded questions, coverage,
   evidence, exclusions, stopping conditions, and decision sufficiency. Follow
-  [bounded exploration](../plan/references/exploration.md).
-- [Verification request](handoff/templates/verify.md) and
-  [result](handoff/templates/verify-result.md): independently collected baseline,
+  [bounded exploration](../../plan/references/exploration.md).
+- [Verification request](templates/verify.md) and
+  [result](templates/verify-result.md): independently collected baseline,
   after artifacts, freshness proof, criteria, and read-only limits. Follow
-  [verification](verification.md). An implementer's report is a claim to check.
-- [Continuation](handoff/templates/continue.md) and
-  [report-only](handoff/templates/report.md): separate new execution from expanding
+  the [`verification` skill](../verification/SKILL.md). An implementer's report is a claim to check.
+- [Continuation](templates/continue.md) and
+  [report-only](templates/report.md): separate new execution from expanding
   existing observations. See continuation rules below.
 
 For an example of a filled request and result, see the
-[worked example](handoff/example.md). It is illustrative, not execution authority.
+[worked example](example.md). It is illustrative, not execution authority.
 
 ## Decisions and clarification
 
-The [human approval plan](../plan/SKILL.md#human-readable-approval-plan) is concise
+The [`plan` skill's human approval plan](../../plan/SKILL.md#human-readable-approval-plan) is concise
 and decision-oriented. The subagent assignment is a separate, detailed execution
 brief. Include the exact approved assigned plan/revision and label supporting
 execution detail separately. Expand only within approved scope, fixed decisions,
@@ -142,7 +147,7 @@ Checks are `passed`, `failed`, `blocked`, or `unrun`; include actual command/che
 result, and decisive output. Declare baseline failures separately. Static evidence
 does not prove runtime behavior. Completed Todos require acceptance evidence;
 cancellation needs explicit authority. Follow
-[Todo transfer](approval-handoff.md#session-local-todo-transfer).
+the [`approval-handoff` skill's todo transfer](../approval-handoff/SKILL.md#session-local-todo-transfer).
 
 Implementation status is `completed`, `partial`, or `blocked`. `completed` requires
 proved acceptance, satisfied required checks, and verified cleanup. Useful edits
@@ -155,7 +160,7 @@ claims, missing proof, necessary edit context, or purposeful spot checks—not
 routine repetition of sufficient investigation. A suggested parent read names the
 question and exact bounded location; explicitly say when none is needed. No
 measured token savings or model obedience is implied. Keep the user-facing summary
-concise under [reporting](reporting.md).
+concise under the [`reporting` skill](../reporting/SKILL.md).
 
 ## Continuation and transition
 

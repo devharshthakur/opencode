@@ -9,7 +9,7 @@ metadata:
 
 ## Establish authority and target
 
-1. Read [PR offer/authorization](../shared/pr-offer.md). Require explicit `/pr`
+1. Load the [`pr-offer` skill](../shared/pr-offer/SKILL.md). Require explicit `/pr`
    invocation or a direct reply to the pending offer, with attributable task scope.
    Preserve the current model; execute directly in `dev`, without workers. In
    `chat`, ask the user to select `dev` instead of broadening permissions.

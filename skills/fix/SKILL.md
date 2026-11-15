@@ -83,7 +83,7 @@ Include:
   Todo items (`- [ ] T1: ...`, `- [ ] T2: ...`) with stable IDs, prerequisites, and
   observable acceptance. Use `direct` by default: the current session executes the
   checklist in order. Bounded discovery/read-only review helpers remain allowed.
-  Only when [worker execution is authorized](../shared/execution.md), select:
+  Only when worker execution is authorized under the [`execution` skill](../shared/execution/SKILL.md), select:
   - `single-worker` (small cohesive fixes, 1–2 files / one tight red-to-green loop):
     one `implement` worker executes the full Todo checklist in order.
   - `per-todo-worker` (large multi-step/multi-component fixes): one upfront approval
@@ -102,7 +102,7 @@ Include:
 
 ## Approval and handoff
 
-Read and follow [approval/handoff](../shared/approval-handoff.md) for final-plan
+Load and follow the [`approval-handoff` skill](../shared/approval-handoff/SKILL.md) for final-plan
 approval and execution handoff, using the selected isolation and actual revision.
 Execute directly by default; plan approval alone does not authorize dispatch.
 Explicit approved worker opt-in or inherited `/improve*` task authority enables
@@ -120,5 +120,5 @@ Todo checklist is awaiting approval (or an exact blocker is reported).
 - `diagnosing-bugs`: root-cause reproduction and verification on `fix/diag-<slug>` and during approved execution.
 - `opencode`: OpenCode tasks, before relying on current V2 behavior.
 - `writing-for-agents`: when designing changes to agent instructions, commands, or skills.
-- [execution](../shared/execution.md): after explicit approval, directly by default;
+- [`execution`](../shared/execution/SKILL.md): after explicit approval, directly by default;
   retain explicit worker opt-in or inherited `/improve*` authority where applicable.

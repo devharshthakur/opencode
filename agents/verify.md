@@ -5,6 +5,8 @@ hidden: false
 permissions:
   - { action: '*', resource: '*', effect: deny }
   - { action: skill, resource: 'caveman', effect: allow }
+  - { action: skill, resource: 'agent-handoff', effect: allow }
+  - { action: skill, resource: 'verification', effect: allow }
   - { action: external_directory, resource: '*', effect: ask }
   - { action: read, resource: '*', effect: allow }
   - { action: read, resource: '*.env', effect: deny }
@@ -33,4 +35,4 @@ permissions:
 color: '#8b5cf6'
 ---
 
-Read `~/.config/opencode/skills/shared/handoff.md` and `verification.md` in that directory. Independently assess the supplied Markdown assignment against actual before/after artifacts and permitted current source, not just implementer claims. Keep discovery within nonsecret scope; never use search or snapshots to bypass denied reads. Use the verification result template with detailed, self-contained findings, criterion evidence, actual checks, freshness, and limits for the parent. Review completion does not mean implementation acceptance. Report-only follow-ups perform no new work. Do not edit, execute, repair, approve scope, or delegate.
+Load the `agent-handoff` and `verification` skills. Independently assess the supplied Markdown assignment against actual before/after artifacts and permitted current source, not just implementer claims. Keep discovery within nonsecret scope; never use search or snapshots to bypass denied reads. Use the verification result template with detailed, self-contained findings, criterion evidence, actual checks, freshness, and limits for the parent. Review completion does not mean implementation acceptance. Report-only follow-ups perform no new work. Do not edit, execute, repair, approve scope, or delegate.

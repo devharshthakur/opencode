@@ -1,3 +1,8 @@
+---
+name: Optional PR delivery
+description: "Use only after a completed development, repair, or commit task to inspect GitHub hosting and make the single offered PR authorization request or interpret a direct affirmative reply."
+---
+
 # Optional GitHub PR delivery
 
 ## Offer once at completion

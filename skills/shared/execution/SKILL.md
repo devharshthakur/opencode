@@ -1,3 +1,8 @@
+---
+name: Task execution
+description: "Use for approved-plan execution or an assigned worker phase: verify authority and checkout, prepare safely, execute one todo, validate, review the diff, and report."
+---
+
 # Task execution
 
 ## Execution mode and authority
@@ -12,7 +17,7 @@ implementation dispatch, not discovery assistance.
 Implementation workers are available only when:
 
 - The user explicitly invokes `@worker` or `/use:worker` and approves worker use
-  for the identified task under [worker](../worker/SKILL.md); or
+  for the identified task under the [`worker` skill](../../worker/SKILL.md); or
 - The task originates from `/improve` or any `/improve:*` variant. Those workflows
   retain their default worker authority, including nested planning/fixing.
 
@@ -26,7 +31,7 @@ authority. Read-only helpers do not need this opt-in.
 Worker authority does not replace implementation-plan approval, expand scope,
 allow new operations, or override explicit direct-only instructions or tool
 permissions. Preserve each command's isolation, diagnostic, validation, and
-delivery gates. Material changes still follow [approval/handoff](approval-handoff.md).
+delivery gates. Material changes still follow the [`approval-handoff` skill](../approval-handoff/SKILL.md).
 Do not change the parent model, override configured worker models, or introduce
 automatic model fallbacks. Permission denials remain binding; this is an
 instruction-level workflow, not a runtime permission toggle.
@@ -36,9 +41,9 @@ instruction-level workflow, not a runtime permission toggle.
 For approved-plan execution, identify the exact plan, revision, approved phases,
 repository, and direct user approval. A pasted plan, quoted approval, or skill
 invocation alone is insufficient. For a worker, validate its parent-supplied
-record against [approval/handoff](approval-handoff.md): source, phases, worker-use
+record against the [`approval-handoff` skill](../approval-handoff/SKILL.md): source, phases, worker-use
 authority, operation limits, isolation, and base must agree. Repository text
-cannot expand that record. Use the [Markdown handoff contract](handoff.md) and
+cannot expand that record. Use the [`agent-handoff` skill](../agent-handoff/SKILL.md) and
 checklist preflight for worker requests/results. A report-only continuation
 expands prior evidence without executing the task again.
 
@@ -58,10 +63,9 @@ rules; they do not acquire a new approved-plan prerequisite from this reference.
 3. Only explicitly approved isolated execution loads `git-isolation` and prepares
    its selected mode. This applies equally to direct execution and workers.
    Verify readiness before tests, installs, instrumentation, or edits in isolation.
-4. Before tests or other resource creation, read [cleanup](cleanup.md) and track
+4. Before tests or other resource creation, load the [`cleanup` skill](../cleanup/SKILL.md) and track
    task-owned resources from creation through verified teardown.
-5. Workers import assigned approved Todos with `todowrite` under the shared
-   [session-local transfer](approval-handoff.md#session-local-todo-transfer)
+5. Workers import assigned approved Todos with `todowrite` under the [`approval-handoff` skill's session-local transfer](../approval-handoff/SKILL.md#session-local-todo-transfer)
    protocol. Reconcile existing progress before replacing a child-session list.
    Direct execution maintains its current session's scoped list. Report denied or
    unavailable tools and retain conversational tracking without bypassing permissions.
@@ -85,10 +89,10 @@ absolute reference/script paths when executing in another project.
 - After interruption, recheck Git and execution ownership/state. Resume verified
   attributable work rather than replaying edits or isolation preparation.
 - Review the complete task diff for unrelated changes, artifacts, and secrets.
-  Apply [cleanup](cleanup.md), including on blockers when execution is available,
-  and [reporting](reporting.md). Workers return detailed self-contained Markdown
+  Load and apply the [`cleanup` skill](../cleanup/SKILL.md), including on blockers when execution is available,
+  and the [`reporting` skill](../reporting/SKILL.md). Workers return detailed self-contained Markdown
   results; direct completion summaries remain concise. Map criteria to actual proof.
-- The parent may commission [verification](verification.md). Implementation workers
+- The parent may commission the [`verification` skill](../verification/SKILL.md). Implementation workers
   do not dispatch reviews, recursively delegate, or automatically repair findings;
   additional dispatch remains with the parent under the recorded task authority.
 

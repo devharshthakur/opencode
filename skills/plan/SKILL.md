@@ -17,7 +17,7 @@ select `dev` without silently switching the model or broadening chat's permissio
    search, documentation, and bounded shell discovery under the rules below.
    An `explore` call stays read-only; parent `dev` performs shell operations.
    Keep implementation in the current session by default under
-   [execution](../shared/execution.md); bounded helpers do not transfer task ownership.
+   the [`execution` skill](../shared/execution/SKILL.md); bounded helpers do not transfer task ownership.
    No implementation may run before approval. Read
    [exploration](references/exploration.md) when delegating substantial discovery.
    Reuse sufficient worker evidence rather than reopening citations routinely.
@@ -38,13 +38,13 @@ select `dev` without silently switching the model or broadening chat's permissio
    explicitly requested, after its write is authorized. No tracker is required
    on disk; use session-local `todowrite` for multi-step progress. Planning todos
    track discovery, not permission to execute. Transfer assigned execution todos
-   only after approval under the shared handoff protocol.
+   only after approval under the [`agent-handoff` skill](../shared/agent-handoff/SKILL.md) protocol.
 
 ## Planning shell boundary
 
 Shell inspection and reversible, task-scoped local containers/services are allowed
 when directly needed for discovery, without separate confirmation for each start.
-Read [cleanup](../shared/cleanup.md) before resource creation and keep its ownership
+Load the [`cleanup` skill](../shared/cleanup/SKILL.md) before resource creation and keep its ownership
 checkpoint. Incidental runtime files belong only in disposable task-owned storage
 outside the checkout; keep repository files unchanged. Use read-only repository
 mounts if needed, local-only listeners, and no persistent storage by default.
@@ -88,8 +88,8 @@ hide a consequential choice. Add technical depth on request, not automatically.
 ## Execution detail and optional agent handoff
 
 Keep sufficient execution detail in conversation for direct execution. Only when
-worker dispatch is authorized under [execution](../shared/execution.md), prepare the detailed
-[Markdown handoff](../shared/handoff.md) from the approved human plan and relevant
+worker dispatch is authorized under the [`execution` skill](../shared/execution/SKILL.md), prepare the detailed
+Markdown handoff using the [`agent-handoff` skill](../shared/agent-handoff/SKILL.md) from the approved human plan and relevant
 evidence. Preserve its revision, assigned phases, outcomes, fixed decisions,
 acceptance, and limits; label execution detail separately from the approved plan.
 The user-facing plan and subagent handoff serve different audiences; do not show
@@ -112,7 +112,7 @@ original-checkout work before approval; never assume it follows isolation.
 
 ## Approval and handoff
 
-Read and follow [approval/handoff](../shared/approval-handoff.md) for final-plan
+Load and follow the [`approval-handoff` skill](../shared/approval-handoff/SKILL.md) for final-plan
 approval and execution handoff, using the selected isolation and actual revision.
 
 **Done when:** every swept decision is answered or explicitly deferred and a
@@ -124,5 +124,5 @@ loading never approves execution.
 
 - `opencode`: OpenCode tasks, before relying on current V2 behavior.
 - `writing-for-agents`: when designing changes to agent instructions, commands, or skills.
-- [execution](../shared/execution.md): after explicit approval, directly by default;
+- [`execution`](../shared/execution/SKILL.md): after explicit approval, directly by default;
   preserve task-scoped worker authority from explicit opt-in or `/improve*` origin.

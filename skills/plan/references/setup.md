@@ -82,12 +82,12 @@ outcomes, preservation decisions, and known gaps. The concise summary must expos
 all material changes and risks; it is not permission for undisclosed work. Expand
 details on request. Detail saves re-investigation, not all handoff token cost.
 
-After planning-owned cleanup is verified, follow the shared
-[approval/handoff](../../shared/approval-handoff.md) procedure for final-plan
+After planning-owned cleanup is verified, load and follow the
+[`approval-handoff` skill](../../shared/approval-handoff/SKILL.md) procedure for final-plan
 approval and execution in the current checkout, with command `setup`, the exact
 approved revision/checklist, and the detailed setup record in `evidence`.
 Preserve the selected parent model/agent and execute the checklist directly by
-default under [execution](../../shared/execution.md). With approved explicit
+default under the [`execution` skill](../../shared/execution/SKILL.md). With approved explicit
 worker opt-in or inherited `/improve*` task authority, dispatch the configured
 `implement` worker with the detailed setup record; additional in-scope workers
 need no repeated worker-use approval. Do not replay running, uncertain, or completed execution.
@@ -95,7 +95,7 @@ need no repeated worker-use approval. Do not replay running, uncertain, or compl
 Have the executor work tasks in prerequisite order, mark `- [x] Ti` only with
 acceptance evidence, and report completed/blocked tasks, actual checks, cleanup,
 and unresolved manual steps. Use `todowrite` for multi-step session progress and
-transfer assigned todos through the shared handoff's session-local protocol.
+transfer assigned todos through the [`approval-handoff` skill's session-local protocol](../../shared/approval-handoff/SKILL.md#session-local-todo-transfer).
 Markdown remains the visible approval checklist and fallback if the tool is
 unavailable/denied. The parent assesses evidence before reconciling its own list
 and gives a concise result.

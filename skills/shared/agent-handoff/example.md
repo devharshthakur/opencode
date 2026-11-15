@@ -2,7 +2,7 @@
 
 Illustrative only. All paths, approval, excerpts, and results below are fictional;
 never copy them as observed evidence or execution authority. Real requests replace
-every example value with attributable facts and use the shared contract.
+every example value with attributable facts and use the `agent-handoff` skill.
 
 ## Parent → user: approval plan
 
@@ -58,7 +58,7 @@ Scope: src/preferences/service.ts and src/preferences/service.test.ts
 Preserve: All unrelated existing changes and valid-name behavior.
 Operation limits: Assigned edits/tests only; no isolation, staging, commits,
 push, PR, or production-data changes.
-Execution setup: shared execution reference, current checkout, local HEAD;
+Execution setup: `execution` skill reference, current checkout, local HEAD;
 verify base and ownership.
 Authorized skills: Dependencies only at their written triggers.
 

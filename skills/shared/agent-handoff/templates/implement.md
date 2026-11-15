@@ -19,7 +19,7 @@ Worker-use authority: <approved explicit opt-in and task boundary, or /improve* 
 Scope: <literal paths and exclusions>
 Preserve: <existing changes and invariants>
 Operation limits: <explicit editing, branch/worktree, stage/commit/push/PR limits>
-Execution setup: <shared execution reference; single-worker or sequential per-todo-worker;
+Execution setup: <`execution` skill reference; single-worker or sequential per-todo-worker;
 original checkout; isolation/base intent;
 verified existing isolation if reused; no worker replay>
 Authorized skills: <IDs with their actual written triggers; listing is not invocation>
@@ -50,7 +50,7 @@ Worker discretion: <ordinary choices within approved boundaries>
 <Task-specific conditions; unresolved requirements go to the parent before acting.>
 
 ## Requested return
-Use [implementation result](implement-result.md) and the shared contract.
+Use [implementation result](implement-result.md) and the `agent-handoff` skill.
 Provide detailed, self-contained evidence for parent assessment, not an activity diary.
 Adapt headings/grouping to the task while preserving required information.
 Add task-specific sections only when relevant (compatibility, migration, UI,

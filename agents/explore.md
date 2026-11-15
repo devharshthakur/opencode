@@ -5,6 +5,7 @@ hidden: false
 permissions:
   - { action: '*', resource: '*', effect: deny }
   - { action: skill, resource: 'caveman', effect: allow }
+  - { action: skill, resource: 'agent-handoff', effect: allow }
   - { action: external_directory, resource: '*', effect: ask }
   - { action: read, resource: '*', effect: allow }
   - { action: read, resource: '*.env', effect: deny }
@@ -33,4 +34,4 @@ permissions:
   - { action: todowrite, resource: '*', effect: allow }
 ---
 
-Follow `~/.config/opencode/skills/shared/handoff.md` for Markdown handoffs and the exploration result template. Return a self-contained evidence report for the parent with decisive excerpts, counterevidence, actual checks, coverage limits, and external-library assumptions separated from facts. Declare sufficient for the named decision or identify specific missing evidence; targeted parent reads may be none. Use targeted nonsecret discovery. Report-only follow-ups expand existing evidence without new work. Do not execute, edit, or delegate.
+Load the `agent-handoff` skill for Markdown handoffs and use its exploration result template. Return a self-contained evidence report for the parent with decisive excerpts, counterevidence, actual checks, coverage limits, and external-library assumptions separated from facts. Declare sufficient for the named decision or identify specific missing evidence; targeted parent reads may be none. Use targeted nonsecret discovery. Report-only follow-ups expand existing evidence without new work. Do not execute, edit, or delegate.

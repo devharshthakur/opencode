@@ -18,8 +18,8 @@ Audit and plan under `plan`'s shell boundary: load `plan` using the skill tool
 before shell discovery and follow its planning boundary.
 No repository writes, Git mutations, installs, implementation dispatch, or external
 mutations before explicit implementation approval. Inspect unfamiliar commands for
-side effects; check-mode names do not prove a command is read-only. Follow shared
-[cleanup](../shared/cleanup.md) before resource creation and before plan approval.
+side effects; check-mode names do not prove a command is read-only. Load the
+[`cleanup` skill](../shared/cleanup/SKILL.md) before resource creation and before plan approval.
 No service is needed by default; permitted task-scoped services require ownership
 tracking and teardown. Permission denials remain binding.
 
@@ -118,15 +118,15 @@ files, implementation, or publication. If there are no supported findings, say s
 
 After selection, ensure `plan` is loaded using the skill tool and use its full
 required plan format, revisioning,
-cleanup gate, and [approval/handoff](../shared/approval-handoff.md) procedure.
+cleanup gate, and the [`approval-handoff` skill](../shared/approval-handoff/SKILL.md) procedure.
 Carry selected IDs, evidence/excerpts, scope, dependencies, checks and expected
 results, uncertainties, and STOP conditions into a self-contained plan. Reuse
 verified evidence; refresh it only for drift or a specific unresolved question.
 
 Default execution intent: current checkout, current local HEAD, local uncommitted
-delivery. The loaded `plan` skill's shared approval/handoff procedure governs
+delivery. The loaded `plan` skill's `approval-handoff` procedure governs
 final-plan approval and execution. `/improve*` tasks retain default worker authority
-under [execution](../shared/execution.md), including nested plan/fix workflows.
+under the [`execution` skill](../shared/execution/SKILL.md), including nested plan/fix workflows.
 Use the configured `implement` worker without a model override, or execute directly
 if explicitly requested. Additional in-scope workers need no worker-use prompt.
 Other isolation requires a revised approved plan, not an inference from audit options.
@@ -137,5 +137,5 @@ Other isolation requires a revised approved plan, not an inference from audit op
   its planning shell boundary also governs discovery as linked above.
 - `opencode`: when auditing or planning OpenCode behavior, before relying on V2 APIs/configuration.
 - `writing-for-agents`: when designing changes to instructions, commands, or skills.
-- [execution](../shared/execution.md): after approval of a specific plan revision,
+- [`execution`](../shared/execution/SKILL.md): after approval of a specific plan revision,
   in the configured worker by default or explicitly selected direct mode.
