@@ -3,3 +3,4 @@ bun.lock
 opencode.json
 opencode.jsonc
 service.json
+.DS_Store
