@@ -340,6 +340,32 @@ behavior, and no service restart is implied.
 </details>
 
 <details>
+<summary><strong>Deterministic skill loading</strong> — plugins for mechanical steps</summary>
+
+Two local plugins move binary, repeated behavior out of prompts:
+
+- `plugins/caveman-auto.ts` attaches the installed `caveman` skill to the first
+  prompt of every session. The per-session attach flag is stored durably, so
+  `stop caveman` or `normal mode` stays off after a plugin reload. `explore` and
+  `verify` allow only `skill/caveman`; their other tools and skills stay denied.
+- `plugins/command-skills.ts` reads the trailing
+  `<!-- opencode:skill <id> -->` marker in a command, attaches that core skill
+  before admission, and removes the marker. The 24 command files that need a
+  workflow skill carry the marker; `ask` and `quick` do not. Commands keep a
+  manual fallback sentence.
+
+Judgment stays in prompts and skills: approval, scope, worker authority, handoffs,
+evidence assessment, commit grouping and messages, PR prose, cleanup, and
+reporting. Static permissions, model and agent selection, and MCP enablement stay
+in configuration. Existing shell helpers such as `preflight.sh` and
+`diag-branch.sh` remain scripts because they are already deterministic.
+
+Both plugins no-op if a skill is absent and log failures. Delete a plugin file to
+disable it; they use the pinned `@opencode/plugin@2.3.0` SDK.
+
+</details>
+
+<details>
 <summary><strong>Independent verification</strong> — a second look when it matters</summary>
 
 The [review-evidence utility](skills/shared/verification.md) collects scoped
@@ -364,6 +390,7 @@ persistent ledger or active plugin.
 │   └── shared/             Execution, handoff, verification, cleanup, and PR rules
 │       └── handoff/        Templates and a worked example
 ├── extensions/handoff/     Review-evidence helpers
+├── plugins/                Global V2 plugins
 ├── opencode.sample.jsonc   Tracked configuration template
 ├── AGENTS.md               Shared agent guidance
 └── README.md               This guide
