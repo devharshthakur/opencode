@@ -28,7 +28,7 @@
     "image_preview": true
   },
   "tabs": {
-    "mode": "off",
+    "mode": "auto",
     "layout": "horizontal",
     "indicators": "numbers"
   },
