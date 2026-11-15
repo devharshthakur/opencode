@@ -7,9 +7,10 @@ metadata:
 
 # Fix
 
-Preserve the current model. Request a missing issue description; clarify essential
-ambiguity. Use this workflow in `dev`. If invoked in `chat`, ask the user to select
-`dev` without silently switching the model or broadening chat's permissions.
+Preserve the current model. Request a missing issue description; settle every
+open decision before planning. Use this workflow in `dev`. If invoked in `chat`,
+ask the user to select `dev` without silently switching the model or broadening
+chat's permissions.
 
 ## Diagnostic exception
 
@@ -70,8 +71,9 @@ excerpts, exact commands, and edit instructions for the detailed worker handoff.
 Include:
 
 - **Goal/Scope:** confirmed symptom, root cause in plain language, exclusions,
-  assumptions, and open questions. Surface decisive technical evidence when needed
-  for a user decision; keep full provenance/reproduction detail in the handoff.
+  assumptions, and the confirmed answers for choices you raised. Surface decisive
+  technical evidence when needed for a user decision; keep full
+  provenance/reproduction detail in the handoff.
 - **Approach:** repair design, regression-test seam (or documented absence of a seam),
   alternatives, and relevant interfaces.
 - **Changes:** user-understandable behavior and affected areas, not an edit inventory.

@@ -7,9 +7,9 @@ metadata:
 
 # Plan
 
-Preserve the current model. Request a missing task; clarify essential ambiguity.
-Use this workflow in `dev`. If invoked in `chat`, ask the user to select `dev`
-without silently switching the model or broadening chat's permissions.
+Preserve the current model. Request a missing task; settle every open decision
+before planning. Use this workflow in `dev`. If invoked in `chat`, ask the user to
+select `dev` without silently switching the model or broadening chat's permissions.
 
 ## Discover and design
 
@@ -22,8 +22,19 @@ without silently switching the model or broadening chat's permissions.
    [exploration](references/exploration.md) when delegating substantial discovery.
    Reuse sufficient worker evidence rather than reopening citations routinely.
 2. Compare viable approaches. Challenge material assumptions with evidence and
-   recommend an alternative when better; do not turn every task into an interview.
-3. Produce the plan in conversation. Save a plan/checkpoint file only when
+   recommend an alternative when better.
+3. Run one decision sweep before drafting. A single `question` batch carries
+   every decision the plan could otherwise raise, so the first revision is
+   approval-ready: scope and exclusions, capability and permission levels,
+   naming and file placement, model and effort variant, config versus Markdown
+   as the source of truth, validation depth and any live test target, delivery
+   (checkout or worktree, commit or uncommitted), documentation scope, and
+   execution mode. Extend that floor with whatever discovery surfaced. Order
+   each item with the recommended option first, and treat a choice you can
+   defend from evidence as a recommendation the user can override. Answers
+   already given in conversation count as settled. Skip the batch only when the
+   task leaves no decision open.
+4. Produce the plan in conversation. Save a plan/checkpoint file only when
    explicitly requested, after its write is authorized. No tracker is required
    on disk; use session-local `todowrite` for multi-step progress. Planning todos
    track discovery, not permission to execute. Transfer assigned execution todos
@@ -62,8 +73,9 @@ starting at 1. Adapt headings, grouping, and length to the task. Include:
   phase/Todo IDs. Explain consequential choices and dependencies, not each code edit.
 - **Success and validation:** observable acceptance criteria and how they will be
   checked; disclose known validation limits. Summarize checks in human terms.
-- **Decisions and risks:** tradeoffs, assumptions needing agreement, open questions,
-  and rollback when relevant. Resolve essential ambiguity before approval.
+- **Decisions and risks:** tradeoffs, assumptions needing agreement, and rollback
+  when relevant. Report the sweep's confirmed answers; a decision that emerges
+  later returns to the user before the plan is presented.
 - **Execution boundaries:** checkout/isolation, local base intent, preservation of
   existing work, and operation limits. No staging, commits, or publishing.
 
@@ -103,9 +115,10 @@ original-checkout work before approval; never assume it follows isolation.
 Read and follow [approval/handoff](../shared/approval-handoff.md) for final-plan
 approval and execution handoff, using the selected isolation and actual revision.
 
-**Done when:** essential ambiguity is resolved and a complete revision is awaiting
-approval, or an exact blocker is reported; the cleanup gate is accounted for with
-verification or explicit blockers. Skill loading never approves execution.
+**Done when:** every swept decision is answered or explicitly deferred and a
+complete revision is awaiting approval, or an exact blocker is reported; the
+cleanup gate is accounted for with verification or explicit blockers. Skill
+loading never approves execution.
 
 ## Dependencies
 

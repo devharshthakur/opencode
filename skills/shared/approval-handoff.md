@@ -31,7 +31,8 @@ not from a command name or a field left unfilled.
 This policy owns final implementation-plan approval for all planning workflows,
 including `/plan*`, `/setup`, `/fix*`, and selected `/improve*` work. Commands and
 skills reference this policy rather than defining their own approval wording.
-Resolve essential ambiguity first, then end the conversational plan with a
+Settle every decision the user owns before presenting the plan; an unanswered
+choice is a follow-up, not a plan. Then end the conversational plan with a
 plain-text statement, never the `question` tool for implementation approval:
 
 - Current checkout: "Ready to implement revision <N> locally, without isolation, commits, or publishing. Reply `approve r<N>` to proceed, or describe changes."
