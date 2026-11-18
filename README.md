@@ -340,9 +340,9 @@ behavior, and no service restart is implied.
 </details>
 
 <details>
-<summary><strong>Deterministic skill loading</strong> — plugins for mechanical steps</summary>
+<summary><strong>Deterministic loading</strong> — plugins for mechanical steps</summary>
 
-Two local plugins move binary, repeated behavior out of prompts:
+Three local plugins move repeated behavior out of prompts:
 
 - `plugins/caveman-auto.ts` attaches the installed `caveman` skill to the first
   prompt of every session. The per-session attach flag is stored durably, so
@@ -353,6 +353,12 @@ Two local plugins move binary, repeated behavior out of prompts:
   before admission, and removes the marker. The 24 command files that need a
   workflow skill carry the marker; `ask` and `quick` do not. Commands keep a
   manual fallback sentence.
+- `plugins/english-output.ts` appends one system part to every model request:
+  user-visible output in English, including plans, reports, session titles, commit
+  messages, and PR text, while code, paths, commands, logs, errors, and existing
+  non-English text stay as written. An explicit request for another language still
+  wins for that output. It hooks the agent loop plus title, compaction, and
+  generate requests, and tags the part so it is never added twice.
 
 Judgment stays in prompts and skills: approval, scope, worker authority, handoffs,
 evidence assessment, commit grouping and messages, PR prose, cleanup, and
@@ -360,8 +366,8 @@ reporting. Static permissions, model and agent selection, and MCP enablement sta
 in configuration. Existing shell helpers such as `preflight.sh` and
 `diag-branch.sh` remain scripts because they are already deterministic.
 
-Both plugins no-op if a skill is absent and log failures. Delete a plugin file to
-disable it; they use the pinned `@opencode/plugin@2.3.0` SDK.
+The two skill plugins no-op if a skill is absent. All three log failures. Delete a
+plugin file to disable it; they use the pinned `@opencode/plugin@2.3.0` SDK.
 
 </details>
 
