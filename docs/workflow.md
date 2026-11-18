@@ -20,6 +20,10 @@ services. It does not edit repository files, install dependencies, or mutate Git
 After plan approval, execution uses the current session and selected model by
 default. `/ask` and bounded `explore` are read-only.
 
+`/fix` additionally authorizes scoped investigative mutations in disposable
+storage under its diagnostic protocol, never in the original checkout. This
+does not expand a surrounding read-only workflow or approve implementation.
+
 `/quick` is the direct-execution command. `/improve*` audits leave files unchanged;
 selecting findings leads to a plan and separate implementation approval.
 
@@ -36,8 +40,19 @@ Workers follow Markdown handoffs; the parent retains acceptance decisions.
 
 ## Isolation and delivery
 
-`/plan:branch`, `/plan:worktree`, `/fix:branch`, and `/fix:worktree` add explicitly
-approved local isolation. Default `/plan` and `/fix` use the current checkout.
+`/plan:branch` and `/plan:worktree` add explicitly approved local implementation
+isolation. Default `/plan` and approved `/fix` repairs use the current checkout.
+An explicit implementation branch/worktree request for `/fix` is resolved in its
+approval plan; separate fix command variants are not needed.
+
+`/fix` performs read-only discovery first and investigative mutations only in
+separately owned disposable storage, reproducing relevant current source without
+changing the original checkout or Git metadata. Diagnostic tests are temporary
+evidence, not automatic project additions. Default to disposable local data and
+no external writes; a source copy is not a security sandbox. Retain the diagnostic
+environment through review, stop unused task-owned services, and remove diagnostic
+resources after completion or explicit cancellation. Report blockers and retained
+evidence rather than claiming unsupported root-cause certainty or cleanup.
 
 Commits and publishing stay separate from plan approval. `/pr` or an accepted
 post-task PR offer is the publishing path. Nothing is amended, merged, or deployed
@@ -56,3 +71,7 @@ provider. Choose a compatible model before sharing sensitive code.
 
 See [agent roles](features.md#agents) and
 [shared approval policy](../skills/shared/approval-handoff/SKILL.md).
+
+Command definitions reload automatically after edits. Validate updated `/fix`
+instructions in a fresh session so previously attached skill text does not
+confuse the check; no service restart is needed for command-file changes.

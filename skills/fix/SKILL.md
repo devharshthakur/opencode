@@ -1,124 +1,140 @@
 ---
 name: fix
-description: Diagnose issues on a temporary branch, plan Todo repairs, and orchestrate approved fixes
+description: Investigate bugs in disposable environments and propose evidence-backed repairs before approval
 metadata:
   opencode/autoinvoke: false
 ---
 
 # Fix
 
-Preserve the current model. Request a missing issue description; settle every
-open decision before planning. Use this workflow in `dev`. If invoked in `chat`,
-ask the user to select `dev` without silently switching the model or broadening
-chat's permissions.
+Use in `dev`, preserving the selected session model and agent. If invoked in
+`chat`, ask the user to select `dev`; do not switch silently. Request a missing
+issue description. This workflow is project-agnostic.
 
-## Diagnostic exception
+Use the [fixed output templates](references/output.md) for the approval plan,
+blocked diagnosis or repair, and repair result. Use them after resuming as well.
 
-Invoking `/fix*` authorizes only the existing `diag-branch.sh` diagnostic protocol
-as a narrow exception to global preservation/hook rules and shared cleanup methods.
-This is not implementation approval or a general Git-mutation grant.
+## Authority and boundaries
 
-- Before `enter`, record the exact checkout, original branch/HEAD, and original
-  staged, unstaged, and untracked state with enough evidence to verify restoration
-  without exposing secrets. After entry, record the snapshot SHA and helper metadata;
-  retain this checkpoint through interruption.
-- Only the unmodified helper may perform its temporary branch creation, staging,
-  snapshot commits with hook/signing suppression, resets, Git clean, branch return,
-  and diagnostic-branch deletion. These operations serve snapshot/restoration only;
-  delivery commits, publishing, and manual reset/clean alternatives remain outside
-  this exception. Normal implementation and delivery retain hooks and checks.
-- Keep diagnosis exclusive to this recorded checkout. Before `leave`, verify the
-  original parent ref, snapshot ancestry, and current branch against the checkpoint.
-  Inspect full status/diffs and untracked paths: every change to be discarded must
-  be attributable to diagnosis. Unexpected edits, uncertain ownership, or inconsistent
-  state stop restoration; preserve the state and ask how to proceed.
-- Do not mutate ignored files, submodules, or nested repositories through this
-  protocol; the snapshot is not proof they can be restored. After `leave`, verify
-  original branch/HEAD, index, staged/unstaged/untracked contents, and diagnostic-branch
-  absence against the checkpoint.
-- On failure or interruption, reconcile ownership and state before continuing;
-  never replay uncertain operations or broaden cleanup. Permission denials remain
-  binding. This is an instruction-based exception, not a crash-safe restore service.
+Invoking `/fix` authorizes read-only discovery and task-scoped diagnostic
+mutations in a separately owned disposable environment under this protocol.
+It does not approve a repair, mutate the original checkout, or authorize Git
+mutations there. No snapshot commits, stash, reset, clean, or branch switching
+for diagnosis. Tool permissions and denials remain binding.
+An enclosing read-only workflow remains read-only; request an explicit workflow
+transition when diagnostic mutations exceed its authority.
 
-## Diagnose on temporary branch
+Load `cleanup` before creating the environment or other diagnostic resources.
+Record their ownership, exact paths/identities, purpose, and intended teardown.
+Use the environment's approved temporary root, outside the original checkout.
+Default to disposable local data/storage, local-only listeners, and no external
+writes. Ask before using existing databases, credentials, live integrations,
+privileged setup, persistent data, or unclear side effects. A source copy is
+not a security sandbox: constrain commands, processes, network, and data too.
 
-1. Read relevant instructions, configuration, code, and tests. An `explore` call
-   may investigate a bounded discovery question; read
-   [exploration](../plan/references/exploration.md) when delegating substantial discovery.
-2. Satisfy the [diagnostic exception](#diagnostic-exception), then read and run
-   `sh <skill-base>/../git-isolation/scripts/preflight.sh` in the current checkout.
-   Then read and run
-   `sh <skill-base>/scripts/diag-branch.sh enter <slug>` to switch to a temporary
-   diagnostic branch `fix/diag-<slug>` that carries and snapshots all uncommitted
-   staged, unstaged, and untracked changes deterministically via Git.
-3. Load `diagnosing-bugs` using the skill tool and run its diagnosis loop (Phases 1–4) on `fix/diag-<slug>`:
-   build a tight red-capable reproduction command, reproduce and minimize the failure
-   (including uncommitted changes when they contribute to the bug), test ranked
-   falsifiable hypotheses, and use tagged `[DEBUG-...]` instrumentation to confirm
-   the exact root cause and regression-test seam.
-4. Once the failure and root cause are confirmed, run
-   `sh <skill-base>/scripts/diag-branch.sh leave <slug>` and re-run `preflight.sh`
-   to verify that the parent branch is active, `fix/diag-<slug>` is deleted, all
-   diagnostic mutations are wiped, and the original staged, unstaged, and untracked
-   changes are restored intact before presenting the plan for approval.
+## 1. Understand and prepare
 
-## Required plan and Todo checklist
+1. Read relevant project instructions, setup commands, code, and existing tests.
+   Record the symptom, expected behavior, environment, original root, branch/HEAD
+   (including detached/unborn state), index, and working changes. Use
+   `git-isolation/scripts/preflight.sh` as read-only inspection where applicable,
+   resolving it from the global skills tree; inspect relevant contents separately.
+   Bounded `explore` assistance is read-only; load
+   [exploration](../plan/references/exploration.md) before substantial delegation.
+2. Investigate read-only first. Before commands that may write files, tests,
+   instrumentation, caches, or setup artifacts, prepare the disposable environment
+   using [diagnostic environment](references/environment.md). That reference also
+   covers non-Git projects and explicitly needed history. Reproduce current source
+   contents, including relevant staged, unstaged, and untracked files, not just HEAD.
+   Record omissions and resolve anything material before claiming reproduction.
+3. Load environment-specific guidance before setup when applicable. For browser
+   applications or projects using web services/data, read
+   [web diagnostics](references/web.md). Other project types use their documented
+   setup within the same generic boundaries; do not assume web tooling.
 
-Use `## Plan: <stable title>` and a revision starting at 1. Follow the
-[human-readable plan](../plan/SKILL.md#human-readable-approval-plan) presentation
-policy: explain the repair and consequential choices concisely; reserve source
-excerpts, exact commands, and edit instructions for the detailed worker handoff.
-Include:
+## 2. Establish causal evidence
 
-- **Goal/Scope:** confirmed symptom, root cause in plain language, exclusions,
-  assumptions, and the confirmed answers for choices you raised. Surface decisive
-  technical evidence when needed for a user decision; keep full
-  provenance/reproduction detail in the handoff.
-- **Approach:** repair design, regression-test seam (or documented absence of a seam),
-  alternatives, and relevant interfaces.
-- **Changes:** user-understandable behavior and affected areas, not an edit inventory.
-  The handoff retains inspected paths and ordered edits, with evidence marked as
-  current rather than immutable; workers should not reconstruct the discussion.
-- **Todo Checklist & Dispatch Mode:** break the fix into small, checkable Markdown
-  Todo items (`- [ ] T1: ...`, `- [ ] T2: ...`) with stable IDs, prerequisites, and
-  observable acceptance. Use `direct` by default: the current session executes the
-  checklist in order. Bounded discovery/read-only review helpers remain allowed.
-  Only when worker execution is authorized under the [`execution` skill](../shared/execution/SKILL.md), select:
-  - `single-worker` (small cohesive fixes, 1–2 files / one tight red-to-green loop):
-    one `implement` worker executes the full Todo checklist in order.
-  - `per-todo-worker` (large multi-step/multi-component fixes): one upfront approval
-    authorizes `dev` to dispatch a fresh `implement` worker for one Todo (`Ti`) at a
-    time, validate its returned test proof and `git diff`, mark `- [x] Ti` in the
-    Markdown Todo checklist, and then dispatch `Ti+1`. Stop immediately if any Todo
-    fails validation or diverges.
-- **Validation:** how the failure will be reproduced and proved fixed, regression
-  coverage, and baseline limitations. Put exact reproduction/check commands and
-  expected red-to-green results in the detailed handoff.
-- **Execution:** `current`, `branch`, or `worktree` (`fix/<task-slug>` when isolated),
-  intended local base (`HEAD` by default; no fetch), preservation decision, and
-  authorized operations/skills. No staging, commits, or publishing.
-- **Risks/Tradeoffs** and **Rollback** when relevant. For OpenCode changes, specify
-  feature-specific reload behavior and fresh-session validation.
+Load `diagnosing-bugs` and perform Phases 1–4 within these boundaries.
+Prefer existing tests, read-only inspection, and debuggers. Create focused
+temporary tests/harnesses or tagged instrumentation only when useful and permitted.
+Do not require test-first development or instrumentation for every bug.
 
-## Approval and handoff
+Capture the reproduction procedure, actual outcomes, baseline, causal evidence,
+competing explanations, and a verification seam in conversation. Distinguish
+observed facts, hypotheses, and unavailable proof. Temporary test evidence must
+include commands/results before removal; do not copy secrets into reports.
 
-Load and follow the [`approval-handoff` skill](../shared/approval-handoff/SKILL.md) for final-plan
-approval and execution handoff, using the selected isolation and actual revision.
-Execute directly by default; plan approval alone does not authorize dispatch.
-Explicit approved worker opt-in or inherited `/improve*` task authority enables
-`single-worker` or `per-todo-worker` without per-worker approval. In `per-todo-worker` mode
-with `branch` or `worktree` isolation, `T1` prepares `fix/<task-slug>` and `T2..Tn`
-reuse that verified isolated checkout. Direct execution prepares the same approved
-isolation itself; no additional direct-execution command is needed.
+If reproduction or causal discrimination is blocked, report the exact uncertainty
+and the next bounded experiment/access needed. Do not present an unconfirmed cause
+as fact or a speculative repair as ready for implementation. Ask for additional
+authority only where needed; otherwise stop with useful evidence preserved.
 
-**Done when:** the temporary diagnostic branch is cleaned up, original uncommitted
-work is restored on the parent branch, and a complete revision with its Markdown
-Todo checklist is awaiting approval (or an exact blocker is reported).
+## 3. Discuss and propose the repair
 
-## Dependencies
+Resolve consequential choices before presenting a plan. Use the
+[human-readable plan](../plan/SKILL.md#human-readable-approval-plan) format with
+`## Plan: <stable title>`, revision starting at 1, and a Markdown Todo checklist
+with stable IDs, prerequisites, and observable acceptance.
 
-- `diagnosing-bugs`: root-cause reproduction and verification on `fix/diag-<slug>` and during approved execution.
+Explain the confirmed symptom/cause, proposed behavior, exclusions, alternatives,
+validation, and material risks. Major refactors are allowed in the proposal when
+causally justified; do not bundle unrelated cleanup. Keep exact commands, paths,
+and evidence in conversation for direct execution; prepare a detailed handoff
+only when implementation workers are authorized.
+
+Record repair execution location separately from diagnosis:
+
+- Default: current checkout, current local HEAD, local uncommitted delivery.
+- An explicit branch/worktree request is resolved in the plan before approval;
+  use `git-isolation` only after approval of that implementation isolation.
+- Resolve reliance on dirty original work before approval; copying it for diagnosis
+  does not authorize transplanting it into an implementation checkout.
+- No staging, commits, fetch, publishing, or implementation dispatch is implied.
+  Direct execution is the default under `execution`; optional worker orchestration
+  belongs to that policy, not a file-count heuristic.
+
+Load and follow `approval-handoff` for the final plan and execution transition.
+Plan approval authorizes only the named repair phases and operation limits.
+
+## 4. Retain, resume, and dispose
+
+Keep the diagnostic environment through plan review; disclose its exact path,
+state, omissions, and intended lifetime. Stop unused task-owned services and
+account for all resources before requesting approval. Retaining this explicitly
+owned diagnostic environment is permitted by `cleanup`; it is not an unreported
+cleanup failure. Retain temporary tests needed for review with it.
+
+After interruption, verify environment identity/state, original checkout,
+approval, and any running executor before continuing. Never repeat creation,
+diagnosis, or implementation merely because a checkpoint is missing. Missing or
+conflicting ownership is a blocker.
+
+After approved repair execution, verify the original symptom and focused checks
+in the implementation environment, not just the diagnostic copy. Report any
+environment mismatch. Diagnostic mutations are not delivery changes: implement
+the approved repair deliberately; do not copy the diagnostic tree wholesale.
+Diagnostic tests remain disposable unless explicitly approved as deliverables.
+
+After completion or explicit cancellation, remove attributable diagnostic
+resources using the environment reference and `cleanup`, then verify absence.
+On a blocker, retain necessary evidence and report exact resources and next action.
+Never delete an implementation branch/worktree, user data, or intended deliverable
+as diagnostic cleanup. Forgotten environments are not automatically disposable:
+reconcile ownership first.
+
+**Planning done when:** a causally supported repair revision awaits approval, or
+an exact investigation blocker is reported; original work remains unchanged and
+all diagnostic resources are accounted for. Execution completion additionally
+requires acceptance, required checks, reviewed diff, and verified disposal or
+explicitly reported cleanup blockers.
+
+## Conditional dependencies
+
+- `cleanup`: before diagnostic resources and at lifecycle/cleanup gates.
+- `diagnosing-bugs`: diagnostic method and verification of approved repair.
 - `opencode`: OpenCode tasks, before relying on current V2 behavior.
-- `writing-for-agents`: when designing changes to agent instructions, commands, or skills.
-- [`execution`](../shared/execution/SKILL.md): after explicit approval, directly by default;
-  retain explicit worker opt-in or inherited `/improve*` authority where applicable.
+- `writing-for-agents`: designing agent instructions, commands, or skills.
+- `approval-handoff`: final repair-plan approval and execution transition.
+- `execution`: approved repair execution, directly by default.
+- `git-isolation`: explicitly approved branch/worktree repair execution only.
+- Browser/debugging methods: only at the triggers in `references/web.md`.

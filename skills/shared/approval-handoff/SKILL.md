@@ -56,8 +56,9 @@ the explicit worker-use proposal/authority or `/improve*` origin. Base SHA may a
 executor verification. `/plan*`
 permits bounded shell discovery under the [`plan` skill](../../plan/SKILL.md), not repository
 writes, Git mutations, fetch, or implementation. Load and apply the [`cleanup` skill](../cleanup/SKILL.md) before
-requesting approval and disclose unresolved cleanup (`/fix*` retains its temporary
-`fix/diag-<slug>` diagnosis and must restore the parent branch before asking).
+requesting approval and disclose unresolved cleanup. `/fix` retains its owned
+disposable diagnostic environment through review, with unused services stopped
+and retained resources disclosed; the original checkout stays unchanged.
 Dirty-file dependencies must be resolved first.
 
 Only direct unambiguous user approval of this revision authorizes execution.
@@ -81,7 +82,7 @@ acceptance, fixed decisions, or material risk still requires renewed approval.
    When independent change verification is planned, capture a scoped parent-owned
    baseline under the [`verification` skill](../verification/SKILL.md) before implementation starts.
 2. Only with approved explicit worker opt-in or `/improve*` task origin, dispatch a
-   foreground configured `implement` worker with the exact approved phases/Todos,
+   configured `implement` worker with the exact approved phases/Todos,
    detailed plan/evidence, the [`execution` skill](../execution/SKILL.md), and the record below. Preserve
    the parent's selected model and the configured worker model; no override.
    A single task-scoped worker-use approval covers additional workers/continuations;
@@ -113,15 +114,16 @@ Carry task identity/repository; actual approval text, plan revision and approved
 phases; explicit allowed/prohibited operations; execution reference, mode/worker,
 dispatch mode, isolation/base intent, original checkout, preservation decision and attributable
 worker state; assigned todos; exact approved plan (including Markdown Todo checklist
-for /fix*); evidence, acceptance and validation; triggered skill dependencies; and
+for /fix); evidence, acceptance and validation; triggered skill dependencies; and
 task-specific guidance and task-scoped worker authority source under named headings.
 Todo evidence references preserve proof, not execution authority. Detailed,
 self-contained evidence reports are for
 parent decisions; the parent's user-facing summary remains concise.
 
-Branch mode explicitly allows branch creation only; worktree mode explicitly
+Implementation branch mode explicitly allows branch creation only; worktree mode explicitly
 allows branch and worktree creation. Use local base intent and `plan/` or `fix/`
 names. All plan and fix variants prohibit staging, commits, push, and PR creation.
+The separate disposable `/fix` diagnostic copy is not implementation isolation.
 Include `git-isolation` only for approved isolated execution; list other dependency
 IDs at their actual triggers. In `per-todo-worker` mode, `T1` prepares any approved isolation and
 `T2..Tn` reuse that verified isolated checkout. The worker verifies base/checkout

@@ -33,14 +33,13 @@ pins override `agents.<id>.model`. Use `/models` to select the session model.
 
 | Command | Purpose |
 | :--- | :--- |
-| `/fix <issue>` | Diagnose and propose a repair plan |
+| `/fix <issue>` | Diagnose in disposable storage and propose an evidence-backed repair; implementation isolation may be explicitly requested |
 | `/improve [scope]` | Audit, select findings, then plan approved work |
 | `/improve:quick` / `/improve:deep` | Hotspot / broader package audit |
 | `/improve:bugs` / `/improve:security` / `/improve:perf` | Correctness / security / performance |
 | `/improve:tests` / `/improve:debt` / `/improve:deps` | Tests / architecture / dependencies |
 | `/improve:dx` / `/improve:docs` / `/improve:next` | Tooling / documentation / product direction |
 | `/plan:branch` / `/plan:worktree` | Plan with approved branch/worktree isolation |
-| `/fix:branch` / `/fix:worktree` | Diagnose and plan repair in approved isolation |
 
 Run `/improve*` in `dev`. Audits are read-only; selecting findings is not
 implementation approval.

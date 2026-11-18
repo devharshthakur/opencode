@@ -50,9 +50,13 @@ remains available; report incomplete cleanup rather than claiming a clean finish
    resolved paths and symlinks to avoid deleting outside the owned boundary. Verify
    absence. Never sweep a shared temp directory or delete by a broad filename glob.
 
-The sole workflow-specific exception to preservation and cleanup methods in this
-section is the [`fix` skill's diagnostic restoration](../../fix/SKILL.md#diagnostic-exception), within
-that protocol's recorded scope. All other cleanup follows these rules.
+The [`fix` workflow](../../fix/SKILL.md) retains its explicitly owned disposable
+diagnostic environment and useful test evidence through repair-plan review.
+Before approval, stop unused task-owned services and disclose the retained
+environment and intended lifetime. Dispose of it after completion or explicit
+cancellation, once ownership and deliverable/evidence status are reconciled.
+This retention does not authorize deleting implementation worktrees or bypassing
+the preservation and cleanup methods above.
 
 Preserve intended deliverables, source changes, caches, persistent volumes/data,
 backups, branches, and worktrees unless separately authorized. Starting a resource
