@@ -49,4 +49,6 @@ is not acceptance.
 At completed development/repair/commit tasks, the parent follows
 the [`pr-offer` skill](../pr-offer/SKILL.md) for the single plain-text GitHub PR offer and
 any later authorization. Worker reports never offer or publish. After authorized
-PR delivery, end with the verified PR URL instead of another offer.
+PR delivery, use the [PR chat result](../../pr/references/templates.md#chat-result)
+instead of the general completion summary. On success, reply with only the
+verified PR URL, without another offer.
