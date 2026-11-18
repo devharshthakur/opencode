@@ -33,8 +33,9 @@ file to disable it. Plugins use the pinned `@opencode/plugin@2.3.0` SDK.
 
 The primary session owns approval, scope, evidence assessment, and acceptance.
 Shared skills define execution, approval handoff, Markdown handoffs, verification,
-cleanup, and completion reporting. Command and skill files are authoritative; this
-page is an overview.
+cleanup, and completion reporting. `/plan` and `/setup` attach separate skills
+and share one [planning procedure](../skills/shared/planning.md).
+Command and skill files are authoritative; this page is an overview.
 
 ## Maintenance
 
