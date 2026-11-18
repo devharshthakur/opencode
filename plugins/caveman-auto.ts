@@ -1,12 +1,15 @@
-// Attach the caveman skill to the first prompt of every session.
+// Attach the caveman skill once per compaction cycle.
 
 import { Plugin, Skill } from "@opencode/plugin"
 
 const attached = new Map<string, boolean>()
+const compactionRequested = new Set<string>()
 
 function storageKey(sessionID: string) {
   return `caveman/attached/${sessionID}`
 }
+
+const COMPACTION_THRESHOLD = 180_000
 
 export default Plugin.define({
   id: "caveman-auto",
@@ -16,15 +19,48 @@ export default Plugin.define({
     void (async () => {
       try {
         for await (const event of ctx.event.subscribe({
-          types: ["session.deleted"],
+          types: ["session.deleted", "session.compaction.ended", "session.compaction.failed", "session.step.ended"],
           signal: controller.signal,
         })) {
           const sessionID = event.data.sessionID
-          attached.delete(sessionID)
-          try {
-            await ctx.storage.remove(storageKey(sessionID))
-          } catch (error) {
-            console.error("caveman-auto: failed to clear session state", error)
+
+          if (event.type === "session.deleted") {
+            attached.delete(sessionID)
+            compactionRequested.delete(sessionID)
+            try {
+              await ctx.storage.remove(storageKey(sessionID))
+            } catch (error) {
+              console.error("caveman-auto: failed to clear session state", error)
+            }
+            continue
+          }
+
+          if (event.type === "session.compaction.ended") {
+            attached.delete(sessionID)
+            compactionRequested.delete(sessionID)
+            try {
+              await ctx.storage.remove(storageKey(sessionID))
+            } catch (error) {
+              console.error("caveman-auto: failed to reset session state after compaction", error)
+            }
+            continue
+          }
+
+          if (event.type === "session.compaction.failed") {
+            compactionRequested.delete(sessionID)
+            continue
+          }
+
+          const usage = event.data.tokens
+          const contextTokens = usage.input + usage.cache.read
+          if (contextTokens >= COMPACTION_THRESHOLD && !compactionRequested.has(sessionID)) {
+            compactionRequested.add(sessionID)
+            try {
+              await ctx.session.compact({ sessionID })
+            } catch (error) {
+              compactionRequested.delete(sessionID)
+              console.error("caveman-auto: failed to request compaction", error)
+            }
           }
         }
       } catch (error) {
@@ -72,6 +108,7 @@ export default Plugin.define({
     return () => {
       controller.abort()
       attached.clear()
+      compactionRequested.clear()
     }
   },
 })
