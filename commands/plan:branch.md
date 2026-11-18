@@ -3,9 +3,7 @@ description: Plan with the current model; approval implements on a local feature
 subagent: false
 ---
 
-Follow the attached `plan` skill. If it is not attached, load it with the skill tool. Authorize its dependency manifest only at written triggers. Isolation: branch. Base: current local HEAD unless explicitly overridden; no fetch. Delivery: local, uncommitted. Preserve the selected session model and agent; use `dev`.
-
-Plan through bounded discovery under `plan`'s shell boundary, optionally using read-only `explore`. Shell inspection and disposable local services are allowed; no repository writes, Git mutations, or implementation dispatch before approval. Load the `cleanup` skill before requesting approval. Resolve dependencies on dirty work before approval. Load the `approval-handoff` skill and follow its procedure; approval executes in the current session/model by default, unless worker use is already authorized for this task under the `execution` skill. Create no worktrees, including verification worktrees. Never replay uncertain or completed work.
+Follow `plan`; load it if not attached. Isolation: branch only; no worktrees, including for verification. Base: local `HEAD` unless explicitly overridden. Delivery: local, uncommitted.
 
 Task:
 $ARGUMENTS

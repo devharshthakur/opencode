@@ -53,8 +53,8 @@ confirming a choice is not implementation approval. Stop and await the user's re
 Name title/revision, phases/Todos, local base intent (`HEAD` by default), and preservation
 decisions beside the approval statement. State direct execution by default, or name
 the explicit worker-use proposal/authority or `/improve*` origin. Base SHA may await
-executor verification. `/plan*`
-permits bounded shell discovery under the [`plan` skill](../../plan/SKILL.md), not repository
+executor verification. `/plan*` and `/setup`
+permit bounded shell discovery under the [shared planning procedure](../planning.md), not repository
 writes, Git mutations, fetch, or implementation. Load and apply the [`cleanup` skill](../cleanup/SKILL.md) before
 requesting approval and disclose unresolved cleanup. `/fix` retains its owned
 disposable diagnostic environment through review, with unused services stopped
@@ -67,7 +67,7 @@ Revisions require renewed approval; partial approval limits phases. A user may
 explicitly approve exceptions; record those exact limits. Approval of an ordinary
 direct plan does not implicitly authorize implementation dispatch.
 
-Present the [`plan` skill's human-readable plan](../../plan/SKILL.md#human-readable-approval-plan)
+Present the [shared human-readable plan](../planning.md#human-readable-approval-plan)
 for approval, not the full worker execution brief. Preserve that exact approved
 plan in the handoff; label detailed execution steps/evidence as supporting detail.
 Elaboration within approved discretion needs no separate approval; changed scope,

@@ -89,7 +89,7 @@ task without losing their role-specific obligations.
 - [Exploration request](templates/explore.md) and
   [result](templates/explore-result.md): bounded questions, coverage,
   evidence, exclusions, stopping conditions, and decision sufficiency. Follow
-  [bounded exploration](../../plan/references/exploration.md).
+  [bounded exploration](../exploration.md).
 - [Verification request](templates/verify.md) and
   [result](templates/verify-result.md): independently collected baseline,
   after artifacts, freshness proof, criteria, and read-only limits. Follow
@@ -103,7 +103,7 @@ For an example of a filled request and result, see the
 
 ## Decisions and clarification
 
-The [`plan` skill's human approval plan](../../plan/SKILL.md#human-readable-approval-plan) is concise
+The [shared human approval plan](../planning.md#human-readable-approval-plan) is concise
 and decision-oriented. The subagent assignment is a separate, detailed execution
 brief. Include the exact approved assigned plan/revision and label supporting
 execution detail separately. Expand only within approved scope, fixed decisions,

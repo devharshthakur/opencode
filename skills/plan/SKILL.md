@@ -1,128 +1,19 @@
 ---
 name: plan
-description: Plan direct execution, with a detailed handoff when workers are authorized
+description: Plan project changes without switching models or implementing before approval
 metadata:
   opencode/autoinvoke: false
 ---
 
 # Plan
 
-Preserve the current model. Request a missing task; settle every open decision
-before planning. Use this workflow in `dev`. If invoked in `chat`, ask the user to
-select `dev` without silently switching the model or broadening chat's permissions.
+Read the [shared planning procedure](../shared/planning.md) before discovery.
+Request the task if missing. Use the checkout mode and base intent named by the
+command. For branch or worktree delivery, use local `HEAD` unless explicitly
+overridden. Resolve reliance on dirty original-checkout work before approval;
+never assume it follows isolation or copy dirty files or credentials automatically.
+The executor verifies the local base after approval; do not fetch.
 
-## Discover and design
-
-1. Read relevant instructions, configuration, code, and tests. Use native reads,
-   search, documentation, and bounded shell discovery under the rules below.
-   An `explore` call stays read-only; parent `dev` performs shell operations.
-   Keep implementation in the current session by default under
-   the [`execution` skill](../shared/execution/SKILL.md); bounded helpers do not transfer task ownership.
-   No implementation may run before approval. Read
-   [exploration](references/exploration.md) when delegating substantial discovery.
-   Reuse sufficient worker evidence rather than reopening citations routinely.
-2. Compare viable approaches. Challenge material assumptions with evidence and
-   recommend an alternative when better.
-3. Run one decision sweep before drafting. A single `question` batch carries
-   every decision the plan could otherwise raise, so the first revision is
-   approval-ready: scope and exclusions, capability and permission levels,
-   naming and file placement, model and effort variant, config versus Markdown
-   as the source of truth, validation depth and any live test target, delivery
-   (checkout or worktree, commit or uncommitted), documentation scope, and
-   execution mode. Extend that floor with whatever discovery surfaced. Order
-   each item with the recommended option first, and treat a choice you can
-   defend from evidence as a recommendation the user can override. Answers
-   already given in conversation count as settled. Skip the batch only when the
-   task leaves no decision open.
-4. Produce the plan in conversation. Save a plan/checkpoint file only when
-   explicitly requested, after its write is authorized. No tracker is required
-   on disk; use session-local `todowrite` for multi-step progress. Planning todos
-   track discovery, not permission to execute. Transfer assigned execution todos
-   only after approval under the [`agent-handoff` skill](../shared/agent-handoff/SKILL.md) protocol.
-
-## Planning shell boundary
-
-Shell inspection and reversible, task-scoped local containers/services are allowed
-when directly needed for discovery, without separate confirmation for each start.
-Load the [`cleanup` skill](../shared/cleanup/SKILL.md) before resource creation and keep its ownership
-checkpoint. Incidental runtime files belong only in disposable task-owned storage
-outside the checkout; keep repository files unchanged. Use read-only repository
-mounts if needed, local-only listeners, and no persistent storage by default.
-
-Before implementation approval: no source/config edits, installs, checkout-writing
-builds/tests, Git mutations (including fetch or isolation preparation), or external
-mutations. Inspect unfamiliar commands/scripts before running them; a test or
-inspection label is not proof of no writes. Ask first for privileged containers,
-host-wide changes, persistent storage, or unclear side effects. Tool permission
-prompts and denials remain binding. Starting a service never grants implementation
-authority. `/ask` and `explore` retain their own read-only restrictions.
-
-Clean up and verify planning-owned resources before presenting the approval-ready
-plan or reporting a blocker; disclose any incomplete cleanup. Reconcile interrupted
-resources rather than replaying startup. This is instruction-based, not a sandbox.
-
-## Human-readable approval plan
-
-Write the user-facing plan for a human deciding whether to approve or change it,
-not for a worker executing edits. Use `## Plan: <stable title>` and a revision
-starting at 1. Adapt headings, grouping, and length to the task. Include:
-
-- **Goal and boundaries:** what changes, why it matters, what stays unchanged,
-  and meaningful exclusions.
-- **Approach and phases:** plain-language outcomes in execution order, with stable
-  phase/Todo IDs. Explain consequential choices and dependencies, not each code edit.
-- **Success and validation:** observable acceptance criteria and how they will be
-  checked; disclose known validation limits. Summarize checks in human terms.
-- **Decisions and risks:** tradeoffs, assumptions needing agreement, and rollback
-  when relevant. Report the sweep's confirmed answers; a decision that emerges
-  later returns to the user before the plan is presented.
-- **Execution boundaries:** checkout/isolation, local base intent, preservation of
-  existing work, and operation limits. No staging, commits, or publishing.
-
-Default to the shortest plan that lets the user understand the whole proposal and
-suggest changes. Omit code snippets, line-by-line edits, exhaustive file lists,
-raw evidence, and command inventories unless they affect the user's decision or
-the user requests them. Keep material risks and scope visible; brevity must not
-hide a consequential choice. Add technical depth on request, not automatically.
-
-## Execution detail and optional agent handoff
-
-Keep sufficient execution detail in conversation for direct execution. Only when
-worker dispatch is authorized under the [`execution` skill](../shared/execution/SKILL.md), prepare the detailed
-Markdown handoff using the [`agent-handoff` skill](../shared/agent-handoff/SKILL.md) from the approved human plan and relevant
-evidence. Preserve its revision, assigned phases, outcomes, fixed decisions,
-acceptance, and limits; label execution detail separately from the approved plan.
-The user-facing plan and subagent handoff serve different audiences; do not show
-the execution brief merely to obtain approval.
-
-Include current/desired behavior, inspected paths/symbols, ordered implementation
-steps, invariants, dependencies, exact validation commands/expected results,
-baseline limitations, skill triggers, and worker discretion where relevant.
-Mark source evidence as current, not immutable. The worker should not have to
-reconstruct the conversation or repeat sufficient research. Reuse decisive evidence
-with provenance rather than copying the transcript. Local implementation detail
-may elaborate approved work; new scope or material decisions require renewed
-approval. For OpenCode changes, include feature-specific reload behavior and
-fresh-session validation in the execution brief; surface user-relevant effects in
-the human plan.
-
-For isolated plans, use local `HEAD` unless the user selects another local base.
-The executor verifies its SHA after approval; no fetch. Resolve reliance on dirty
-original-checkout work before approval; never assume it follows isolation.
-
-## Approval and handoff
-
-Load and follow the [`approval-handoff` skill](../shared/approval-handoff/SKILL.md) for final-plan
-approval and execution handoff, using the selected isolation and actual revision.
-
-**Done when:** every swept decision is answered or explicitly deferred and a
-complete revision is awaiting approval, or an exact blocker is reported; the
-cleanup gate is accounted for with verification or explicit blockers. Skill
-loading never approves execution.
-
-## Dependencies
-
-- `opencode`: OpenCode tasks, before relying on current V2 behavior.
-- `writing-for-agents`: when designing changes to agent instructions, commands, or skills.
-- [`execution`](../shared/execution/SKILL.md): after explicit approval, directly by default;
-  preserve task-scoped worker authority from explicit opt-in or `/improve*` origin.
+Inspect relevant instructions, code, configuration, and tests. Compare viable
+approaches and recommend the best supported one. Resolve material user choices
+using the shared decision sweep. Present the shared plan format and approval gate.

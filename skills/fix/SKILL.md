@@ -40,7 +40,7 @@ not a security sandbox: constrain commands, processes, network, and data too.
    `git-isolation/scripts/preflight.sh` as read-only inspection where applicable,
    resolving it from the global skills tree; inspect relevant contents separately.
    Bounded `explore` assistance is read-only; load
-   [exploration](../plan/references/exploration.md) before substantial delegation.
+   [exploration](../shared/exploration.md) before substantial delegation.
 2. Investigate read-only first. Before commands that may write files, tests,
    instrumentation, caches, or setup artifacts, prepare the disposable environment
    using [diagnostic environment](references/environment.md). That reference also
@@ -72,7 +72,7 @@ authority only where needed; otherwise stop with useful evidence preserved.
 ## 3. Discuss and propose the repair
 
 Resolve consequential choices before presenting a plan. Use the
-[human-readable plan](../plan/SKILL.md#human-readable-approval-plan) format with
+[human-readable plan](../shared/planning.md#human-readable-approval-plan) format with
 `## Plan: <stable title>`, revision starting at 1, and a Markdown Todo checklist
 with stable IDs, prerequisites, and observable acceptance.
 

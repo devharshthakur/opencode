@@ -63,7 +63,7 @@ callers, and critical flows; exclude generated/vendor output and sensitive files
 Record missing or unsafe checks without inventing a green baseline.
 
 Read the [audit checklist](references/audit-checklist.md). Before substantial
-delegation, read [evidence-first exploration](../plan/references/exploration.md)
+delegation, read [evidence-first exploration](../shared/exploration.md)
 and use its brief, packet, verification routing, and stopping rules. Each child
 gets a self-contained question, distinct scope/exclusions, relevant known facts,
 decided tradeoffs, checklist sections, report budget, and read-only/secret rules.

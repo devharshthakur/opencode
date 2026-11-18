@@ -1,7 +1,7 @@
 # Audit checklist
 
 Use the relevant category sections, not a mandatory whole-repository checklist.
-Shared [exploration](../../plan/references/exploration.md) owns evidence packets
+Shared [exploration](../../shared/exploration.md) owns evidence packets
 and verification routing. Each audit brief names its sections and distinct scope.
 
 ## Categories
