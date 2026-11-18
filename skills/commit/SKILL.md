@@ -11,6 +11,9 @@ The caller supplies task scope or a default-scope policy, confirmation policy, a
 optional grouping policy; this skill grants no authority. Loading it or asking
 about commit messages does not approve staging.
 
+Use the [fixed output templates](references/output.md) for all callers,
+including automatic and PR-scoped commits. Keep exact messages verbatim.
+
 ## Inspect
 
 1. Read `../git-isolation/scripts/preflight.sh`, then run it in the checkout.
@@ -36,10 +39,13 @@ about commit messages does not approve staging.
   changes together; path or hunk count alone is not a reason to split. If unrelated
   concerns share a path, keep that path in one commit or stop for a revised grouping.
   When the caller requests one commit or a specific grouping, follow that instead.
-- Present the ordered series with exact paths and full messages. With confirmation
-  required, obtain direct approval for the series before committing; changed paths,
-  grouping, or messages require renewed approval. With not-required policy, proceed
-  within the explicit invocation's scope.
+- Retain the exact path-to-commit mapping and full messages for execution. Present
+  the ordered messages and file counts, not individual paths, unless asked.
+  With confirmation required, obtain direct approval before staging or committing.
+  Changed paths, grouping, or messages require renewed approval even if counts
+  match. If the exact mapping cannot be recovered after interruption, reconcile
+  it and obtain renewed approval before proceeding. With not-required policy,
+  proceed within the explicit invocation's scope.
 
 ## Create and verify
 
