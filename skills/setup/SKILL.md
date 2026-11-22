@@ -33,8 +33,10 @@ Plan local, uncommitted setup in the current checkout from local `HEAD`.
 
 ## Confirm choices and plan
 
-Use the shared decision sweep. Cover applicable documented choices, including
-optional ones such as themes, providers, adapters, install modes, and paths.
+Use the shared clarification rounds until the exact setup is unambiguous. Cover
+applicable documented choices, including optional ones such as themes, providers,
+adapters, install modes, and paths. Also ask about goals, constraints, existing
+conventions to follow, and what "working" means for this project.
 Group compatible low-risk existing values and recommended defaults into one
 confirmation with individual overrides. Show the actual values unless sensitive.
 Ask about material choices separately in the same round when independent.

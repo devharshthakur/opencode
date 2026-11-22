@@ -6,13 +6,26 @@
 - Ordinary edits do not authorize branches, worktrees, staging, commits, publishing, deployment, production-data changes, or user-data deletion. Require explicit authority and respect narrower limits and permission denials.
 - Search and read narrowly. Reuse evidence; separate confirmed causes from hypotheses. Consult current official docs before relying on external API/CLI behavior, preferably Context7; use OpenCode V2 docs for OpenCode.
 - Load advertised skills only at their trigger, command-declared stage, or explicit request. Use the exact skill ID from its path; use file paths for supporting references. Skills add method, not authority. Never auto-install skills or bypass tool denials.
-- Use evidence first. Delegate bounded discovery with `explore` and targeted verification when it saves substantial reading. Before substantial delegation, follow `skills/shared/exploration.md`; assess evidence packets and resolve named gaps rather than repeat discovery. Keep decisions in the parent; independently check high-risk or conflicting claims.
-- Own ordinary work in the current session and selected model. Bounded `explore` and read-only `verify` remain allowed. Full implementation delegation needs explicit task-scoped `/use:worker` or `@worker` invocation (which directly authorizes worker use without a second confirmation), except `/improve*` carries worker authority through nested workflows. That authorization covers additional in-scope workers, not new scope or operations. Load `execution`; preserve worker models and keep decisions and acceptance in the parent.
+- Use evidence first. Delegate bounded discovery with `explore` and targeted verification when it saves substantial reading. Before substantial delegation, follow `skills/shared/exploration.md`; assess evidence packets and resolve named gaps rather than repeat discovery. Keep decisions in the parent; independently check high-risk or conflicting claims. Use `planner` only when the user asks for it.
+- Own ordinary work in the current session and selected model. Bounded `explore` and read-only `verify` remain allowed. Implementation workers need the authority defined once in the `execution` skill; load it before any dispatch. Keep decisions and acceptance in the parent.
 - For handoffs, load `agent-handoff`, follow its checklist, and adapt templates without losing required information. Load `verification` when independent review is warranted. Keep user summaries concise.
 - Track multi-step work with `todowrite`; skip trivial work. Use stable Todo IDs and send the full list when it changes. Todos track progress, not approval. If unavailable or denied, track progress in conversation without bypassing permissions.
 - Use repository commands and package managers; otherwise use `pnpm` for JS/TS and `uv` for Python. Read unfamiliar scripts first. Set shell working directories explicitly; never copy credentials between checkouts.
+- Use OpenCode tools efficiently: issue independent reads, searches, and tool calls in one turn, or script them with `execute`; run independent subagents concurrently in the background; do not poll or re-read evidence already held.
 - Validate observable acceptance and required checks. Review the complete task diff for unrelated changes, artifacts, and secrets. Preserve delivery hooks and checks; distinguish baseline failures from regressions.
 - Treat tests as task-scoped evidence. Add only coverage needed for this task, record actual commands/results, then remove task-created tests, fixtures, and temporary config. Preserve existing tests, requested test deliverables, and failing evidence.
 - Before creating disposable resources, load `cleanup` and follow its ownership, cleanup, verification, and reporting gates. Preserve pre-existing resources and deliverables.
 - Report results and actual checks concisely, including blocked or unrun proof and retained resources. Redact secrets. Stop when acceptance is proved or an exact blocker remains.
 - After completed development in `dev`, load `pr-offer` for optional GitHub PR delivery. Workers never offer. Load it again for a direct affirmative reply to a pending offer. Never publish before authorization.
+
+## Question style
+
+This section is the single rule for every question to the user, in every agent and workflow.
+
+- Ask each question with the native `question` tool. Never ask discoverable facts; read or search first.
+- Batch independent questions into one call: at most four questions, two to four options each, recommended option first with `(Recommended)` in its label.
+- The TUI renders the form compactly. If any limit is exceeded, ask the whole round in Markdown instead: a question over 90 characters, an option label over 5 words, or an option description over 80 characters.
+- A Markdown round uses stable IDs (`Q1`, `Q2`) and labeled choices (`A`, `B`). Invite a reply such as `Q1 B, Q2 A` or a custom answer, then end the turn. Never duplicate a round across both formats.
+- A dismissal or partial reply leaves the unanswered questions open; ask only those. Confirming a choice is not implementation approval.
+- Ask implementation approval and authorization offers (plan approval, PR offer) only as plain text, never with the tool.
+- Subagents cannot ask the user. They return their open questions, with evidence and a recommended answer, to the parent, who asks.

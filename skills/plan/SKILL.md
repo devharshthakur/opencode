@@ -16,4 +16,4 @@ The executor verifies the local base after approval; do not fetch.
 
 Inspect relevant instructions, code, configuration, and tests. Compare viable
 approaches and recommend the best supported one. Resolve material user choices
-using the shared decision sweep. Present the shared plan format and approval gate.
+through the shared clarification rounds until nothing material is ambiguous. Present the shared plan format and approval gate.

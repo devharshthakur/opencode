@@ -36,7 +36,8 @@ but still respects Git, commit, and safety limits.
 | `/setup <sources...>` | Current checkout | Adapting a library/tool setup from docs or URLs |
 | `/create:skill <idea>` | Current checkout | Designing and adding a project-local skill |
 
-During planning, the agent inspects the codebase, asks any clarifying questions, and
+During planning, the agent inspects the codebase, asks clarifying questions (through the
+`question` tool, or Markdown when options are long) until nothing is ambiguous, and
 presents a numbered plan (for example, `Revision: r1`). **No files are edited, no
 packages are installed, and Git is not mutated until you reply `approve r1`** (or
 give another direct approval).
