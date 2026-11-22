@@ -1,4 +1,5 @@
 // Attach a command's core skill from its trailing marker.
+// Attachments reset after compaction so the skill is attached again.
 
 import { Plugin, Skill } from "@opencode/plugin"
 
@@ -6,9 +7,33 @@ const attached = new Set<string>()
 
 const marker = /\n?<!--\s*opencode:skill\s+([a-z0-9-]+)\s*-->\s*$/
 
+function clearSession(sessionID: string) {
+  const prefix = `${sessionID}:`
+  for (const key of attached) {
+    if (key.startsWith(prefix)) attached.delete(key)
+  }
+}
+
 export default Plugin.define({
   id: "command-skills",
   async setup(ctx) {
+    const controller = new AbortController()
+
+    void (async () => {
+      try {
+        for await (const event of ctx.event.subscribe({
+          types: ["session.deleted", "session.compaction.ended"],
+          signal: controller.signal,
+        })) {
+          clearSession(event.data.sessionID)
+        }
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          console.error("command-skills: event subscription failed", error)
+        }
+      }
+    })()
+
     await ctx.session.hook("prompt", async (event) => {
       const match = marker.exec(event.prompt.text)
       if (!match) return
@@ -40,6 +65,7 @@ export default Plugin.define({
     })
 
     return () => {
+      controller.abort()
       attached.clear()
     }
   },
