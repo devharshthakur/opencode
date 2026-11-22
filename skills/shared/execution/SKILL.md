@@ -16,17 +16,17 @@ implementation dispatch, not discovery assistance.
 
 Implementation workers are available only when:
 
-- The user explicitly invokes `@worker` or `/use:worker` and approves worker use
-  for the identified task under the [`worker` skill](../../worker/SKILL.md); or
+- The user explicitly invokes `/use:worker` or `@worker` for the identified task
+  under the [`worker` skill](../../worker/SKILL.md) (that explicit invocation
+  directly authorizes worker use without a separate confirmation prompt); or
 - The task originates from `/improve` or any `/improve:*` variant. Those workflows
   retain their default worker authority, including nested planning/fixing.
 
-Record the authority source and task boundary in conversation. One worker-use
-approval covers the workers needed for that task, not a worker count. The parent
+Record the authority source and task boundary in conversation. Task-scoped worker
+authorization covers the workers needed for that task, not a worker count. The parent
 may dispatch additional workers or authorized continuations within the approved
-task without repeating the worker-use prompt. Task completion/cancellation ends
-that authority; unrelated tasks start direct. A pending opt-in request is not
-authority. Read-only helpers do not need this opt-in.
+task without asking again. Task completion/cancellation ends that authority;
+unrelated tasks start direct. Read-only helpers do not need this opt-in.
 
 Worker authority does not replace implementation-plan approval, expand scope,
 allow new operations, or override explicit direct-only instructions or tool

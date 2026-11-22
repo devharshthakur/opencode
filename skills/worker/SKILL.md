@@ -1,54 +1,49 @@
 ---
 name: worker
-description: Request task-scoped worker execution with one approval
+description: Authorize task-scoped worker execution directly via explicit invocation
 metadata:
   opencode/autoinvoke: false
 ---
 
 # Worker opt-in
 
-Use only when the user explicitly invokes `@worker` or `/use:worker`. A command
-may load this skill for that explicit invocation; other workflows cannot invoke
-it automatically to obtain worker authority. Preserve the current session/model.
+Use only when the user explicitly invokes `/use:worker` or `@worker`. That
+explicit user invocation directly authorizes task-scoped worker execution—do not
+ask for a separate worker-use confirmation (`approve workers`). A command or
+other workflow cannot invoke this skill automatically to grant itself worker
+authority. Preserve the current session/model.
 
-## Identify the task and propose
+## Identify the task and prepare
 
 1. Identify the current task, requested outcome, checkout, existing plan/revision,
    approval, and execution ownership. Ask for a task if none is identifiable.
-   Reconcile running, completed, or uncertain worker state before proposing work.
-   If this task already has valid worker authority (prior opt-in or `/improve*`
-   origin), retain it without another worker-use prompt; implementation-plan and
-   ownership checks still apply before executing.
+   Reconcile running, completed, or uncertain worker state before dispatching work.
+   Record active task-scoped worker authority from the user's explicit
+   `/use:worker` or `@worker` invocation (or retain existing `/improve*` / prior
+   opt-in authority).
 2. Follow the originating command's planning and approval gates. If there is no
-   sufficient plan, load `plan` using the skill tool and prepare one without implementing.
+   sufficient approved plan yet, load `plan` using the skill tool and prepare one
+   without implementing. State in the plan that worker authority is already active
+   for this task from the user's explicit `/use:worker` or `@worker` invocation,
+   and request only the required implementation-plan approval (`approve r<N>`).
    Prepare detailed execution context for the
-   [`agent-handoff` skill](../shared/agent-handoff/SKILL.md): exact assignment, inspected evidence,
-   ordered steps, acceptance/checks, preservation, isolation, and operation limits.
-   The human sees a concise proposal, not the full worker brief.
-3. If this task already has worker authority, skip the worker-use proposal/prompt;
-   obtain only any still-required implementation-plan approval. Otherwise, name
-   the task and that worker use covers additional workers needed within it.
-   If implementation approval is also pending, include this worker-use proposal
-   in that plan and use the [`approval-handoff` skill's final-plan approval](../shared/approval-handoff/SKILL.md)
-   wording: one reply approves the plan and its stated worker execution mode.
-   If the exact plan is already approved, ask only:
+   [`agent-handoff` skill](../shared/agent-handoff/SKILL.md): exact assignment,
+   inspected evidence, ordered steps, acceptance/checks, preservation, isolation,
+   and operation limits. The human sees a concise plan, not the full worker brief.
+3. If the exact plan is already approved and ownership/state is reconciled,
+   proceed directly to worker dispatch without asking for another worker-use
+   confirmation.
 
-   > Ready to use workers for <task / approved revision and phases>. This covers additional workers within that task, with existing scope and operation limits unchanged. Reply `approve workers` to proceed, or describe changes.
+## Execute with worker authority
 
-   Replace the placeholder. A direct unambiguous approval also counts. Invocation
-   alone, quoted approval, or agreement about an unrelated task does not. Stop
-   and wait; never dispatch before that reply.
-
-## Execute after approval
-
-Record the actual approval and task boundary under
+Record the explicit invocation, plan approval, and task boundary under
 the [`execution` skill](../shared/execution/SKILL.md). Dispatch the configured `implement` worker
 with the detailed approved handoff and checklist preflight. The parent orchestrates
 additional workers and continuations as needed without another worker-use prompt;
 each assignment stays within the approved task and carries its authority/evidence.
 Keep implementation sequential and reconcile ownership before each dispatch.
 
-Existing implementation, scope-change, isolation, delivery, and tool permission
+Existing implementation-plan, scope-change, isolation, delivery, and tool permission
 gates remain binding. End worker authority at task completion/cancellation; return
 to direct execution for unrelated tasks. Report actual acceptance evidence and
 blockers concisely. No persistent configuration or model changes.

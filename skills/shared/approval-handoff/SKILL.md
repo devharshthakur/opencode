@@ -19,8 +19,8 @@ these fields explicitly so a later reader does not infer them from command linea
   revision/phases and quoted approval text.
 - Execution mode: `direct` in the current session/model, or `worker`, with the
   checkout/isolation and base intent.
-- Worker authority: `none`, `proposed`, `active` with its source, or `ended`; the
-  source is explicit `@worker`/`/use:worker` opt-in or `/improve*` task origin.
+- Worker authority: `none`, `active` with its source, or `ended`; the source is
+  explicit user `/use:worker`/`@worker` invocation or `/improve*` task origin.
 - Next permitted action: the single action currently authorized, such as present the
   revision, await `approve r<N>`, dispatch, execute an assigned phase, report only,
   or stop.
@@ -52,7 +52,8 @@ confirming a choice is not implementation approval. Stop and await the user's re
 
 Name title/revision, phases/Todos, local base intent (`HEAD` by default), and preservation
 decisions beside the approval statement. State direct execution by default, or name
-the explicit worker-use proposal/authority or `/improve*` origin. Base SHA may await
+the active worker authority from explicit `/use:worker`/`@worker` invocation or
+`/improve*` origin. Base SHA may await
 executor verification. `/plan*` and `/setup`
 permit bounded shell discovery under the [shared planning procedure](../planning.md), not repository
 writes, Git mutations, fetch, or implementation. Load and apply the [`cleanup` skill](../cleanup/SKILL.md) before
@@ -81,12 +82,13 @@ acceptance, fixed decisions, or material risk still requires renewed approval.
    branch/worktree preparation in direct mode; execution mode does not alter isolation.
    When independent change verification is planned, capture a scoped parent-owned
    baseline under the [`verification` skill](../verification/SKILL.md) before implementation starts.
-2. Only with approved explicit worker opt-in or `/improve*` task origin, dispatch a
+2. Only with active worker authority from explicit user `/use:worker`/`@worker`
+   invocation or `/improve*` task origin, dispatch a
    configured `implement` worker with the exact approved phases/Todos,
    detailed plan/evidence, the [`execution` skill](../execution/SKILL.md), and the record below. Preserve
    the parent's selected model and the configured worker model; no override.
-   A single task-scoped worker-use approval covers additional workers/continuations;
-   no new worker-use approval for worker count. For `per-todo-worker`, dispatch one
+   Task-scoped worker authority covers additional workers/continuations without
+   re-prompting; no new authorization for worker count. For `per-todo-worker`, dispatch one
    Todo at a time after validating prior proof/diff and updating `- [x] Ti`.
 3. Record each returned worker ID and status. Never dispatch duplicate work while
    running, after repeated approval, or after completion. Reuse an attributable
