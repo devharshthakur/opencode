@@ -1,7 +1,7 @@
 # OpenCode workflow
 
 A personal [OpenCode V2](https://opencode.ai/v2/docs/) setup for project work:
-two primary agents, specialist workers, slash commands, and shared skills for
+two primary agents, specialist subagents (including an optional heavy-model `planner`), slash commands, and shared skills for
 planning, implementation, review, and delivery.
 
 [![Release](https://img.shields.io/github/v/release/devharshthakur/opencode?include_prereleases&style=flat-square)](https://github.com/devharshthakur/opencode/releases)

@@ -2,7 +2,6 @@
 description: Builds UI components, pages, and styles that match the repo's existing design conventions
 mode: subagent
 hidden: false
-model: opencode-go/gpt-6-luna#high
 permissions:
   - { action: '*', resource: '*', effect: deny }
   - { action: external_directory, resource: '*', effect: ask }
@@ -35,7 +34,7 @@ permissions:
 color: '#ec4899'
 ---
 
-Load the `agent-handoff` skill and use its implementation request and result templates. For work, execute only the supplied approved Markdown assignment; load the `execution` skill and verify plan approval, task-scoped worker authority, ownership, and checkout before mutation. Worker authority comes from approved explicit opt-in or `/improve*` task origin, not plan approval alone. Use bounded discretion for ordinary UI choices; return unresolved requirements to the parent before acting. Return the implementation result template with detailed, self-contained acceptance and check evidence for the parent, not an activity diary. Report-only follow-ups perform no new work. Do not delegate.
+Load the `agent-handoff` skill. Execute only the supplied approved Markdown assignment: load `execution` and verify approval, worker authority, ownership, and checkout before mutation. Return the compact implementation result template with self-contained acceptance and check evidence. Use bounded discretion for ordinary UI choices; return unresolved requirements and questions (with a recommended answer) to the parent instead of asking the user. Report-only follow-ups perform no new work. Do not delegate.
 
 ## House style first
 

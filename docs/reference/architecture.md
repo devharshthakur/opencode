@@ -19,8 +19,8 @@
 ## Configuration
 
 `opencode.sample.jsonc` is the tracked config template. Local `opencode.jsonc` and
-`service.json` are ignored. Agent frontmatter may pin models independently from the
-config. See [Getting Started](../guide/getting-started.md) for initialization and
+`service.json` are ignored. Agent models are set under `agents` in the config; agent
+files do not pin models. See [Getting Started](../guide/getting-started.md) for initialization and
 credentials.
 
 Configuration changes normally reload automatically. Plugin changes outside watched
@@ -77,7 +77,7 @@ Command and skill files are authoritative; this page is an overview.
 ## Maintenance
 
 - Use a fresh session to validate agent, permission, or skill changes.
-- Check agent frontmatter before relying on a model pin or permission profile.
+- Check the `agents` models in your config and the agent permission profiles before relying on them.
 - Static checks do not prove live permissions, model behavior, or plugin behavior.
 - This repository has no permanent test suite. Run `git diff --check` for whitespace
   errors and conflict markers, and `npm run docs:build` after documentation changes.

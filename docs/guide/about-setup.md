@@ -16,7 +16,7 @@ Think of the setup as five building blocks that layer on top of each other:
 | :--- | :--- | :--- |
 | `opencode.jsonc` | Local config | Your machine-specific settings: providers, models, and MCP servers. Created from `opencode.sample.jsonc` and ignored by Git. |
 | `AGENTS.md` | Shared rules | Baseline instructions that apply across the setup (preserve existing work, ask before risky actions, verify changes). |
-| `agents/` | Who does the work | Defines the two primary agents you talk to (`dev`, `chat`) and four specialist subagents (`explore`, `implement`, `ui`, `verify`). |
+| `agents/` | Who does the work | Defines the two primary agents you talk to (`dev`, `chat`) and five specialist subagents (`explore`, `planner`, `implement`, `ui`, `verify`). |
 | `commands/` | How you start a task | Slash commands like `/plan`, `/fix`, `/improve`, `/commit`, and `/pr` that launch repeatable workflows. |
 | `skills/` | Step-by-step playbooks | Reusable instructions that commands or agents load when needed (for planning, execution, Git isolation, verification, cleanup, and reporting). |
 | `plugins/` | Small automations | Background TypeScript hooks that attach command skills automatically, keep responses in English, and optionally load the concise `caveman` style. |
@@ -97,9 +97,18 @@ For the full handoff lifecycle and rules, see [Workers](./workers.md).
 
 - **Session model:** Pick any model you have access to with `/models`. Commands keep
   your chosen session model instead of silently switching it.
-- **Pinned worker models:** `implement` and `ui` pin specific models in their agent
-  frontmatter (`agents/implement.md` and `agents/ui.md`). Check those pins if you do
-  not have access to those models.
+- **Models live in config:** Every agent model, including the optional `planner`, the
+  `compaction`/`title`/`summary` helpers, and the workers, is set under `agents` in
+  `opencode.jsonc` (template: `opencode.sample.jsonc`). Agent files name roles, not
+  models, so changing a model is a one-line edit. Check those entries if you do not
+  have access to the listed models.
+- **Tiered models:** Plan with a heavy model, execute with a cheap one. Either run
+  `/use:worker`, or switch the session model with `/models` and tell the new model to
+  execute the approved plan. Reply `approve r<N> brief` to get a compact execution
+  brief first; compact, switch, then ask the new model to run it.
+- **Questions:** Agents ask through OpenCode's `question` tool. When a question or
+  option is too long for the TUI, they ask in plain Markdown instead (`Q1 B, Q2 A`).
+  `/plan`, `/setup`, and `/ask` keep asking until the task is unambiguous.
 - **Plugins:** Three small plugins in `plugins/` handle automatic skill attachment
   for slash commands (`command-skills.ts`), consistent English output
   (`english-output.ts`), and optional concise replies (`caveman-auto.ts`).

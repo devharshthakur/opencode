@@ -1,6 +1,6 @@
 # Agents
 
-OpenCode has two primary agents and four specialist workers. Agent selection and
+OpenCode has two primary agents and five specialist subagents. Agent selection and
 model selection are independent; commands preserve the current session model.
 
 ## Primary agents
@@ -25,22 +25,27 @@ may differ from the session model.
 | `implement` | Execute an approved implementation handoff and return validation evidence | Scoped edits and checks; no recursion, browser, or delegation |
 | `ui` | Build UI components, pages, and styles that match existing conventions | Read, edit, shell, web, skills, image generation; sensitive files denied |
 | `verify` | Independently review actual approved changes | Read-only; no shell, edits, tests, or delegation |
+| `planner` | Optional heavy-model planning draft; used only on request | Read-only; no shell, edits, questions, or delegation |
 
 `explore` and `verify` report evidence but do not change files. `implement` returns a
 self-contained result for the parent to accept. `ui` follows existing design
 conventions and handles visual implementation.
 
-## Model pins
+## Model assignments
+
+Models are assigned only in `opencode.jsonc` under `agents.<id>.model`; no agent file
+pins one. The tracked template is `opencode.sample.jsonc`.
 
 | Agent | Model |
 | :--- | :--- |
-| `implement` | `opencode-go/deepseek-v4.1-flash#max` |
-| `ui` | `opencode-go/gpt-6-luna#high` |
-| Others | Session or configuration default |
+| `dev`, `chat`, `implement`, `compaction`, `title`, `summary` | `opencode-go/deepseek-v4.1-flash#max` |
+| `verify`, `ui` | `opencode-go/gpt-6-luna#high` |
+| `planner` | `opencode-go/kimi-k3.1-pro#high` |
+| `explore` | `opencode-go/muse-spark-1.3-contributor#high` |
 
-Model pins live in agent frontmatter and override `agents.<id>.model` from the
-configuration. Use `/models` to choose the session model. Check the pins before
-using `implement` or `ui`, and edit them if you cannot access those models.
+Use `/models` to choose the session model. Edit the config entries if you cannot
+access these models. `verify` uses a different model family from `implement` so the
+review does not share its blind spots.
 
 > [!NOTE]
 > The configured Muse Contributor model is not zero-data-retention. Prompts and
@@ -61,7 +66,7 @@ The checked-in permission lists are the source of truth. The main differences:
 | `verify` | Denied | Denied | Denied | Common secrets denied |
 
 Permission checks supplement, but do not replace, approval and ownership rules.
-Static frontmatter does not prove live runtime behavior.
+Static configuration does not prove live runtime behavior.
 
 ## Choosing an agent
 
