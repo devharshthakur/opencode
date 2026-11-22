@@ -28,9 +28,10 @@
     "image_preview": true
   },
   "tabs": {
-    "mode": "off",
+    "mode": "auto",
     "layout": "horizontal",
-    "indicators": "numbers"
+    "indicators": "status",
+    "scope": "cwd"
   },
   "attention": {
     "notifications": true,
