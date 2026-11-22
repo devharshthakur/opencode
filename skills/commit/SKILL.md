@@ -32,8 +32,13 @@ including automatic and PR-scoped commits. Keep exact messages verbatim.
   `<type>[optional scope][!]: <description>`, optional body and verified footers.
 - Use a verified scope or omit it. Short imperative description, no trailing
   period, header about 72 characters. A body is optional for trivial self-explanatory
-  changes; otherwise briefly explain what/why. Write prose in lowercase, preserving
-  identifier/package/path casing inside backticks. Never invent a breaking change.
+  changes; otherwise briefly explain what/why. Write prose in lowercase. In the
+  description, body, and footers, wrap identifiers, paths, npm package names, and
+  web technology names used by the project (languages, frameworks, libraries,
+  tools, package managers) in backticks, preserving their original casing. Leave
+  the `type(scope)!:` prefix untouched, including a technology name used as the
+  scope, and never double-wrap an existing code span. Never invent a breaking
+  change.
 - Default to small, coherent commits: one concern per commit, in dependency order,
   each independently reviewable and not knowingly broken. Keep tightly coupled
   changes together; path or hunk count alone is not a reason to split. If unrelated
