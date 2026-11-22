@@ -4,6 +4,7 @@ A personal [OpenCode V2](https://opencode.ai/v2/docs/) setup for project work:
 two primary agents, specialist workers, slash commands, and shared skills for
 planning, implementation, review, and delivery.
 
+[![Release](https://img.shields.io/github/v/release/devharshthakur/opencode?include_prereleases&style=flat-square)](https://github.com/devharshthakur/opencode/releases)
 [![Documentation](https://img.shields.io/badge/docs-read%20the%20guide-2ea44f?style=flat-square)](https://devharshthakur.github.io/opencode/)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 
