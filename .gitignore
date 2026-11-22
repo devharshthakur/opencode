@@ -5,3 +5,6 @@ opencode.jsonc
 service.json
 .DS_Store
 .agents/
+docs/.vitepress/cache
+docs/.vitepress/dist
+docs/.vitepress/.temp
