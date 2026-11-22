@@ -1,58 +1,60 @@
 # OpenCode workflow
 
-A personal [OpenCode V2](https://opencode.ai/v2/docs/) setup for project work. It
-provides two primary agents, specialist workers, slash commands, and shared skills
-for planning, implementation, review, and delivery.
+A personal [OpenCode V2](https://opencode.ai/v2/docs/) setup for project work:
+two primary agents, specialist workers, slash commands, and shared skills for
+planning, implementation, review, and delivery.
 
-This repository is a configuration collection, not a standalone application. Copy
-or adapt the pieces you need.
+[![Documentation](https://img.shields.io/badge/docs-read%20the%20guide-2ea44f?style=flat-square)](https://devharshthakur.github.io/opencode/)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 
-## Documentation
-
-The full documentation is published at
-[devharshthakur.github.io/opencode](https://devharshthakur.github.io/opencode/).
-
-| Section | What it covers |
-| :--- | :--- |
-| [Getting Started](docs/guide/getting-started.md) | Prerequisites, installation, provider setup, and a first-run check |
-| [About the Setup](docs/guide/about-setup.md) | How the setup is structured, primary agents, subagents, and why they are split |
-| [Commands and Workflows](docs/guide/commands-and-workflows.md) | Slash commands, approval boundaries, isolation, and delivery gates |
-| [Using the Setup](docs/guide/using-the-setup.md) | Practical starter guide for picking agents, commands, and running your first tasks |
-| [Workers](docs/guide/workers.md) | Worker roles, handoffs, and task-scoped authorization |
-| [Agents](docs/reference/agents.md) | Primary agents, workers, models, and access |
-| [Commands](docs/reference/commands.md) | Slash commands for asking, planning, fixing, shipping, and improving |
-| [Skills](docs/reference/skills.md) | Workflow, delivery, shared-policy, and tool skills |
-| [Architecture](docs/reference/architecture.md) | Repository layout, plugins, configuration, and maintenance |
+> [!NOTE]
+> This repository is a global configuration, not a project template. Install it
+> once, and every project you open uses the same agents, commands, and skills.
 
 ## Quick start
 
-1. Clone this repository to `~/.config/opencode`.
-2. Create your local config from the tracked sample:
+```sh
+git clone https://github.com/devharshthakur/opencode.git ~/.config/opencode
+cd ~/.config/opencode
+cp -i opencode.sample.jsonc opencode.jsonc
+```
 
-   ```sh
-   cp opencode.sample.jsonc opencode.jsonc
-   ```
+Then:
 
-3. Set provider accounts, accessible model IDs, and required environment variables.
-4. Start OpenCode from a project and choose a model with `/models`.
+1. Set your provider credentials and accessible model IDs.
+2. Start OpenCode in a project.
+3. Pick a model with `/models`.
 
 > [!TIP]
-> Context7 is enabled in the sample config. Other MCP servers are opt-in. Local
+> Context7 is enabled by default. Other MCP servers are opt-in. Local
 > `opencode.jsonc` and `service.json` files are Git-ignored.
 
-The sample records defaults only. Check the model pins in `agents/implement.md` and
-`agents/ui.md` before using those workers, and edit them if you cannot access the
-listed models.
+> [!IMPORTANT]
+> Check the worker model pins in [`agents/implement.md`](agents/implement.md) and
+> [`agents/ui.md`](agents/ui.md) before using `implement` or `ui`.
+
+## Documentation
+
+| Guide | What it covers |
+| :--- | :--- |
+| [Getting Started](docs/guide/getting-started.md) | Install, configure, verify |
+| [About the Setup](docs/guide/about-setup.md) | Structure, primary agents, subagents |
+| [Commands and Workflows](docs/guide/commands-and-workflows.md) | Approvals, isolation, delivery gates |
+| [Using the Setup](docs/guide/using-the-setup.md) | Day-to-day walkthrough |
+
+Full reference: [Agents](docs/reference/agents.md) · [Commands](docs/reference/commands.md) · [Skills](docs/reference/skills.md) · [Architecture](docs/reference/architecture.md)
 
 ## Safety
 
-- Plan approval authorizes local implementation only.
-- Worker execution needs task-scoped authorization, except `/improve*` workflows.
-- Commits, pushes, pull requests, and deployment have separate approval gates.
-- `dev` is allow-all. Review configured permissions and provider data policies.
-- The configured Muse Contributor model is not zero-data-retention.
+> [!WARNING]
+> `dev` is allow-all, including shell commands and sensitive reads. Review the
+> configured permissions and your provider's data policy before use.
 
-See [Commands and Workflows](docs/guide/commands-and-workflows.md) for the full boundaries.
+- Plan approval authorizes local implementation only.
+- Worker execution needs task-scoped `/use:worker` or `@worker` authorization,
+  except `/improve*`.
+- Commits, pushes, PRs, and deployment have separate approval gates.
+- The configured Muse Contributor model is not zero-data-retention.
 
 ## License
 
