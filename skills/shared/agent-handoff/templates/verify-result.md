@@ -1,29 +1,19 @@
 # Verification result
 
-## Identity and review status
-Request: <request ID>
-Task: <task ID>
-Role: verify
+Request: <request ID> | Task: <task ID>
 Review status: <completed | partial | blocked>
 Implementation assessment: <supported | contradicted | unverified | mixed>
 
-## Acceptance assessments
-- A1 — <supported | contradicted | unverified>: <evidence and limitations>
+## Acceptance
+- A1 — <supported | contradicted | unverified>: <evidence and limitation>
 
 ## Findings
-<Severity, exact location/excerpt, evidence, impact, and criterion for each
-distinct root cause—or none found within stated coverage.>
+<Per root cause: severity, location/excerpt, impact, criterion; or none within coverage.>
 
-## Supporting evidence and actual checks
-<Observed source/artifact evidence and actual permitted checks/results.
-Label implementation-reported checks separately; static review is not runtime proof.>
+## Checks and freshness
+<Actual permitted checks and results. Implementer-reported checks labeled as claims.
+Freshness: matched | drifted | unverified. Coverage limits.>
 
-## Freshness and coverage
-<Parent proof assessed, artifacts reviewed, exclusions and coverage limitations.>
-
-## Gaps and targeted follow-ups
-<Unverified criteria and smallest useful lookup; targeted parent reads or none.>
-
-## Todos, blockers, and cleanup
-<Assigned Todo statuses/evidence if any. Blockers mean inability to finish review,
-not implementation defects. Cleanup/resource state or none created.>
+## Gaps and blockers
+<Unverified criteria with smallest lookup. Blockers mean inability to finish the
+review, not implementation defects.>

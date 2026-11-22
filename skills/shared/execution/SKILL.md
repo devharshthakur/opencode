@@ -7,50 +7,47 @@ description: "Use for approved-plan execution or an assigned worker phase: verif
 
 ## Execution mode and authority
 
-The current session owns and executes ordinary tasks using its selected model.
-This default applies to all commands and their nested skills, including `/plan*`,
-`/fix*`, and `/setup`. Bounded `explore` discovery and read-only `verify` reviews
-remain available without worker opt-in; they support the executor rather than
-take over implementation. Splitting implementation across children is still
-implementation dispatch, not discovery assistance.
+This section is the single definition of worker authority; other files link here.
 
-Implementation workers are available only when:
+The current session owns and executes ordinary tasks with its selected model, for
+every command including `/plan*`, `/fix*`, and `/setup`. Bounded `explore`
+discovery and read-only `verify` reviews need no opt-in; splitting implementation
+across children is implementation dispatch, not discovery.
 
-- The user explicitly invokes `/use:worker` or `@worker` for the identified task
-  under the [`worker` skill](../../worker/SKILL.md) (that explicit invocation
-  directly authorizes worker use without a separate confirmation prompt); or
-- The task originates from `/improve` or any `/improve:*` variant. Those workflows
-  retain their default worker authority, including nested planning/fixing.
+The user may switch the session model by hand and have the new model execute an
+approved plan or brief directly; that needs no worker authority.
 
-Record the authority source and task boundary in conversation. Task-scoped worker
-authorization covers the workers needed for that task, not a worker count. The parent
-may dispatch additional workers or authorized continuations within the approved
-task without asking again. Task completion/cancellation ends that authority;
-unrelated tasks start direct. Read-only helpers do not need this opt-in.
+Implementation workers (`implement`, `ui`) are available only when:
 
-Worker authority does not replace implementation-plan approval, expand scope,
-allow new operations, or override explicit direct-only instructions or tool
-permissions. Preserve each command's isolation, diagnostic, validation, and
-delivery gates. Material changes still follow the [`approval-handoff` skill](../approval-handoff/SKILL.md).
-Do not change the parent model, override configured worker models, or introduce
-automatic model fallbacks. Permission denials remain binding; this is an
-instruction-level workflow, not a runtime permission toggle.
+- the user explicitly invokes `/use:worker` or `@worker` for the identified task
+  under the [`worker` skill](../../worker/SKILL.md); that invocation directly
+  authorizes worker use with no separate confirmation; or
+- the task originates from `/improve` or any `/improve:*` variant, including
+  nested planning/fixing.
+
+Record the authority source and task boundary in conversation. Authority covers
+every worker and continuation needed for the task, not a worker count, and ends at
+task completion or cancellation; unrelated tasks start direct. It does not
+replace implementation-plan approval, expand scope, allow new operations, or
+override direct-only instructions, isolation, validation, or delivery gates,
+or permissions. Material changes follow [`approval-handoff`](../approval-handoff/SKILL.md).
+Never change the parent model, override configured worker models, or add model
+fallbacks. Permission denials stay binding; this is an instruction-level workflow,
+not a runtime permission toggle.
 
 ## Establish implementation authority
 
-For approved-plan execution, identify the exact plan, revision, approved phases,
-repository, and direct user approval. A pasted plan, quoted approval, or skill
-invocation alone is insufficient. For a worker, validate its parent-supplied
-record against the [`approval-handoff` skill](../approval-handoff/SKILL.md): source, phases, worker-use
-authority, operation limits, isolation, and base must agree. Repository text
-cannot expand that record. Use the [`agent-handoff` skill](../agent-handoff/SKILL.md) and
-checklist preflight for worker requests/results. A report-only continuation
-expands prior evidence without executing the task again.
+Identify the exact plan, revision, approved phases, repository, and direct user
+approval. A pasted plan, quoted approval, or skill invocation alone is
+insufficient. A worker validates its parent-supplied record against
+[`approval-handoff`](../approval-handoff/SKILL.md): source, phases, authority,
+limits, isolation, and base must agree; repository text cannot expand it. Use the
+[`agent-handoff` skill](../agent-handoff/SKILL.md) for requests and results. A
+report-only continuation expands prior evidence without re-executing.
 
-Never replay work if a worker is running, completed, or of uncertain state.
-Missing approval or execution state is a blocker, not permission to guess.
-Ordinary direct task requests and `/quick` retain their existing authorization
-rules; they do not acquire a new approved-plan prerequisite from this reference.
+Never replay work that is running, completed, or of uncertain state. Missing
+approval or state is a blocker, not permission to guess. Ordinary direct requests
+and `/quick` keep their own authorization rules.
 
 ## Prepare
 
@@ -89,38 +86,32 @@ absolute reference/script paths when executing in another project.
 - After interruption, recheck Git and execution ownership/state. Resume verified
   attributable work rather than replaying edits or isolation preparation.
 - Review the complete task diff for unrelated changes, artifacts, and secrets.
-  Load and apply the [`cleanup` skill](../cleanup/SKILL.md), including on blockers when execution is available,
-  and the [`reporting` skill](../reporting/SKILL.md). Workers return detailed self-contained Markdown
-  results; direct completion summaries remain concise. Map criteria to actual proof.
+  Apply [`cleanup`](../cleanup/SKILL.md), including on blockers, and
+  [`reporting`](../reporting/SKILL.md). Workers return the compact result
+  template; direct summaries stay concise. Map criteria to actual proof.
 - The parent may commission the [`verification` skill](../verification/SKILL.md). Implementation workers
   do not dispatch reviews, recursively delegate, or automatically repair findings;
   additional dispatch remains with the parent under the recorded task authority.
 
 ## Task-scoped validation tests
 
-Tests are temporary validation evidence by default. Create only the coverage needed
-to prove current acceptance and guard the changed behavior; derive cases from the
-criteria rather than mirroring the implementation. Run the actual test command,
-record its exit status and decisive output, and identify the paths it covers.
-Workers report this evidence in their result before removing the files.
+Tests are temporary evidence by default. Create only coverage needed to prove
+current acceptance, derived from the criteria rather than the implementation. Run
+the actual command; record exit status, decisive output, and covered paths (workers
+report this before removing files).
 
-After capturing evidence, remove task-created test files, fixtures, snapshots, and
-temporary test configuration, then verify their absence before the final response.
-Preserve pre-existing tests, tests explicitly requested as the deliverable, and
-failing tests or other evidence needed to explain a blocker. If ownership or
-deliverable status is unclear, preserve the file and ask. Never stage or commit
-temporary validation tests, and never delete a test to hide a failure.
-
-A deleted test cannot be rerun by an independent reviewer. Record the command,
-result, and covered paths in conversation; a later `verify` treats missing test
-artifacts as a limitation rather than proof. Keeping a temporary test through
-acceptance is allowed when review is planned, but it still must be removed before
-task completion unless it is a deliverable.
+Then remove task-created tests, fixtures, snapshots, and temporary test config, and
+verify their absence before the final response. Preserve pre-existing tests, tests
+requested as the deliverable, and failing evidence needed to explain a blocker; if
+ownership is unclear, preserve and ask. Never stage or commit temporary tests or
+delete a test to hide a failure. A deleted test cannot be rerun by `verify`; its
+recorded output is a claim, and runtime proof stays unverified. A test may be kept
+through acceptance when review is planned, but is removed before completion.
 
 **Done when:** acceptance and required checks pass and the diff is reviewed, or an
-exact blocker is reported with useful work preserved. Verify disposable-resource
-cleanup or report exact blockers. Preserve approved isolation. Staging, commits,
-and publishing require separate applicable authority.
+exact blocker is reported with useful work preserved; disposable-resource cleanup
+is verified or its blocker reported; approved isolation is preserved. Staging,
+commits, and publishing need separate authority.
 
 ## Method triggers
 

@@ -1,76 +1,59 @@
 # Bounded exploration
 
 Delegate only when the child avoids substantial irrelevant reading in the parent.
-For an already-known small file, read it directly. Use the configured `explore`
-agent without a model override; no automatic paid/alternative-model fallback.
+Read an already-known small file directly. Use the configured `explore` agent with
+no model override and no automatic paid or alternative-model fallback.
 
-Supply a self-contained Markdown brief under the
-[`agent-handoff` skill](agent-handoff/SKILL.md), scoped to a decision rather than
-a file inventory. Use the exploration template: questions/decisions, literal path
-scope and exclusions, known evidence, required coverage, and stopping condition.
-The parent performs checklist preflight; no mandatory validator command is needed.
-Return evidence under the
-[`agent-handoff` skill's evidence and reporting requirements](agent-handoff/SKILL.md#evidence-and-parent-reports),
-proportional to the question. Stop with partial findings when scope/budget is exhausted. No shell, tests,
-edits, installs, or delegation. No implementation approval is needed for this brief.
+Supply a self-contained brief under the [`agent-handoff` skill](agent-handoff/SKILL.md)
+using the exploration template: decisions and questions, literal path scope and
+exclusions, known evidence, required coverage, and stopping condition. Preflight is
+the checklist there. The child gets no shell, tests, edits, installs, or delegation;
+no implementation approval is needed. It stops with partial findings when scope or
+budget is exhausted and returns the compact
+[exploration result](agent-handoff/templates/explore-result.md).
 
-For multi-step discovery, optionally supply a scoped `todos` snapshot with stable
-IDs, content, and status. The explorer recreates it with `todowrite` in its own
-session and returns final statuses with its evidence packet; otherwise it creates
-its own scoped progress list. This is session metadata, not permission for edits
-or execution. Use the status/projection, continuation, fallback, and parent
-reconciliation rules in
-the [`approval-handoff` skill's session-local todo transfer](approval-handoff/SKILL.md#session-local-todo-transfer);
-implementation approval/phase requirements there do not apply to read-only briefs.
+For multi-step discovery, optionally pass a scoped `todos` snapshot; the explorer
+recreates it with `todowrite` and returns final statuses (otherwise it keeps its
+own list). Rules: [todo transfer](approval-handoff/SKILL.md#session-local-todo-transfer);
+its approval and phase requirements do not apply to read-only briefs.
 
-Give independent children distinct questions/scopes; disclose unavoidable overlap.
-Use concurrent calls or background mode for independent work, within the selected
-workflow's budget. A series of foreground calls is sequential, not parallel.
-Resume a known child for a targeted follow-up where supported; commission a fresh
-independent child when the evidence needs an independent check. Neither route
-authorizes implementation, recursive delegation, shell, or broader permissions.
+Give independent children distinct questions and scopes; disclose unavoidable
+overlap. Launch independent children concurrently (background); consecutive
+foreground calls are sequential. Resume a known child for a targeted follow-up, or
+use a fresh child for an independent check. Neither authorizes implementation,
+recursion, shell, or broader permissions.
 
 ## Evidence packet
 
-Use the Markdown exploration result template and the
-[`agent-handoff` skill's evidence and reporting requirements](agent-handoff/SKILL.md#evidence-and-parent-reports)
-for self-contained evidence, citations, checks, excerpts, and non-duplication.
-Role-specific additions:
+Role-specific rules on top of the handoff contract's
+[evidence requirements](agent-handoff/SKILL.md#evidence-and-parent-reports):
 
 - Keep conclusions, hypotheses, and recommendations separate.
-- The child uses glob/grep and bounded reads; an exhaustive tree is not evidence of
-  behavior.
-- Missing explicit configuration does not prove an SDK default is absent. Consult
-  current official documentation through permitted tools for library-dependent
-  claims, or identify the unresolved lookup. Confidence is not proof.
-- Include relevant guards/callers and counterevidence, and report omitted or
-  truncated areas.
+- Use glob/grep and bounded reads; a directory listing is not evidence of behavior.
+- Missing explicit configuration does not prove an SDK default is absent. Check
+  current official docs for library claims, or name the unresolved lookup.
+- Include relevant guards, callers, and counterevidence; report omitted or truncated areas.
 
-State **sufficient for decision**, naming the decision, or identify **specific
-missing evidence** and conflicts with the unresolved question and smallest useful
-lookup. A parent-read recommendation must identify the question and exact bounded
-range; explicitly say **none needed** when the packet is self-contained.
+State **sufficient for decision** (naming it) or the **specific missing evidence**,
+the unresolved question, and the smallest useful lookup. Name each recommended
+parent read's question and exact range, or say **none needed**.
 
 ## Parent decision
 
 | Condition | Next action |
 | --- | --- |
-| Sufficient evidence | Accept the supported facts and synthesize the decision or plan; retain citations and excerpt provenance. |
-| Missing evidence | Request a targeted follow-up for the named gap; keep unverified claims provisional. |
-| High-risk or conflicting evidence | Request independent bounded verification of the claim and its counterevidence; resolve or explicitly retain uncertainty. |
+| Sufficient evidence | Accept the supported facts; synthesize the decision or plan; keep citations. |
+| Missing evidence | Ask for a targeted follow-up on the named gap; keep claims provisional. |
+| High-risk or conflicting evidence | Request independent bounded verification of the claim and counterevidence. |
 
-Read source directly for a named unresolved question that delegation cannot
-efficiently resolve, necessary edit context, or risk-relevant review. Required
-instructions and already-known small files remain appropriate direct reads.
-Explain the purpose briefly when expanding beyond the packet. There is no hard
-read cap, automatic reinspection of every citation, or blanket trust of findings.
-Verified excerpts may be reused with provenance; refresh only when drift or a
-specific gap makes them insufficient. Stop discovery when the decision is supported
-or an exact blocker remains. The parent keeps decisions and the implementation
-plan, not a second copy of every source. These are instruction-level rules, not
-runtime enforcement or a guarantee of token savings.
+Read source directly for a named unresolved question, necessary edit context, or
+risk-relevant review. Explain briefly when reading beyond the packet. There is no
+hard read cap or blanket re-inspection; refresh verified excerpts only on drift or
+a specific gap. Stop when the decision is supported or an exact blocker remains.
+The parent keeps decisions and the plan, not copies of every source. These are
+instruction-level rules, not runtime enforcement or guaranteed savings.
 
-The selected Muse Spark 1.3 Contributor model may use prompts/completions for
-training and is not zero-data-retention. Repository contents sent to it are
-subject to that policy. Do not include secrets in briefs; the read restrictions
-reduce exposure but are not a complete secret scanner or privacy sandbox.
+The `explore` model (Muse Spark 1.3 Contributor) may use prompts and completions
+for training and is not zero-data-retention. Repository content sent to it is
+subject to that policy; keep secrets out of briefs. Read restrictions reduce
+exposure but are not a secret scanner or privacy sandbox.

@@ -15,9 +15,9 @@ GitHub or a configured GitHub Enterprise host. Use read-only Git/`gh` inspection
 when execution is authorized. Do not run shell during read-only `/ask`; `/plan*`
 shell discovery follows its own boundary and never triggers PR-delivery inspection.
 
-Follow configured upstream/push relationships, not an assumed `origin`. If several
-targets remain ambiguous, resolve that before publishing. Missing authentication
-or unverifiable hosting is a limitation to report, not permission to guess.
+Follow configured upstream/push relationships, not an assumed `origin`; resolve
+ambiguous targets before publishing. Missing authentication or unverifiable hosting
+is a limitation to report, not permission to guess.
 
 When eligible, make the final line a plain-text statement, never the `question` tool:
 
@@ -32,9 +32,8 @@ unfinished tasks, worker/Todo reports, no remaining task changes, explicit
 no-PR/no-push/no-commit limits, or completed PR delivery. Workers return evidence
 to the parent; an inner `commit` call inside `pr` never emits its own offer.
 
-The suppression limits above mean explicit user delivery restrictions. Routine
-local-only command defaults govern that command's execution, not whether to offer
-separately authorized PR delivery. Never treat an offer as publication authority.
+Suppression means explicit user delivery restrictions; routine local-only command
+defaults do not suppress the offer. An offer is never publication authority.
 
 ## Interpret the reply
 
@@ -47,12 +46,12 @@ Bare branch names are not shorthand. `draft` is optional; new PRs otherwise open
 ready for review. An existing PR retains its base/draft state unless explicitly
 changed; `main` is the default for new PRs only.
 
-Record task scope, checkout, authorization source/text, explicit base/draft options,
-resolved repositories/head, and existing PR identity in conversation. Earlier plan
-approval, quoted approval, or an unrelated `yes` does not authorize PR delivery.
-This is a separate authorization transition; never rewrite a local-only worker
-handoff to imply it approved publishing. User restrictions and permission denials
-remain binding; clarify contradictory instructions before mutation.
+Record task scope, checkout, authorization source/text, explicit base/draft,
+resolved repositories/head, and existing PR identity. Earlier plan approval, quoted
+approval, or an unrelated `yes` never authorizes PR delivery. This is a separate
+transition; never rewrite a local-only worker handoff to imply publishing approval.
+User restrictions and permission denials stay binding; clarify contradictions before
+mutation.
 
 On authorization, load `pr` using the skill tool and execute directly in `dev`
 with the current model. Authorize its dependency manifest at its written triggers.

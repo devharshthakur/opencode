@@ -5,96 +5,66 @@ description: "Use when planning or performing selective read-only review of high
 
 # Independent verification
 
-Use configured `verify` selectively for high-risk/cross-cutting changes,
+Use the configured `verify` selectively: high-risk or cross-cutting changes,
 conflicting evidence, or a parent/user request. Use `explore` for ordinary source
 discovery and named gaps. The parent keeps acceptance and dispatch decisions.
 
-## Prepare independently collected evidence
+## Prepare independent evidence
 
-Follow the [`agent-handoff` skill](../agent-handoff/SKILL.md). Before implementation, the parent records
-resource ownership under the [`cleanup` skill](../cleanup/SKILL.md) and captures a scoped working-state
-baseline; after implementation, capture changes from that baseline, **not just
-HEAD**. The shell-denied verifier reads these actual before/after artifacts and
-relevant current source; the implementer's summary is only a claim to check.
-If review is selected only afterward and no attributable baseline exists, report
-that gap. A targeted current-source `explore` assessment may still be useful, but
-must not masquerade as a complete before/after review or invent a snapshot.
+Follow the [`agent-handoff` skill](../agent-handoff/SKILL.md). Before implementation,
+record resource ownership under [`cleanup`](../cleanup/SKILL.md) and capture a scoped
+working-state baseline; afterward capture changes from that baseline, not just
+`HEAD`. The shell-denied verifier reads these before/after artifacts and current
+source; the implementer's summary is only a claim. If review is chosen afterward
+with no attributable baseline, report that gap; a current-source `explore` pass is
+useful but is not a before/after review, and no snapshot may be invented.
 
-Task-scoped tests may already be deleted under the [`execution` skill's test policy](../execution/SKILL.md#task-scoped-validation-tests). Without test artifacts the
-verifier cannot rerun them; recorded command output remains a claim, so report
-runtime/test proof as unverified unless an attributable run is evidenced.
+Task tests may already be deleted ([test policy](../execution/SKILL.md#task-scoped-validation-tests));
+without artifacts the verifier cannot rerun them, so report runtime proof as
+unverified unless an attributable run is evidenced.
 
-The parent collects the evidence itself; there is no project utility. Before
-implementation, copy the scoped working state into one private `handoff-evidence-*`
-directory under a `temp_root` that exists outside the repository and is not its
-ancestor; after implementation, capture the same scope again and compare. Record
-immediately, including partial results from a failed capture: repository, capture
-ID, scope paths and exclusions, `temp_root`, exact directory, manifest path and
-digest, observed time, changed/unexpected paths, and limitations. Preserve baseline
-and snapshot until review, freshness, and parent reconciliation finish; then remove
-those exact task-owned directories and verify removal. Capture never sweeps
-temporary roots. Retain failure evidence in conversation, not secrets.
+The parent collects evidence itself (there is no project utility): copy the scoped
+state into one private `handoff-evidence-*` directory under a temp root outside the
+repository and not its ancestor, then capture the same scope after implementation
+and compare. Record immediately, even for partial captures: repository, capture ID,
+scope and exclusions, temp root, exact directory, manifest path and digest, observed
+time, changed or unexpected paths, limitations. Keep baseline and snapshot until
+review, freshness, and reconciliation finish; then remove those exact directories
+and verify removal. Never sweep temp roots; never record secrets.
 
-The manifest holds working-state fingerprints plus before/after artifact paths
-(before relative to the baseline directory; after relative to the snapshot
-directory). There is no raw diff in parent output. Parent token cost is the compact
-manifest summary; the worker reads actual artifacts. Bind the manifest digest in the
-verify request, together with the capture ID, `freshness`, and `observed_at`
-under the Markdown request's independent baseline/changes section. The parent reruns
-freshness immediately before dispatch and again before
-acceptance, supplying the actual result to the verifier when needed. Verifiers
-cannot compute hashes through shell; mark freshness unverified without attributable
-parent proof. Reading stale/tampered evidence never proves acceptance.
+The manifest holds working-state fingerprints and before/after artifact paths
+(relative to the baseline and snapshot directories); parent output has no raw diff.
+Bind the manifest digest, capture ID, `freshness`, and `observed_at` in the verify
+request. Rerun freshness just before dispatch and before acceptance. Verifiers
+cannot hash; without parent proof, freshness is unverified. Stale or tampered
+evidence never proves acceptance.
 
 ## Collection boundaries
 
-Content artifacts are limited to assigned paths. To flag unexpected changes, the
-parent fingerprints nonignored, nonexcluded, nonprotected repository files by
-read-only inspection; this is local I/O, not additional parent-model source reading.
-Capture runs with optional locks disabled and no hooks, external diffs, or textconv.
-HEAD/index changes are flagged for reconciliation. New/deleted files and file
-modes are included; pre-existing dirty work is the baseline, not claimed as edits.
+Content artifacts cover only assigned paths. To flag unexpected changes, the parent
+fingerprints nonignored, nonexcluded, nonprotected files by read-only inspection
+(local I/O, not model reading). Run Git with optional locks off and no hooks,
+external diffs, or textconv. Flag `HEAD`/index changes for reconciliation; include
+new/deleted files and modes; pre-existing dirty work is baseline, not claimed edits.
 
-Known secret-bearing paths, ignored files, symlinks, non-UTF-8/binary scoped files,
-and oversized/unreadable files are not copied. Limits: 1 MB/file, 32 MB scanned,
-10,000 listed files, bounded Git output/time. Skipped files and truncation are
-explicit limitations, never a complete-review claim. Exclusions/ignored files are
-outside coverage. This is not a secret scanner, filesystem sandbox, or ownership
-oracle; repository status/fingerprints cannot identify another actor's intent.
-Use scope/exclusions and existing read permissions; never use snapshots to route
-around a denied read. Sensitive config needs parent-owned field-limited sanitized
-proof or an explicit unverified criterion, not copying credentials to a neutral name.
-
-Capture must run only under the parent's authorized inspection scope. Capture does
-create disposable evidence files; it does not grant edit/test/execution scope.
-Unexpected changes, drift, incomplete coverage, or unclear attribution return to
-the parent. Report freshness as matched, drifted, or unverified; collection errors
-are limitations, never a pass.
+Do not copy known secret-bearing paths, ignored files, symlinks, binary or
+non-UTF-8 scoped files, or oversized/unreadable files. Limits: 1 MB/file, 32 MB
+scanned, 10,000 files, bounded Git output and time. Skips and truncation are stated
+limitations, never a complete-review claim. This is not a secret scanner, sandbox,
+or ownership oracle. Use scope and existing read permissions; never route around a
+denied read. Sensitive config needs parent-owned, field-limited sanitized proof or an
+explicit unverified criterion. Capture creates disposable evidence files only; it
+grants no edit, test, or execution scope. Report unexpected changes, drift,
+incomplete coverage, or unclear attribution to the parent; freshness is matched,
+drifted, or unverified, and collection errors are limitations, never a pass.
 
 ## Review and return
 
-1. Confirm task, scope, baseline/snapshot identities, parent freshness proof, and
-   permissions. Review the actual artifact contents and relevant current source.
-2. Compare changes against each acceptance criterion and invariant. Seek concrete
-   counterexamples; distinguish source observations from runtime assumptions.
-   Do not merely paraphrase or ratify the implementer's receipt.
-   Carry relevant approved check definitions in the acceptance/required-checks
-   section when criteria reference their IDs. This is reference material, not execution
-   authority. Claimed implementation checks are not checks the verifier performed;
-   without trustworthy runtime/log evidence, report that proof as unverified.
-3. Return the Markdown verification result under the
-   [`agent-handoff` skill's evidence and reporting requirements](../agent-handoff/SKILL.md#evidence-and-parent-reports).
-   Verification-specific content: findings with severity/location/evidence/impact,
-   every criterion supported/contradicted/unverified, actual checks, freshness,
-   limitations, todos, blockers, and cleanup. Put failed implementation criteria in
-   findings/assessments, not review blockers; blockers describe inability to finish
-   the review, and completed reviews report none. Report each root cause once and do
-   not duplicate findings for the same mismatch.
-4. The parent assesses findings, coverage, freshness, and cleanup before acceptance.
-   It may return in-scope corrections to the attributable implementer under current
-   approval; material changes require a revised plan/approval. A new review request
-   binds the corrected snapshot; a report-only request never repairs or re-reviews.
+1. Confirm task, scope, baseline/snapshot identity, freshness proof, and permissions. Review artifact contents and relevant current source.
+2. Compare against each criterion and invariant; seek concrete counterexamples; separate source observation from runtime assumption. Approved check definitions in the request are reference only. Claimed implementation checks were not performed by the verifier; without trustworthy logs, that proof is unverified.
+3. Return the [verification result](../agent-handoff/templates/verify-result.md). Put failed criteria in findings and assessments, not blockers (blockers mean the review could not finish). Report each root cause once.
+4. The parent assesses findings, coverage, freshness, and cleanup. It may send in-scope corrections to the attributable implementer under current approval; material changes need a revised plan. A new review binds the corrected snapshot; a report-only request never repairs or re-reviews.
 
-`verify` does not edit, run shell/tests/installations, delegate, or approve scope.
-Independent session context is not an independent model guarantee. Pending live
-permission/model-obedience proof must remain explicit; no automatic service restart.
+`verify` does not edit, run shell or tests, install, delegate, or approve scope. A
+separate session is not a guarantee of an independent model; live permission and
+model-obedience proof stays explicit.

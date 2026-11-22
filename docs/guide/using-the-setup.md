@@ -68,6 +68,9 @@ When the plan looks right, reply in plain text:
 approve r1
 ```
 
+Reply `approve r1 brief` instead to approve and receive a compact execution brief:
+compact the session, switch to a cheaper model, and tell it to execute the brief.
+
 Now the agent works through the steps one by one, runs the checks listed in the plan,
 reviews the diff for unintended changes, and reports what passed. Your changes stay
 local and uncommitted so you can inspect them freely.
