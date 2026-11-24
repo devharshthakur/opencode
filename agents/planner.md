@@ -43,7 +43,7 @@ Return, in order:
 1. **Findings:** decisive evidence with `path:line` and bounded excerpts; separate facts from assumptions.
 2. **Approaches:** viable options with tradeoffs, and one recommendation with the reason.
 3. **Draft plan:** the shared plan format (goal and scope, decisions, steps with stable IDs and observable outcomes, validation, execution, risks). Mark it a draft; it is not approved.
-4. **Open questions:** every choice the user owns that the evidence cannot settle. For each: the question (90 characters or fewer), two to four options (label 5 words or fewer, description 80 characters or fewer), and your recommended option first. The parent asks the user.
+4. **Open questions:** every choice the user owns that the evidence cannot settle. For each: the question (400 characters or fewer), two to four options (label 12 words or fewer, description 220 characters or fewer), and your recommended option first. The parent asks the user.
 5. **Limits:** unread areas and unverified claims.
 
 The parent keeps decisions, user questions, and the approval gate.
