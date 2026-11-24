@@ -24,7 +24,7 @@ This section is the single rule for every question to the user, in every agent a
 
 - Ask each question with the native `question` tool. Never ask discoverable facts; read or search first.
 - Batch independent questions into one call: at most four questions, two to four options each, recommended option first with `(Recommended)` in its label.
-- The TUI renders the form compactly. If any limit is exceeded, ask the whole round in Markdown instead: a question over 90 characters, an option label over 5 words, or an option description over 80 characters.
+- The TUI renders the form compactly. If any limit is exceeded, ask the whole round in Markdown instead: a question over 400 characters, an option label over 12 words, or an option description over 220 characters.
 - A Markdown round uses stable IDs (`Q1`, `Q2`) and labeled choices (`A`, `B`). Invite a reply such as `Q1 B, Q2 A` or a custom answer, then end the turn. Never duplicate a round across both formats.
 - A dismissal or partial reply leaves the unanswered questions open; ask only those. Confirming a choice is not implementation approval.
 - Ask implementation approval and authorization offers (plan approval, PR offer) only as plain text, never with the tool.

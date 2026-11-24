@@ -24,9 +24,17 @@ Count planned files in the proposal and verified files in results.
 <approval line only when confirmation is required>
 ```
 
-For `/commit`, end with:
-“Reply `approve` to stage and create this exact series, or describe changes.”
-Wait for approval. For `/commit:auto` and
+For `/commit`, end with the
+[approval gate prompt](../../shared/approval-handoff/SKILL.md#approval-gate-protocol):
+
+```text
+Gate: commit c<N>
+Ready to stage and create this exact series, without amend, push, or PR.
+Reply `approve c<N>` (or `/approve`) to proceed, or describe changes.
+```
+
+Substitute the series ID (`c1` first; increment on any change to paths, grouping, or
+messages). Wait for approval and follow the protocol's resolution rules. For `/commit:auto` and
 commits inside `/pr`, omit that line and proceed within approved scope.
 
 ## Standalone result

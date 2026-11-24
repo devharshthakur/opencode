@@ -59,7 +59,7 @@ starts only after approval.
 
 | Command | Purpose | Gate |
 | :--- | :--- | :--- |
-| `/commit [scope]` | Propose coherent local commits | Approval before staging or committing |
+| `/commit [scope]` | Propose coherent local commits | `approve c<N>` or `/approve` before staging or committing |
 | `/commit:auto [scope]` | Create coherent local commits | Invocation authorizes scoped local commits |
 | `/pr [:<base>] [draft]` | Commit task changes, push, and create or update a PR | Invocation authorizes the task-scoped PR flow |
 
@@ -67,6 +67,21 @@ starts only after approval.
 `/commit:auto` still stops for secrets, unclear ownership, or staged changes outside
 a narrower scope. `/pr` defaults to `main`, rejects invalid arguments, and never
 force-pushes, merges, deploys, or closes issues.
+
+## Approvals
+
+| Command | Purpose |
+| :--- | :--- |
+| `/approve [id] [brief]` | Send your approval reply for the single pending plan or commit gate |
+
+Plan and `/commit` gates end with `Gate: <kind> <id>`: `r<N>` for plans, `c<N>` for
+commit series. Reply `approve <id>` or run `/approve`. Bare `/approve` works only when
+exactly one gate is pending and it is in the last assistant message with no changes
+requested since. A stale, unknown, or mismatched ID authorizes nothing. The agent
+states `Approved: <kind> <id>` and re-verifies scope before acting; changed scope
+re-presents the gate with the next ID. `brief` applies to plan gates only. The PR offer
+and `/commit:auto` do not use gates. Approval is instruction-driven, not a runtime
+hook.
 
 ## Workers
 

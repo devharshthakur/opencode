@@ -39,8 +39,8 @@ but still respects Git, commit, and safety limits.
 During planning, the agent inspects the codebase, asks clarifying questions (through the
 `question` tool, or Markdown when options are long) until nothing is ambiguous, and
 presents a numbered plan (for example, `Revision: r1`). **No files are edited, no
-packages are installed, and Git is not mutated until you reply `approve r1`** (or
-give another direct approval).
+packages are installed, and Git is not mutated until you reply `approve r1`** or run
+`/approve` (or give another direct approval).
 
 All `/plan*` variants start from local `HEAD` by default and leave your changes
 uncommitted when done.
@@ -83,9 +83,15 @@ authorizes commits or pushes.
 
 | Command | What it does | Approval gate |
 | :--- | :--- | :--- |
-| `/commit [scope]` | Proposes clean, grouped commit messages and file counts | Waits for commit approval before staging or committing |
+| `/commit [scope]` | Proposes clean, grouped commit messages and file counts | Waits for `approve c1` (or `/approve`) before staging or committing |
 | `/commit:auto [scope]` | Creates scoped local commits directly | Running the command authorizes local commits (still stops for secrets or unclear scope) |
 | `/pr [:<base>] [draft]` | Commits task changes, pushes, and opens or updates a GitHub PR | Running the command authorizes the task-scoped PR flow |
+
+`/approve` sends your approval reply for the single pending plan or commit gate. Gates
+end with `Gate: plan r<N>` or `Gate: commit c<N>`. Bare `/approve` works only when exactly
+one gate is pending and it is the latest message; otherwise, pass the ID (for example,
+`/approve c2`). A stale ID approves nothing. The agent confirms with `Approved: <kind> <id>`
+and re-checks scope first; a changed series re-presents the gate with the next ID.
 
 Nothing is force-pushed, amended, merged, or deployed automatically.
 

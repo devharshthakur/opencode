@@ -68,7 +68,8 @@ When the plan looks right, reply in plain text:
 approve r1
 ```
 
-Reply `approve r1 brief` instead to approve and receive a compact execution brief:
+Or run `/approve` when exactly one plan is pending. Reply `approve r1 brief` (or
+`/approve brief`) instead to approve and receive a compact execution brief:
 compact the session, switch to a cheaper model, and tell it to execute the brief.
 
 Now the agent works through the steps one by one, runs the checks listed in the plan,
@@ -85,7 +86,8 @@ local and uncommitted so you can inspect them freely.
 Once you are happy with the local changes, choose how you want to deliver them:
 
 - Run **`/commit`** to review proposed commit messages and file groupings before
-  anything is staged or committed.
+  anything is staged or committed. Reply `approve c1` (or run `/approve`) to create the
+  series; any change to the grouping or messages gets a new ID, such as `c2`.
 - Run **`/pr`** (or **`/pr draft`**) when you are ready to commit task changes, push
   the branch, and open or update a GitHub pull request.
 
