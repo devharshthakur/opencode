@@ -20,7 +20,7 @@ current session and model.
    authority source.
 2. Follow the originating command's planning and approval gates. If no sufficient
    approved plan exists, load `plan`, prepare one without implementing, state that
-   worker authority is already active, and request only `approve r<N>`. Prepare the
+   worker authority is already active, and request only `approve r<N>` through the gate prompt. Prepare the
    detailed worker brief for the [`agent-handoff` skill](../shared/agent-handoff/SKILL.md);
    the user sees only the concise plan.
 3. Once the exact plan is approved and ownership is reconciled, dispatch the

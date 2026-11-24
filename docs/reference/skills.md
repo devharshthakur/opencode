@@ -38,7 +38,7 @@ unrelated work and stop on ambiguous scope.
 | Skill | Purpose |
 | :--- | :--- |
 | `shared/execution` | Verify authority and checkout, execute one Todo, validate, review the diff |
-| `shared/approval-handoff` | Present plans for `approve r<N>`, record state, dispatch authorized workers |
+| `shared/approval-handoff` | Define approval gates (`approve r<N>`, `approve c<N>`, `/approve`), record state, dispatch authorized workers |
 | `shared/agent-handoff` | Prepare and reconcile explore, implement, ui, and verify Markdown handoffs |
 | `shared/verification` | Selective read-only review with before/after evidence and freshness |
 | `shared/cleanup` | Track disposable resources and verify teardown during success or failure |

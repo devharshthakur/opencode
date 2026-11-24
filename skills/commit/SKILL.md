@@ -46,8 +46,10 @@ including automatic and PR-scoped commits. Keep exact messages verbatim.
   When the caller requests one commit or a specific grouping, follow that instead.
 - Retain the exact path-to-commit mapping and full messages for execution. Present
   the ordered messages and file counts, not individual paths, unless asked.
-  With confirmation required, obtain direct approval before staging or committing.
-  Changed paths, grouping, or messages require renewed approval even if counts
+  With confirmation required, obtain direct approval before staging or committing,
+  using the [approval gate protocol](../shared/approval-handoff/SKILL.md#approval-gate-protocol)
+  (`c<N>` IDs, resolution rules, scope re-check).
+  Changed paths, grouping, or messages require renewed approval (next `c<N>`) even if counts
   match. If the exact mapping cannot be recovered after interruption, reconcile
   it and obtain renewed approval before proceeding. With not-required policy,
   proceed within the explicit invocation's scope.

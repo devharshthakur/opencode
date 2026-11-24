@@ -68,7 +68,8 @@ When the plan looks right, reply in plain text:
 approve r1
 ```
 
-Reply `approve r1 brief` instead to approve and receive a compact execution brief:
+Or run `/approve` when exactly one plan is pending. Reply `approve r1 brief` (or
+`/approve brief`) instead to approve and receive a compact execution brief:
 compact the session, switch to a cheaper model, and tell it to execute the brief.
 
 Now the agent works through the steps one by one, runs the checks listed in the plan,
