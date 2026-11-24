@@ -51,7 +51,8 @@ Full reference: [Agents](docs/reference/agents.md) · [Commands](docs/reference/
 > `dev` is allow-all, including shell commands and sensitive reads. Review the
 > configured permissions and your provider's data policy before use.
 
-- Plan approval authorizes local implementation only.
+- Plan approval authorizes local implementation only. Reply `approve r<N>`, or run
+  `/approve` when exactly one gate is pending. Commit gates use `approve c<N>` the same way.
 - Worker execution needs task-scoped `/use:worker` or `@worker` authorization,
   except `/improve*`.
 - Commits, pushes, PRs, and deployment have separate approval gates.

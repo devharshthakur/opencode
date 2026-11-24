@@ -59,7 +59,7 @@ starts only after approval.
 
 | Command | Purpose | Gate |
 | :--- | :--- | :--- |
-| `/commit [scope]` | Propose coherent local commits | Approval before staging or committing |
+| `/commit [scope]` | Propose coherent local commits | `approve c<N>` or `/approve` before staging or committing |
 | `/commit:auto [scope]` | Create coherent local commits | Invocation authorizes scoped local commits |
 | `/pr [:<base>] [draft]` | Commit task changes, push, and create or update a PR | Invocation authorizes the task-scoped PR flow |
 
