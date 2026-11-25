@@ -3,6 +3,10 @@
 Syntax: `/pr [:<base>] [@<remote>] [draft]`. Resolve in this order; every blocker
 stops before any commit, branch creation, or push, and names the exact fix.
 
+These rules are the specification that `../scripts/pr-target.sh` implements. Agents
+run the script instead of applying them by hand; keep the two in sync when either
+changes.
+
 ## Base repository and branch
 
 | Input | Rule |
@@ -19,7 +23,9 @@ fetched if stale, not the local branch of the same name.
 
 The head repository is the repository of the branch's push remote:
 `branch.<name>.pushRemote`, then `remote.pushDefault`, then the upstream remote.
-Block on ambiguity. Without push rights to the head repository, report a blocker;
+A head branch with none of these (for example one just created from the base
+branch) inherits the local base branch's `pushRemote` or upstream remote. A
+repository with exactly one remote uses it. Block on remaining ambiguity. Without push rights to the head repository, report a blocker;
 never create a fork.
 
 | Current state | Action |
@@ -33,7 +39,8 @@ never create a fork.
 A branch "branched from the base ref" when `git merge-base HEAD <base-ref>` exists
 and no other ref is merged into HEAD but not into the base ref. List candidates with
 `git for-each-ref --merged HEAD --no-merged <base-ref>`, excluding the current
-branch and its own remote-tracking ref. Any remaining candidate means the branch
+branch, its own remote-tracking ref, and the local base branch (which may be ahead
+of `<base-ref>`). The nearest candidate is the one with the fewest commits to HEAD. Any remaining candidate means the branch
 descends from something other than the base: block and name it.
 
 ## Cross-repository heads
