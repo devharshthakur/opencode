@@ -11,7 +11,9 @@ The approved handoff supplies task identity, original checkout, mode, local base
 (`HEAD` by default), and operation limits. This skill grants no new authority.
 Current-checkout execution does not load it.
 
-1. Read `scripts/preflight.sh`, then run it in the original checkout. Inspect
+1. Run `sh scripts/preflight.sh` (trusted read-only helper; run it, do not read
+   it) with the original checkout as workdir, or reuse an invocation snapshot of
+   it that is still current. Inspect
    relevant staged/unstaged diffs and untracked files separately; its bounded
    output is not ownership proof. Record original branch/path and exact local base SHA.
 2. Stop for an unborn repository, invalid base, or unclear ownership. Never create
