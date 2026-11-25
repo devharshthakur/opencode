@@ -22,8 +22,17 @@ sending. A request to change the display format does not waive this.
 
 ## Inspect
 
-1. Read `../git-isolation/scripts/preflight.sh`, then run it in the checkout.
-   Inspect full staged/unstaged diffs, untracked contents, and recent commit style.
+1. Start from the command's invocation snapshot: `preflight.sh` output (branch,
+   status with every untracked file listed individually, staged/unstaged
+   statistics) and `scripts/conventions.sh` output (recent commit subjects and
+   convention files). Both are trusted read-only helpers; run them, do not read
+   them. For any missing output (no snapshot, or a caller such as `/pr` whose
+   snapshot lacks conventions), run the missing helper with the checkout as
+   workdir: `sh ../git-isolation/scripts/preflight.sh` or `sh scripts/conventions.sh`,
+   both resolved against this skill's base directory. A section marked
+   `[truncated ...]` must be inspected separately. Then inspect full staged and
+   unstaged diffs and untracked contents; statistics are not ownership proof.
+   Read any listed convention file before proposing messages.
 2. Attribute every included path/hunk to the requested scope. Arguments may narrow
    scope. When the caller gives no scope and defines the default as current changes,
    the scope is every tracked change, staged or unstaged (modification or deletion),

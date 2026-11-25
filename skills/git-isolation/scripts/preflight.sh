@@ -64,7 +64,7 @@ else
   if [ "$code" -eq 1 ]; then printf '%s\n' '(unborn; no commit yet)'
   else printf '%s\n' "$head" | bounded >&2; exit "$code"; fi
 fi
-report 'Status (staged / unstaged / untracked)' status --porcelain=v1 --untracked-files=all
+report 'Status (branch, staged / unstaged / untracked)' status --porcelain=v1 --branch --untracked-files=all
 report 'Unstaged statistics' diff --no-ext-diff --no-textconv --stat
 report 'Staged statistics' diff --cached --no-ext-diff --no-textconv --stat
 report Worktrees worktree list --porcelain
