@@ -56,7 +56,14 @@ shared planning/execution workflow instead of importing another executor protoco
 
 ## 1. Recon and scope
 
-Read already-known small guidance/manifests directly. Identify repository intent,
+Start from the command's project recon snapshot (`scripts/recon.py`: repository
+state, instruction files, manifests, package managers, scripts, task targets, CI,
+tooling config). Treat it as the file inventory: do not rediscover those facts
+with listing or search calls. Without a snapshot, run
+`python3 scripts/recon.py` (resolved against this skill's base directory) with the
+project as workdir; it is a trusted read-only helper, so run it without reading it.
+A truncated section needs separate inspection. Then read the listed guidance and
+manifests that matter for the scope. Identify repository intent,
 conventions, relevant ADRs/glossary, package manager, verification commands, current
 local HEAD and working-tree state. Bound searches to the requested paths, relevant
 callers, and critical flows; exclude generated/vendor output and sensitive files.

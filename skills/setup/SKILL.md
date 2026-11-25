@@ -24,7 +24,10 @@ after approval; do not fetch.
   against their source. Request missing essential material rather than guessing.
   Record source, version, decisive guidance, and gaps in conversation.
 - Inspect the destination: instructions, manifests, lockfiles, runtimes,
-  existing config, and relevant entry points. Inspect an intended new directory
+  existing config, and relevant entry points. Start from the command's project
+  recon snapshot (`../codebase-improve/scripts/recon.py`, a trusted read-only
+  helper; run it without reading it if no snapshot exists) and read only the
+  listed files that matter; do not rediscover the inventory. Inspect an intended new directory
   before proposing a generator. Use current official docs for compatibility;
   distinguish version-pinned instructions from latest guidance. Surface conflicts,
   required upgrades, and incompatible recipes. Do not send credentials or private
