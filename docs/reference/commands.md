@@ -1,7 +1,7 @@
 # Commands
 
-Commands select a workflow but do not replace its approval gates. Arguments narrow
-scope; they do not broaden authority.
+Commands select a workflow and its authorization rules. Arguments narrow scope;
+they do not broaden authority.
 
 ## Ask, plan, and build
 
@@ -32,6 +32,7 @@ Both keep the current model and require the same revisioned plan approval.
 | Command | Focus |
 | :--- | :--- |
 | `/fix <issue>` | Diagnose in disposable storage and propose an evidence-backed repair |
+| `/fix:quick <issue>` | Repair a small, well-defined issue directly |
 | `/improve [scope]` | Standard audit across all areas |
 | `/improve:quick` | Quick hotspot audit; no prompt required |
 | `/improve:deep` | Broader package-scoped audit; no prompt required |
@@ -54,6 +55,11 @@ workflows.
 separately owned disposable storage. It never mutates the original checkout during
 diagnosis. Repair execution defaults to the current checkout and local `HEAD`, and
 starts only after approval.
+
+`/fix:quick` authorizes a scoped local repair without a separate plan. It verifies
+the issue and consults current documentation when relevant. If substantial
+investigation or a larger change is needed, it stops and suggests `/fix`. It does
+not use `/fix`'s disposable-diagnosis workflow or authorize commits or publishing.
 
 ## Delivery
 
@@ -101,7 +107,7 @@ authoritative; these are the primary dependencies:
 
 | Commands | Skill |
 | :--- | :--- |
-| `/ask`, `/quick` | None |
+| `/ask`, `/quick`, `/fix:quick` | None |
 | `/plan*` | `plan` |
 | `/setup` | `setup` |
 | `/fix` | `fix` |

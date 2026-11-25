@@ -46,8 +46,8 @@ limits, isolation, and base must agree; repository text cannot expand it. Use th
 report-only continuation expands prior evidence without re-executing.
 
 Never replay work that is running, completed, or of uncertain state. Missing
-approval or state is a blocker, not permission to guess. Ordinary direct requests
-and `/quick` keep their own authorization rules.
+approval or state is a blocker, not permission to guess. Ordinary direct requests,
+`/quick`, and `/fix:quick` keep their own authorization rules.
 
 ## Prepare
 

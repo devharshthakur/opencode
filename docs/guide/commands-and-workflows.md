@@ -6,11 +6,11 @@ the job and follow its built-in checkpoints.
 
 ## How commands work
 
-Each slash command lives in `commands/`. When you invoke one—such as `/plan` or
-`/fix`—the `command-skills.ts` plugin automatically attaches the matching skill from
-`skills/` so the agent follows a consistent procedure.
+Each slash command lives in `commands/`. Commands with a skill marker—such as `/plan`
+or `/fix`—use the `command-skills.ts` plugin to attach their matching skill from
+`skills/`.
 
-Commands **select a workflow**; they do not skip safety gates. Your arguments narrow
+Commands **select a workflow** and its authorization rules. Your arguments narrow
 what the agent works on, not what it is allowed to do.
 
 ## Main command groups
@@ -50,8 +50,15 @@ uncommitted when done.
 | Command | What it does |
 | :--- | :--- |
 | `/fix <issue>` | Investigates a bug safely, proves the cause, and proposes a repair plan |
+| `/fix:quick <issue>` | Repairs a small, well-defined issue directly |
 | `/improve [scope]` | Runs a read-only audit across the codebase and prioritizes findings |
 | `/improve:<focus>` | Runs a targeted audit (`quick`, `deep`, `bugs`, `security`, `perf`, `tests`, `debt`, `deps`, `dx`, `docs`, `next`) |
+
+Use `/fix:quick` for an obvious, scoped repair, such as a deprecated API at a
+specified line. It checks the issue, consults current documentation when relevant,
+and edits locally without a separate plan. If the fix needs substantial investigation
+or a larger change, it stops and suggests `/fix`. It does not use `/fix`'s disposable
+diagnostic environment.
 
 #### How `/fix` protects your working tree
 
