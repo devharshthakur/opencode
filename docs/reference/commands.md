@@ -13,7 +13,12 @@ they do not broaden authority.
 | `/setup <sources...>` | Plan a customized setup from docs, URLs, attachments, or skills | After approval |
 | `/create:skill <idea>` | Design a local skill, then create it after design confirmation | After confirmation |
 
-`/plan*`, `/setup`, `/fix`, `/commit*`, and `/pr` pre-fill a read-only Git snapshot (`git status`, recent log or diff stat) through fixed `!` blocks that never include your arguments. `/plan`, `/setup`, and `/ask` ask clarifying questions until the task is unambiguous.
+Commands pre-fill read-only, local-only context through fixed `!` blocks that never include your arguments, so agents start from complete facts instead of spending tool calls on discovery:
+
+- `/plan*`, `/setup`, `/fix`: Git status and recent log.
+- `/commit*`: `preflight.sh` output (branch, every untracked file, staged/unstaged statistics) and `conventions.sh` output (recent commit subjects, commit-convention files).
+- `/pr`: `preflight.sh` output and recent commits. The agent then runs `pr-target.sh` once with your arguments quoted; it resolves remotes, base, head branch action, author/merge checks, `gh` auth, and existing PRs without mutating anything.
+- `/improve*`, `/setup`: `recon.py` project inventory (instructions, manifests, package managers, scripts, task targets, CI, tooling). `/plan`, `/setup`, and `/ask` ask clarifying questions until the task is unambiguous.
 
 `/plan` uses local `HEAD` as the base and keeps delivery local and uncommitted.
 Planning does not edit files, install dependencies, or mutate Git.

@@ -32,6 +32,21 @@ authority on their own.
 Commits, pushes, and pull requests remain separate gates. Delivery skills preserve
 unrelated work and stop on ambiguous scope.
 
+## Helper scripts
+
+Deterministic, read-only helpers replace discovery that agents would otherwise run
+call by call. Agents run them per their skill's usage contract without reading them.
+
+| Script | Used by | Output |
+| :--- | :--- | :--- |
+| `git-isolation/scripts/preflight.sh` | `/commit*`, `/pr`, execution, isolation, `/fix` | Branch, HEAD, status with every untracked file, diff statistics, worktrees |
+| `commit/scripts/conventions.sh` | `/commit*`, commits inside `/pr` | Recent commit subjects and commit-convention files |
+| `pr/scripts/pr-target.sh` | `/pr` | Resolved PR target facts, `BLOCKER:` lines, `result: ready\|blocked` (exit 0/3; 2 for bad arguments) |
+| `codebase-improve/scripts/recon.py` | `/improve*`, `/setup` | Bounded project inventory; never opens env or credential files |
+| `fix/scripts/diagnostic-env.py` | `/fix` | Disposable diagnostic copy lifecycle (`inspect`, `create`, `status`, `remove`) |
+
+`pr-target.sh` implements `pr/references/targets.md`; keep the two in sync.
+
 ## Shared policy skills
 
 | Skill | Purpose |
