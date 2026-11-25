@@ -26,7 +26,7 @@ reply and task origin.
 ## Approval gate protocol
 
 This section is the single definition of the approval prompt and its resolution.
-Plan gates (below) and `/commit` series gates use it. The PR offer and `/commit:auto`
+Plan gates (below) and `/commit` series gates use it. `/commit:auto` and `/pr`
 do not. Always plain text, never the `question` tool.
 
 **Prompt format.** End the gate with exactly:
@@ -144,6 +144,5 @@ edits, commits, or publishing.
 ## After completion
 
 The parent may run [`verification`](../verification/SKILL.md) for risk, conflict, or
-request, then loads [`pr-offer`](../pr-offer/SKILL.md). Only the parent offers;
-workers and intermediate Todos never do. PR authorization starts the separate
-`pr` workflow and never replays local implementation.
+request, then reports. Do not offer or suggest a PR. An explicit `/pr` is separate
+and never replays local implementation.

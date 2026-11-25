@@ -92,7 +92,7 @@ authorizes commits or pushes.
 | :--- | :--- | :--- |
 | `/commit [scope]` | Proposes clean, grouped commit messages and file counts in a required table | Waits for `approve c1` (or `/approve`) before staging or committing |
 | `/commit:auto [scope]` | Creates scoped local commits directly | Running the command authorizes local commits (still stops for secrets or unclear scope) |
-| `/pr [:<base>] [draft]` | Commits task changes, pushes, and opens or updates a GitHub PR | Running the command authorizes the task-scoped PR flow |
+| `/pr [:<base>] [@<remote>] [draft]` | Commits changes, pushes, and opens or updates a GitHub PR (`:dev` sets the base branch, `@upstream` targets another remote's repo) | Running the command authorizes the PR flow |
 
 `/approve` sends your approval reply for the single pending plan or commit gate. Gates
 end with `Gate: plan r<N>` or `Gate: commit c<N>`. Bare `/approve` works only when exactly
@@ -100,7 +100,8 @@ one gate is pending and it is the latest message; otherwise, pass the ID (for ex
 `/approve c2`). A stale ID approves nothing. The agent confirms with `Approved: <kind> <id>`
 and re-checks scope first; a changed series re-presents the gate with the next ID.
 
-Nothing is force-pushed, amended, merged, or deployed automatically.
+Nothing is force-pushed, amended, merged, or deployed automatically. The agent never
+offers or suggests a PR; run `/pr` yourself when you want one.
 
 ### 5. Opting into implementation workers
 
@@ -124,7 +125,7 @@ next:
 | **Plan** (`approve r<N>`) | Local edits and checks in the approved checkout | Workers (unless `/use:worker`, `@worker`, or `/improve*` was invoked), commits, pushes, PRs, deployment |
 | **Worker use** (`/use:worker` or `@worker`) | Delegating approved task steps to workers | New scope, unapproved plans, or extra operations |
 | **Commit** | Staging and creating local commits | Pushing or opening a PR |
-| **PR** | Task-scoped commits, push, and PR creation/update | Merging or deploying |
+| **PR** (`/pr`) | Commits, push, and PR creation/update | Merging or deploying |
 
 A Todo list tracks progress—it is **not** an approval. Permission denials and
 destructive-operation confirmations always still apply.

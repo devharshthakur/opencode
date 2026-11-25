@@ -7,55 +7,63 @@ metadata:
 
 # GitHub pull request
 
-Use the same [output templates](references/templates.md) for direct `/pr`,
-offer replies, create/update, custom bases, and draft delivery.
+`/pr` is the only way a PR is created or updated. No other workflow offers, hints
+at, or starts one. Use the [output templates](references/templates.md) for all
+create, update, custom-target, and draft delivery. Resolve the target with the
+[target rules](references/targets.md).
 
 ## Establish authority and target
 
-1. Load the [`pr-offer` skill](../shared/pr-offer/SKILL.md). Require explicit `/pr`
-   invocation or a direct reply to the pending offer, with attributable task scope.
-   Preserve the current model; execute directly in `dev`, without workers. In
-   `chat`, ask the user to select `dev` instead of broadening permissions.
-2. Read destination instructions and
-   `../git-isolation/scripts/preflight.sh`, then run that helper in the checkout.
-   Inspect index, unstaged/untracked content, existing commits, remotes, upstream,
-   and branch push configuration. Preserve unrelated work and the existing index.
-   Detached/unborn HEAD, secrets, mixed unrelated hunks/staged changes, or unclear
-   ownership block delivery. Do not treat all dirty files as task-owned.
-3. Consult current official Git and GitHub CLI documentation before relying on
+1. Require an explicit `/pr` invocation. A bare `yes`, quoted approval, or earlier
+   plan approval never authorizes delivery. Preserve the current model; execute
+   directly in `dev`, without workers. In `chat`, ask the user to select `dev`
+   instead of broadening permissions.
+2. Parse arguments as `[:<base>] [@<remote>] [draft]`, in any order, each at most
+   once. Reject unknown or duplicate tokens and empty values. `:<base>` is a branch
+   name and `@<remote>` is a configured git remote name; validate both with Git,
+   never as URLs, `owner/name`, or shell syntax, and quote every value. Bare names
+   are not shorthand. `draft` makes a new PR a draft; new PRs otherwise open ready
+   for review.
+3. Read destination instructions and `../git-isolation/scripts/preflight.sh`, then
+   run that helper in the checkout. Inspect index, unstaged/untracked content,
+   existing commits, remotes, upstream, and branch push configuration. Preserve
+   unrelated work and the existing index. Detached/unborn HEAD, secrets, or staged
+   changes outside the delivery scope block delivery.
+4. Consult current official Git and GitHub CLI documentation before relying on
    commands. Verify `gh` availability/authentication for the resolved host without
-   printing tokens. Distinguish the base repository from the head/push repository
-   in fork workflows; verify GitHub hosting, permissions, and branch relationships.
-   Prefer configured upstream/push relationships; do not assume `origin`. Resolve
-   ambiguous remotes, URL rewrites, or multiple destinations before mutation.
-4. Query open PRs using the exact head repository/branch and target repository.
+   printing tokens. Verify GitHub (or configured GitHub Enterprise) hosting from
+   fetch/push destinations without printing embedded credentials. Distinguish the
+   base (target) repository from the head (push) repository, and verify permissions
+   and branch relationships. Do not assume `origin`; resolve ambiguous remotes or
+   URL rewrites before mutation.
+5. Resolve the base repository, base branch, and head repository/branch by the
+   [target rules](references/targets.md). Record the invocation text, checkout,
+   explicit tokens, resolved repositories and branches, and existing PR identity.
+6. Query open PRs using the exact head repository/branch and target repository.
    Reuse a matching existing open PR; multiple matches require clarification.
-   New PRs default explicitly to `main`, even if GitHub's default differs; verify
-   the requested base exists. A missing base is a blocker, not a silent fallback.
-   Existing PRs retain their base/draft state unless explicitly changed. Never
-   retarget a PR or convert its draft state from an omitted option.
+   Existing PRs retain their base/draft state unless a token explicitly changes it.
 
 ## Prepare and review outgoing changes
 
 1. Verify task acceptance and required local checks, including recorded baseline
-   limitations. Unverified task acceptance or newly failing required checks block
-   publishing; report known baseline failures honestly rather than inventing green.
-2. Reuse an attributable task branch when safe. If on `main`, the selected base,
-   or another verified protected/default branch, create an unused `fix/<slug>` or
-   `feat/<slug>` task branch from current local HEAD before committing. Preserve
-   uncommitted work in place; no stash, reset, clean, or manual patch transfer.
-   Validate the name, avoid collisions, and verify the destination branch/status.
-   Never push directly to a base/protected branch. No new worktree is needed.
-3. If task changes are uncommitted, load `commit` using the skill tool with exact
-   task scope and `Confirmation policy: not-required`. Output the commit table from the commit skill's output template and
-   commit only attributable changes. The inner commit stops at local verification;
+   limitations, when the session has task history. Newly failing required checks
+   block publishing; report known baseline failures honestly rather than inventing
+   green.
+2. Delivery scope is all uncommitted changes plus every commit ahead of the
+   resolved base ref (`<remote>/<base>`). Do not require session attribution.
+3. Branch handling follows the [target rules](references/targets.md#head-branch).
+   Preserve uncommitted work in place; no stash, reset, clean, or manual patch
+   transfer. Never push directly to a base/protected branch. No new worktree is
+   needed.
+4. If changes are uncommitted, load `commit` using the skill tool with the exact
+   scope and `Confirmation policy: not-required`. Output the commit table from the
+   commit skill's output template. The inner commit stops at local verification;
    this skill alone owns subsequent publication and the final response.
-4. Verify the remote base/head without implicit merge/rebase. Fetch only the
-   necessary verified refs if local information is insufficient; fetching does not
-   authorize integrating changes. Review the complete outgoing diff and history
-   relative to the verified base, not only the latest task edits. Unrelated commits,
-   secrets, empty changes, or uncertain ownership block publication. Do not push
-   unrelated commits merely because only task files were staged.
+5. Fetch only the verified base and head refs if local information is insufficient;
+   fetching does not authorize merging or rebasing. Review the complete outgoing
+   diff and history relative to the verified base ref. Secrets, an empty diff,
+   merge commits, or commits by an author other than the configured Git identity
+   block publication. List the blocking commits; there is no override.
 
 ## Write for the reviewer
 
@@ -87,27 +95,28 @@ material reviewer need warrants an extra section; use plain prose in PR content.
 1. Record exact host, base/head repositories and branches, title/body, draft state,
    type label, and PR identity (if any). Use explicit destinations and safely quoted
    arguments/body files or stdin, never interpolated user text as shell code.
-2. Ensure the matching Conventional Commit type label exists in the target
+2. Ensure the matching Conventional Commit type label exists in the base
    repository. Create it only if absent; never use `--force` or alter existing label
    colors/descriptions. If label creation is denied, report the blocker; do not
    broaden permissions or silently omit the requested label.
-3. Push only the verified task head to its explicit remote/ref. Use a normal push;
+3. Push only the verified head to its explicit remote/ref. Use a normal push;
    non-fast-forward rejection blocks delivery. No force-push, automatic fork,
    merge, rebase, deployment, or branch deletion.
 4. Recheck for an existing matching open PR immediately before creation. Use
    `gh pr create` with explicit `--repo`, `--base`, `--head`, `--title`, `--body-file`,
-   `--label`, and `--draft` only when requested. For a matching existing PR use
-   `gh pr edit` on its exact number/URL with explicit repository; preserve human
-   content and labels, and change base/draft only when explicitly requested.
-   Consult current CLI syntax for draft conversion. Unsupported fork/head forms
-   are blockers, not permission to silently choose another repository.
+   `--label`, and `--draft` only when requested. Use `<owner>:<branch>` for `--head`
+   when the head repository differs from the base repository. For a matching
+   existing PR use `gh pr edit` on its exact number/URL with explicit repository;
+   preserve human content and labels, and change base/draft only when explicitly
+   requested. Consult current CLI syntax for draft conversion. Unsupported fork/head
+   forms are blockers, not permission to silently choose another repository.
 5. Read back the PR URL, base/head repository/branch, title/body, labels, draft state,
    and published head SHA. Distinguish pending CI from local validation. A failed
    command can still create a PR: on uncertainty, inspect remote state before any
    retry. Never duplicate a PR or repeat completed commits after interruption.
 6. Follow the [chat result](references/templates.md#chat-result): on success,
    reply with only the verified PR URL. If delivery is blocked, report the
-   precise blocker. Do not emit a PR offer.
+   precise blocker.
 
 **Done when:** the created/updated PR and published head are verified and its URL
 is reported, or a precise blocker is recorded with local/remote state preserved.
@@ -115,8 +124,8 @@ No automatic merge, issue closure, branch cleanup, or external skill deletion.
 
 ## Dependencies
 
-- `commit`: only when authorized PR preparation needs task-scoped local commits;
-  pass `Confirmation policy: not-required` and suppress its completion offer.
+- `commit`: only when PR preparation needs local commits; pass
+  `Confirmation policy: not-required`.
 - `opencode`: only for OpenCode-specific behavior needed by the task.
 - `writing-for-agents`: only when the task itself changes agent instructions,
   commands, or skills; not for ordinary PR prose.

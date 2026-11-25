@@ -80,9 +80,8 @@ within approved scope.
 
 Use one row per verified commit. For an empty scope, output only an Item/Value table
 with the row `Result | Nothing to commit.`, then stop.
-Append only the exact [PR offer](../../shared/pr-offer/SKILL.md#offer-once-at-completion)
-when eligible. Inside `/pr`, omit this result and hand verified commit evidence to the
-PR workflow; use its result template once.
+Append nothing after the tables. Inside `/pr`, omit this result and hand verified
+commit evidence to the PR workflow; use its result template once.
 
 ## Standalone blocker
 

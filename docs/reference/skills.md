@@ -27,8 +27,7 @@ authority on their own.
 | Skill | Purpose |
 | :--- | :--- |
 | `commit` | Create explicitly authorized, scoped local commits under a confirmation policy |
-| `pr` | Prepare task-scoped commits and create or update a verified GitHub PR |
-| `shared/pr-offer` | Inspect GitHub hosting and make the single optional PR offer after completed work |
+| `pr` | Prepare commits and create or update a verified GitHub PR, only on explicit `/pr` |
 
 Commits, pushes, and pull requests remain separate gates. Delivery skills preserve
 unrelated work and stop on ambiguous scope.

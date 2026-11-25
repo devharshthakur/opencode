@@ -96,9 +96,8 @@ Before sending any proposal, result, or blocker, verify:
 
 If any check fails, rewrite the reply before sending.
 
-At standalone completion, load and follow the [`pr-offer` skill](../shared/pr-offer/SKILL.md).
-When invoked inside `pr`, return local commit evidence to that workflow instead;
-do not emit an inner completion offer or independently publish.
+Never offer or suggest a PR at completion. When invoked inside `pr`, return local
+commit evidence to that workflow; do not independently publish.
 
 **Done when:** only authorized changes are committed in the approved series and
 verified, or a precise blocker is reported with work/index preserved. Tool

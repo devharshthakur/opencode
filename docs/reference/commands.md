@@ -67,12 +67,30 @@ not use `/fix`'s disposable-diagnosis workflow or authorize commits or publishin
 | :--- | :--- | :--- |
 | `/commit [scope]` | Propose coherent local commits | `approve c<N>` or `/approve` before staging or committing |
 | `/commit:auto [scope]` | Create coherent local commits | Invocation authorizes scoped local commits |
-| `/pr [:<base>] [draft]` | Commit task changes, push, and create or update a PR | Invocation authorizes the task-scoped PR flow |
+| `/pr [:<base>] [@<remote>] [draft]` | Commit changes, push, and create or update a PR | Invocation authorizes the PR flow |
 
 `/commit` always shows the planned series as a table (ID, Type, Subject, Body, Files) before it acts.
 `/commit:auto` still stops for secrets, unclear ownership, or staged changes outside
-a narrower scope. `/pr` defaults to `main`, rejects invalid arguments, and never
-force-pushes, merges, deploys, or closes issues.
+a narrower scope. `/pr` is the only way a PR is created: no workflow offers or
+suggests one. It never force-pushes, merges, deploys, or closes issues.
+
+### `/pr` targets
+
+| Token | Meaning |
+| :--- | :--- |
+| `:<base>` | Base branch. Default `main`; if the target repo has no `main`, `/pr` blocks and names the real default. |
+| `@<remote>` | Git remote whose repository receives the PR. Default: the push remote's repository, so a fork's parent is never targeted implicitly. |
+| `draft` | Open a new PR as a draft. |
+
+Tokens may appear in any order, each at most once. Examples: `/pr` (feature branch
+to `main`), `/pr :dev` (stacked PR), `/pr @upstream` (fork to upstream `main`),
+`/pr :dev @upstream draft`.
+
+On `main`, `/pr` creates a `feat/` or `fix/` branch from local HEAD. On another
+branch it reuses the branch only if it branched from the base; otherwise it blocks
+and names the likely parent (for example, "re-run `/pr :dev`"). Scope is all
+uncommitted changes plus commits ahead of the base. `/pr` blocks on secrets, merge
+commits, and commits by another author. It never creates a fork.
 
 ## Approvals
 
@@ -85,8 +103,8 @@ commit series. Reply `approve <id>` or run `/approve`. Bare `/approve` works onl
 exactly one gate is pending and it is in the last assistant message with no changes
 requested since. A stale, unknown, or mismatched ID authorizes nothing. The agent
 states `Approved: <kind> <id>` and re-verifies scope before acting; changed scope
-re-presents the gate with the next ID. `brief` applies to plan gates only. The PR offer
-and `/commit:auto` do not use gates. Approval is instruction-driven, not a runtime
+re-presents the gate with the next ID. `brief` applies to plan gates only. `/commit:auto`
+and `/pr` do not use gates. Approval is instruction-driven, not a runtime
 hook.
 
 ## Workers

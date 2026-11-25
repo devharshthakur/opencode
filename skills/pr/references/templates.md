@@ -24,8 +24,8 @@ content on updates. Write normal reviewer-facing prose, not caveman shorthand.
 ## Chat result
 
 On successful delivery, the entire final reply is the verified PR URL on its own
-line. No label, table, recap, or offer. This applies to create, update, and draft
-delivery, including PR offer replies.
+line. No label, table, recap, or follow-up suggestion. This applies to create,
+update, and draft delivery.
 
 If delivery is blocked, report the specific blocker and any next action needed.
 Include the verified URL if a PR already exists; never guess one. Published PR

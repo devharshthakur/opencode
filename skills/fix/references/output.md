@@ -51,6 +51,3 @@ Checks: <actual results and material failures, limitations, or unrun checks>
 State: <revision/Todo status, checkout and delivery state; preserved work if relevant>
 Cleanup: <verified disposal, none created, or exact retained resources and next action>
 ```
-
-If eligible, append only the exact
-[PR offer](../../shared/pr-offer/SKILL.md#offer-once-at-completion) as the final line.

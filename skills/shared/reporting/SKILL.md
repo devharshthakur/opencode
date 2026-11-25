@@ -19,8 +19,7 @@ Never invent results, hashes, links, or savings. Redact secrets. No automatic
 next-phase execution or publishing.
 
 Workers follow the [`agent-handoff` skill](../agent-handoff/SKILL.md) and the
-role's compact result template; they never offer PRs or publish. The parent gives
-the user a concise summary, not the worker report. After completed development,
-repair, or commit work, the parent follows [`pr-offer`](../pr-offer/SKILL.md).
-After authorized PR delivery, use the [PR chat result](../../pr/references/templates.md#chat-result);
+role's compact result template; they never publish. The parent gives the user a
+concise summary, not the worker report. Never offer or suggest a PR. After an
+explicit `/pr`, use the [PR chat result](../../pr/references/templates.md#chat-result);
 on success reply with only the verified PR URL.

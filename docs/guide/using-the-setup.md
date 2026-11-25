@@ -16,7 +16,7 @@ is how to use it in your day-to-day work.
 | Find bugs, security issues, or cleanup opportunities | `dev` | `/improve:quick` or `/improve:security` |
 | Delegate a multi-step build to subagents | `dev` | `/use:worker` (or `@worker`) |
 | Create clean local commits | `dev` | `/commit` |
-| Push and open a GitHub pull request | `dev` | `/pr` or `/pr draft` |
+| Push and open a GitHub pull request | `dev` | `/pr`, `/pr draft`, or `/pr :dev @upstream` |
 
 ## Walkthrough: your first real task
 
@@ -88,8 +88,10 @@ Once you are happy with the local changes, choose how you want to deliver them:
 - Run **`/commit`** to review proposed commit messages, file counts, and groupings in a table before
   anything is staged or committed. Reply `approve c1` (or run `/approve`) to create the
   series; any change to the grouping or messages gets a new ID, such as `c2`.
-- Run **`/pr`** (or **`/pr draft`**) when you are ready to commit task changes, push
-  the branch, and open or update a GitHub pull request.
+- Run **`/pr`** (or **`/pr draft`**) when you want to commit changes, push the
+  branch, and open or update a GitHub pull request into `main`. The agent never offers
+  this for you. Use `:<branch>` for another base and `@<remote>` to target another
+  repository, such as `@upstream` from a fork.
 
 ## Everyday patterns
 
