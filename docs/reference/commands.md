@@ -13,7 +13,7 @@ they do not broaden authority.
 | `/setup <sources...>` | Plan a customized setup from docs, URLs, attachments, or skills | After approval |
 | `/create:skill <idea>` | Design a local skill, then create it after design confirmation | After confirmation |
 
-`/plan*`, `/fix`, `/commit*`, and `/pr` pre-fill a read-only Git snapshot (`git status`, recent log or diff stat) through fixed `!` blocks that never include your arguments. `/plan`, `/setup`, and `/ask` ask clarifying questions until the task is unambiguous.
+`/plan*`, `/setup`, `/fix`, `/commit*`, and `/pr` pre-fill a read-only Git snapshot (`git status`, recent log or diff stat) through fixed `!` blocks that never include your arguments. `/plan`, `/setup`, and `/ask` ask clarifying questions until the task is unambiguous.
 
 `/plan` uses local `HEAD` as the base and keeps delivery local and uncommitted.
 Planning does not edit files, install dependencies, or mutate Git.

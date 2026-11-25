@@ -9,6 +9,9 @@ metadata:
 
 Read the [shared planning procedure](../shared/planning.md) before discovery.
 Plan local, uncommitted setup in the current checkout from local `HEAD`.
+Resolve reliance on dirty original-checkout work before approval; never copy
+dirty files or credentials automatically. The executor verifies the local base
+after approval; do not fetch.
 
 ## Find the applicable recipe
 
