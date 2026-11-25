@@ -46,7 +46,7 @@
     { "action": "read", "resource": "*.pypirc", "effect": "ask" },
     { "action": "read", "resource": "*.aws/credentials*", "effect": "ask" },
   ],
-  "compaction": { "auto": false, "keep": { "tokens": 30000 } },
+  "compaction": { "auto": false, "background": false, "keep": { "tokens": 0 } },
   "experimental": { "todo": true },
   "mcp": {
     "servers": {
