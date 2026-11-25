@@ -69,7 +69,7 @@ not use `/fix`'s disposable-diagnosis workflow or authorize commits or publishin
 | `/commit:auto [scope]` | Create coherent local commits | Invocation authorizes scoped local commits |
 | `/pr [:<base>] [draft]` | Commit task changes, push, and create or update a PR | Invocation authorizes the task-scoped PR flow |
 
-`/commit` shows commit messages and per-commit file counts before it acts.
+`/commit` always shows the planned series as a table (ID, Type, Subject, Body, Files) before it acts.
 `/commit:auto` still stops for secrets, unclear ownership, or staged changes outside
 a narrower scope. `/pr` defaults to `main`, rejects invalid arguments, and never
 force-pushes, merges, deploys, or closes issues.

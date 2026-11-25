@@ -85,7 +85,7 @@ local and uncommitted so you can inspect them freely.
 
 Once you are happy with the local changes, choose how you want to deliver them:
 
-- Run **`/commit`** to review proposed commit messages and file groupings before
+- Run **`/commit`** to review proposed commit messages, file counts, and groupings in a table before
   anything is staged or committed. Reply `approve c1` (or run `/approve`) to create the
   series; any change to the grouping or messages gets a new ID, such as `c2`.
 - Run **`/pr`** (or **`/pr draft`**) when you are ready to commit task changes, push

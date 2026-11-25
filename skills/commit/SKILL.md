@@ -14,6 +14,12 @@ about commit messages does not approve staging.
 Use the [fixed output templates](references/output.md) for all callers,
 including automatic and PR-scoped commits. Keep exact messages verbatim.
 
+**Mandatory table:** every commit proposal, standalone result, and standalone blocker
+MUST open with the commit table from `references/output.md`, for every caller and
+every display request. Read that file before composing any of them. Prose, lists,
+per-commit code blocks, or a reply without the table are invalid; rewrite before
+sending. A request to change the display format does not waive this.
+
 ## Inspect
 
 1. Read `../git-isolation/scripts/preflight.sh`, then run it in the checkout.
@@ -45,7 +51,9 @@ including automatic and PR-scoped commits. Keep exact messages verbatim.
   concerns share a path, keep that path in one commit or stop for a revised grouping.
   When the caller requests one commit or a specific grouping, follow that instead.
 - Retain the exact path-to-commit mapping and full messages for execution. Present
-  the ordered messages and file counts, not individual paths, unless asked.
+  the ordered messages and file counts as the commit table in `references/output.md`,
+  not individual paths, unless asked. Requested branch or merge steps go in its
+  Item/Value table.
   With confirmation required, obtain direct approval before staging or committing,
   using the [approval gate protocol](../shared/approval-handoff/SKILL.md#approval-gate-protocol)
   (`c<N>` IDs, resolution rules, scope re-check).
@@ -75,6 +83,18 @@ including automatic and PR-scoped commits. Keep exact messages verbatim.
    or folding the failure into a later commit.
 3. Verify each hash, complete message, included files, the final remaining changes,
    and staged status. Report actual validation and leave commits local.
+
+## Pre-send check
+
+Before sending any proposal, result, or blocker, verify:
+
+1. The reply opens with the commit table from `references/output.md`.
+2. The table has exactly the columns `ID`, `Type`, `Subject`, `Body`, `Files`.
+3. Every commit is one row. No commit is described only in prose or a code block.
+4. Branch, merge, push/PR, check, and remaining-state details are Item/Value rows,
+   not prose.
+
+If any check fails, rewrite the reply before sending.
 
 At standalone completion, load and follow the [`pr-offer` skill](../shared/pr-offer/SKILL.md).
 When invoked inside `pr`, return local commit evidence to that workflow instead;

@@ -1,72 +1,102 @@
 # Commit output
 
-Use these Markdown layouts in chat. Keep labels and order. Replace every
-placeholder; do not add a recap. Keep the tables in caveman mode. Use exactly
-three columns: `ID`, `Commit message`, and `Files`. Use one row per commit in
-execution order, with sequential IDs starting at 1. For a title-only commit,
-show only the subject in the `Commit message` cell, without a label. If the
-message has a body or footers, show `title: ` before the subject, then
-`<br>description: ` and the full remaining message in the same cell.
-Never add a separate description list or totals row. Omit routine inspection
-narration. Do not list individual paths or hashes unless asked. Escape Markdown syntax and use `<br>`
-for line breaks within the cell, including blank lines. The labels and escapes
-are display only; use the original verbatim message when committing.
-Count planned files in the proposal and verified files in results.
+## Mandatory table
 
-## Commit series
+Every commit proposal, standalone result, and standalone blocker MUST open with the
+commit table below, for every caller and every display request. Tables are required
+even in caveman mode and even when the user does not ask for one.
 
-```markdown
-| ID | Commit message | Files |
-| ---: | --- | ---: |
-| 1 | title: <subject><br>description: <body and footers> | <number> |
-| 2 | <subject without a body or footers> | <number> |
+Invalid output, which must be rewritten before sending:
 
-<approval line only when confirmation is required>
-```
+- prose, bullet lists, or per-commit code blocks in place of table rows;
+- a commit table with columns other than `ID`, `Type`, `Subject`, `Body`, `Files`;
+- branch, merge, push/PR, check, or remaining-state details written as prose
+  instead of Item/Value rows.
 
-For `/commit`, end with the
-[approval gate prompt](../../shared/approval-handoff/SKILL.md#approval-gate-protocol):
+## Commit table
 
-```text
+Columns, exactly in this order:
+
+- `ID`: sequential from 1 in execution order.
+- `Type`: the `type(scope)` prefix exactly as in the verified message, with `!` if
+  present (for example `feat`, `chore(config)`).
+- `Subject`: the description after the prefix, verbatim, without a trailing period.
+- `Body`: the body and footers, with `<br>` for each line break and each blank line.
+  Use `-` when the message has no body or footers.
+- `Files`: planned file count in a proposal; verified file count in a result.
+
+Do not list individual paths or hashes unless asked. Escape Markdown syntax inside
+cells. The table is display only: commit the original verbatim message, one `-m` per
+paragraph.
+
+## Item/Value table
+
+Use this table after the commit table, with only the rows that apply:
+
+- `Branch`, `Merge`, `Push / PR` in a proposal (`Push / PR` is `none` unless authorized).
+- `Checks`, `Remaining` in a standalone result.
+- `Blocked`, `Remaining`, `Next` in a standalone blocker.
+- `Committed` with value `none` when no commit succeeded.
+
+No totals row and no separate description list.
+
+## Commit series (proposal)
+
+````markdown
+| ID | Type | Subject | Body | Files |
+| ---: | --- | --- | --- | ---: |
+| 1 | <type(scope)> | <subject> | <body and footers with <br>, or -> | <planned number> |
+| 2 | <type(scope)> | <subject> | - | <planned number> |
+
+| Item | Value |
+| --- | --- |
+| Branch | <name, when requested> |
+| Merge | <method and target, when requested> |
+| Push / PR | none |
+
 Gate: commit c<N>
 Ready to stage and create this exact series, without amend, push, or PR.
 Reply `approve c<N>` (or `/approve`) to proceed, or describe changes.
-```
+````
 
+The `Gate` block is plain text per the
+[approval gate protocol](../../shared/approval-handoff/SKILL.md#approval-gate-protocol).
 Substitute the series ID (`c1` first; increment on any change to paths, grouping, or
-messages). Wait for approval and follow the protocol's resolution rules. For `/commit:auto` and
-commits inside `/pr`, omit that line and proceed within approved scope.
+messages). For `/commit:auto` and commits inside `/pr`, omit the gate block and proceed
+within approved scope.
 
 ## Standalone result
 
-```markdown
-| ID | Commit message | Files |
-| ---: | --- | ---: |
-| 1 | title: <verified subject><br>description: <verified body and footers> | <number> |
-| 2 | <verified subject without a body or footers> | <number> |
+````markdown
+| ID | Type | Subject | Body | Files |
+| ---: | --- | --- | --- | ---: |
+| 1 | <verified type(scope)> | <verified subject> | <verified body and footers, or -> | <verified number> |
 
-Checks: <actual validation or not run>
-Remaining: <relevant changes and index status, or clean>
-```
+| Item | Value |
+| --- | --- |
+| Checks | <actual validation, or not run> |
+| Remaining | <relevant changes and index status, or clean> |
+````
 
-Use one row per verified commit. For an empty scope, say `Nothing to
-commit.` and stop. Append only the exact
-[PR offer](../../shared/pr-offer/SKILL.md#offer-once-at-completion) when eligible.
-Inside `/pr`, omit this result and hand verified commit evidence to the PR
-workflow; use its result template once.
+Use one row per verified commit. For an empty scope, output only an Item/Value table
+with the row `Result | Nothing to commit.`, then stop.
+Append only the exact [PR offer](../../shared/pr-offer/SKILL.md#offer-once-at-completion)
+when eligible. Inside `/pr`, omit this result and hand verified commit evidence to the
+PR workflow; use its result template once.
 
 ## Standalone blocker
 
-```markdown
-Blocked: <precise blocker>
+````markdown
+| ID | Type | Subject | Body | Files |
+| ---: | --- | --- | --- | ---: |
+| 1 | <verified type(scope)> | <verified subject> | <verified body and footers, or -> | <verified number> |
 
-| ID | Commit message | Files |
-| ---: | --- | ---: |
-| 1 | title: <verified subject><br>description: <verified body and footers> | <number> |
-| 2 | <verified subject without a body or footers> | <number> |
+| Item | Value |
+| --- | --- |
+| Blocked | <precise blocker> |
+| Remaining | <uncommitted work and index state> |
+| Next | <smallest safe action or decision> |
+````
 
-Remaining: <uncommitted work and index state>
-Next: <smallest safe action or decision>
-```
-
-If no commit succeeded, replace the table with `Committed: none`.
+If no commit succeeded, omit the commit table and show only the Item/Value table with
+`Committed | none` as its first row, followed by `Blocked`, `Remaining`, and `Next`.

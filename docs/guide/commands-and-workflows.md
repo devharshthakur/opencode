@@ -90,7 +90,7 @@ authorizes commits or pushes.
 
 | Command | What it does | Approval gate |
 | :--- | :--- | :--- |
-| `/commit [scope]` | Proposes clean, grouped commit messages and file counts | Waits for `approve c1` (or `/approve`) before staging or committing |
+| `/commit [scope]` | Proposes clean, grouped commit messages and file counts in a required table | Waits for `approve c1` (or `/approve`) before staging or committing |
 | `/commit:auto [scope]` | Creates scoped local commits directly | Running the command authorizes local commits (still stops for secrets or unclear scope) |
 | `/pr [:<base>] [draft]` | Commits task changes, pushes, and opens or updates a GitHub PR | Running the command authorizes the task-scoped PR flow |
 

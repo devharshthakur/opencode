@@ -47,7 +47,7 @@ offer replies, create/update, custom bases, and draft delivery.
    Validate the name, avoid collisions, and verify the destination branch/status.
    Never push directly to a base/protected branch. No new worktree is needed.
 3. If task changes are uncommitted, load `commit` using the skill tool with exact
-   task scope and `Confirmation policy: not-required`. Present messages/file counts and
+   task scope and `Confirmation policy: not-required`. Output the commit table from the commit skill's output template and
    commit only attributable changes. The inner commit stops at local verification;
    this skill alone owns subsequent publication and the final response.
 4. Verify the remote base/head without implicit merge/rebase. Fetch only the
