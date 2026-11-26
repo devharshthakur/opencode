@@ -18,7 +18,9 @@ Commands pre-fill read-only, local-only context through fixed `!` blocks that ne
 - `/plan*`, `/setup`, `/fix`: Git status and recent log.
 - `/commit*`: `preflight.sh` output (branch, every untracked file, staged/unstaged statistics) and `conventions.sh` output (recent commit subjects, commit-convention files).
 - `/pr`: `preflight.sh` output and recent commits. The agent then runs `pr-target.sh` once with your arguments quoted; it resolves remotes, base, head branch action, author/merge checks, `gh` auth, and existing PRs without mutating anything.
-- `/improve*`, `/setup`: `recon.py` project inventory (instructions, manifests, package managers, scripts, task targets, CI, tooling). `/plan`, `/setup`, and `/ask` ask clarifying questions until the task is unambiguous.
+- `/improve*`, `/setup`: `recon.py` project inventory (instructions, manifests, package managers, scripts, task targets, CI, tooling).
+
+`/plan`, `/setup`, and `/ask` ask clarifying questions until the task is unambiguous.
 
 `/plan` uses local `HEAD` as the base and keeps delivery local and uncommitted.
 Planning does not edit files, install dependencies, or mutate Git.
